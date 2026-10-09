@@ -1,0 +1,29 @@
+{
+ "key": "freeze-sticker",
+ "pack": "sticker",
+ "imported": "2026-10-08",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the sticker page replaces the picture and the handwritten notes are its words, so the reel's captions are hidden from the freeze on",
+ "reel_env": [],
+ "in_a_reel": [
+  "the buyer's style wins: set the note typeface, INK, ACCENT and PAGE from the reel's caption style before building (effects/INDEX.md, \"Restyling an effect's own words\")",
+  "F_OUT = None (the default) ends the slot on the sticker: put the slot at the end of the reel or end it on a cut. With an out frame the picture cuts back hard to plain footage",
+  "start the slot before F_FREEZE so its first frame is live picture, and LOOK at work/frames.jpg before baking: eyes open, no motion blur, no hand across the face. That one still is the whole effect",
+  "leave GRADE = '' (the reel owns the look). NOTES are the buyer's own words: never a number, result, handle or keyword the speaker does not say"
+ ],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # 1. word onsets as frames",
+  "edit put the word's onset in F_FREEZE (and note frames, F_OUT) in the CLIP block of build.py",
+  "run bake.py frames      # 2. LOOK at work/frames.jpg: eyes open, no motion blur, a good expression. This one still is the whole effect: move F_FREEZE if not",
+  "run bake.py      # 3. bakes the sticker and lays out the notes (5 s). Read its warnings, LOOK at work/check.jpg: border whole, green box on the head, notes clear of the sticker",
+  "run build.py SAFE=1      # page with the safe guide",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 1.0,1.4,1.5,1.8,2.4      # your own times: just before the freeze, the freeze, landed, each note written",
+  "run build.py      # 4. clean page (no guide), then render",
+  "hf render",
+  "run check.py"
+ ]
+}

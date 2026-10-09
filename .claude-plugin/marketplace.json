@@ -1,0 +1,15 @@
+{
+  "name": "creator-studio",
+  "owner": {
+    "name": "Marc Cleroux",
+    "url": "https://github.com/tenfoldmarc"
+  },
+  "description": "Claude Creator Studio by Marc Cleroux (@tenfoldmarc).",
+  "plugins": [
+    {
+      "name": "video-studio",
+      "source": "./video-studio",
+      "description": "Turns raw 9:16 talking-head clips into a finished Instagram reel in the look you saved in the Studio Picker: best takes, cuts, captions, effects and sound."
+    }
+  ]
+}

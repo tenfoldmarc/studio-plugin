@@ -1,0 +1,37 @@
+{
+ "key": "spotlight",
+ "pack": "spotlight",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the key words are the caption while the lights are down (KEYWORDS). To let the reel's captions carry the words instead, build with CAPTIONS=0 (lights only) and keep the reel captions on for the slot",
+ "reel_env": [],
+ "in_a_reel": [
+  "the buyer's style wins: set FONT, the case of KEYWORDS and their colour from the reel's caption style before building (effects/INDEX.md, \"Restyling an effect's own words\")",
+  "set F_IN a few frames after the slot starts and F_OUT before it ends, so the first and last frame are the plain picture. F_OUT = None only when the slot ends on a cut or at the end of the reel",
+  "leave GRADE = '' (the reel owns the look)",
+  "KEYWORDS are words the speaker says, one to three of them. Look at work/check_edge.jpg at full size before rendering: the cutout edge decides this effect"
+ ],
+ "sounds": {
+  "assets_fx/impact-bass-short.mp3": {
+   "from": "impact-bass-1",
+   "duration": 0.9,
+   "fade_out": [
+    0.27,
+    0.63
+   ]
+  }
+ },
+ "steps": [
+  "run onsets.py      # 1. prints word onsets as frames",
+  "edit the CLIP block in build.py: F_IN, F_OUT, KEYWORDS",
+  "run prep.py      # 2. measures and bakes (1 to 3 min). LOOK at work/check_edge.jpg (full size) and work/check_sheet.jpg",
+  "run build.py SAFE=1      # 3. places the words and prints each ink box. It stops if a word is on the face or outside the safe zone",
+  "hf lint",
+  "hf snapshot --at 1.0,2.4,2.7,3.4,3.7      # your own times: before F_IN, both words on, mid hold, mid release, after",
+  "run build.py      # 4. the clean page (no guide), then render",
+  "hf render",
+  "run check.py      # 5. frame count and plain frames at both ends, writes work/final_sheet.jpg and work/final_edge.jpg"
+ ]
+}

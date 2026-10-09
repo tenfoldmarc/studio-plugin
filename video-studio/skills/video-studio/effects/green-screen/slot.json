@@ -1,0 +1,36 @@
+{
+ "key": "green-screen",
+ "pack": "green-screen",
+ "imported": "2026-10-08",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions stay on in the caption style the buyer picked. The speaker is shrunk to the bottom of the frame, so the captions move to the line above the head: build.py prints the fx_add.py --caption-y value to use. Only a reel with no captions at all (caption style 'none') uses this effect's own CAPS words: then build without CAPTIONS=0 and add the slot with --captions hide",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0 and add the slot with the --caption-y value build.py prints: the buyer's captions sit on the line above the speaker's head, in their style. Look at one reel snapshot inside the slot; a tall caption style may need SIZE = 'small'",
+  "leave IN_FRAME / OUT_FRAME at their defaults (or a spoken word) so the first and last frame of the slot are the plain picture. HARD_IN / HARD_OUT only where the reel itself cuts on that frame",
+  "keep GRADE = 'none' (the reel owns the look) and the wallpaper neutral",
+  "after ANY change to the CLIP block run prep.py again before build.py, and LOOK at work/layout.jpg: the background's subject must not sit behind the speaker (SIDE, SIZE, reframe)",
+  "only when the effect draws its own words (a reel with no caption style): they are the speaker's own, read the auto lines once and fix mishearings in CAP_FIX"
+ ],
+ "sounds": {},
+ "steps": [
+  "do ask the buyer what goes behind them: their own clip or picture of the thing they are talking about (copy it into <slot>/bg/). When it is someone else's footage, ask for that person's handle and set credit to it; never invent a handle. No material from the buyer = no Green Screen: leave it out and say so",
+  "run prep.py words      # copy the user's file(s) into ./bg; 1. every word with its frame -> edit the CLIP block in build.py",
+  "run prep.py      # 2. measures the cutout, cuts the bg files, work/layout.json + work/layout.jpg (LOOK)",
+  "run build.py SAFE=1 CAPTIONS=0      # 3. page with the guide; prints boxes, the --caption-y value, snapshot times",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py CAPTIONS=0      # 4. guide off",
+  "hf render",
+  "run check.py      # 5. frame count, plain edges, cut frames, face / body rows, sheet, stills, phone copy"
+ ],
+ "buyer_folder": {
+  "name": "bg",
+  "min": 1,
+  "what": "the buyer's own video (mp4, mov, webm) or picture (png, jpg) of the thing they are talking about. Only material they may show"
+ }
+}

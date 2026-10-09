@@ -1,0 +1,34 @@
+{
+ "key": "before-and-after",
+ "pack": "before-after",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions run through the wipe in the caption style the buyer picked (the tags stay). Only a reel with no captions at all (caption style 'none') uses this effect's own CAPS words",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0: the buyer's captions carry the words on both sides of the line. The after look is the grade, the shade and the push-in; raise AFTER_GRADE if the change does not read at phone size",
+  "OUT = 'auto' (the look eases off in the last 0.6 s and the slot ends on the plain picture). OUT = None only when the slot ends on a cut or at the end of the reel",
+  "start the slot at least 0.3 s before the payoff word and leave 1.5 s or more after the sweep, or the after look has no time to be seen",
+  "the two tags say 'before' and 'after' or the buyer's own two words: no claim, number or result on screen that the buyer did not give"
+ ],
+ "sounds": {},
+ "steps": [
+  "run measure.py      # words with measured starts and where the head is, then edit the CLIP block in build.py",
+  "run prep_after.py      # ONLY when AFTER names your own file (skip it otherwise): makes assets/after.mp4 and checks it lines up",
+  "run build.py SAFE=1 CAPTIONS=0      # prints the wait position, sweep times, caption lines and every warning (!!)",
+  "hf lint",
+  "hf snapshot --at 0.1,2.0,3.0      # use your own times: tag in, line waiting, mid sweep, after look",
+  "run build.py CAPTIONS=0      # guide off",
+  "hf render",
+  "run check.py      # frame count, plain edges, both sides while the line waits, sheet, stills, phone copy"
+ ],
+ "buyer_folder": {
+  "name": "after",
+  "min": 0,
+  "what": "optional: the buyer's own finished version of the SAME frames (same take, 9:16, no punch-in or speed change). Empty = the after side is made in the slot"
+ }
+}

@@ -1,0 +1,26 @@
+{
+ "key": "comment-bubble",
+ "pack": "comment-bubble",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the thread sits where the captions go",
+ "reel_env": [],
+ "in_a_reel": [
+  "the buyer's style wins: set WORD_FONT, TEXT_FONT, UPPER and the three colours in the CLIP block from the reel's caption style before building (effects/INDEX.md, \"Restyling an effect's own words\")",
+  "set PUSH = 1 and GRADE = '' unless the slot ends on a cut (the plate must match its neighbours)",
+  "set T_OUT so the thread leaves before the slot ends, unless the slot ends on a cut or at the end of the reel"
+ ],
+ "sounds": {},
+ "steps": [
+  "run measure.py      # onsets + suggested times; LOOK at work/measure_check.jpg and work/avatar_check.jpg",
+  "edit the CLIP block in build.py (texts, the suggested times, AVATAR_FRAME)",
+  "run build.py SAFE=1",
+  "hf lint",
+  "hf snapshot --at <T_IN+.3,T_TYPE+.1,T_SEND,T_SEND+.2,T_DOTS+.1,T_REPLY+.15,T_LINK+.2,end-.05>",
+  "run build.py      # must print 0",
+  "hf render",
+  "run check.py      # frame count + work/check/full.jpg and band.jpg from the FINAL mp4"
+ ]
+}

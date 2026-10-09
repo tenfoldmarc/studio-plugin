@@ -1,0 +1,26 @@
+{
+ "key": "pointer-callout",
+ "pack": "pointer-callout",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the reel's captions stay on: the cards sit on clear background beside or above the speaker. If build.py puts a card over the body where the caption band is, add fewer or shorter cards, or hide the reel captions for the slot (--hide-captions a-b)",
+ "reel_env": [],
+ "in_a_reel": [
+  "keep GRADE = 'none' (the reel owns the look)",
+  "cards come on at IN_F at the earliest and everything is gone 6 frames before the slot ends, so both edges are the plain picture. Each card needs 1 s on screen",
+  "card text is the buyer's own words for the things they name in the clip: no number, result or claim they do not say"
+ ],
+ "sounds": {},
+ "steps": [
+  "run track.py      # measure the head, the tie points, the open space and the word starts (about 30 s); read what it prints",
+  "edit the CLIP block in build.py, then build with the guide on; a line starting with !! is a stop or a warning to act on",
+  "run build.py SAFE=1",
+  "hf lint",
+  "hf snapshot --at 3.6,4.5      # snapshot 0.6 s after the last card lands and 0.5 s before the end (seconds; build.py prints the landing frames)",
+  "run build.py      # build without the guide, then render",
+  "hf render",
+  "run check.py      # numbers, sheet, lock crops, stills, phone copy"
+ ]
+}

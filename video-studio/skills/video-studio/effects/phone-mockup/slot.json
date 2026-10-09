@@ -1,0 +1,35 @@
+{
+ "key": "phone-mockup",
+ "pack": "phone-mockup",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions carry the words. The phone sits beside the head; if build.py prints that it reaches the caption band, make it smaller (PHONE_W) or raise it (PHONE_TOP)",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "set IN_FRAME a few frames after the slot starts and OUT_FRAME at least 14 frames before it ends (the phone is gone 12 frames after OUT_FRAME), so both edges are the plain picture",
+  "keep GRADE = 'none' (the reel owns the look)",
+  "the packaged card shows only words the speaker says in the clip: no numbers, names or claims that are not theirs"
+ ],
+ "sounds": {},
+ "steps": [
+  "do ask the buyer what goes on the phone: their own screen recording or picture (copy it into <slot>/screen/ and set SCREEN), or the packaged card typed from what they say in the clip (SCREEN = None, replace every placeholder). Only a screen that is theirs to show. Neither a file nor words that fit a card = no Phone Mockup: leave it out and say so",
+  "run measure.py      # every word with the frame a tap would land on, where the speaker is",
+  "edit copy the buyer's file into screen/ (if any), edit the CLIP block in build.py",
+  "run prep.py      # soft cutout for the dark phone (+ the screen file cut to the slot), about 1 min",
+  "run build.py SAFE=1 CAPTIONS=0      # prints side, size, bounds, tap frames, warnings (!!) and snapshot times",
+  "hf lint",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py CAPTIONS=0      # guide off",
+  "hf render",
+  "run check.py      # frame count, plain first / last frame, safe zone, tap points, sheet, stills, phone copy"
+ ],
+ "buyer_folder": {
+  "name": "screen",
+  "min": 0,
+  "what": "optional: the buyer's own screen recording (mp4, mov, webm) or picture (png, jpg) for the phone. Empty = the packaged card with the buyer's words"
+ }
+}

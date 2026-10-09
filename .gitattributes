@@ -1,0 +1,9 @@
+# Plain git only: Claude never downloads Git LFS files, so the preview clips must stay regular files.
+*.mp4 binary
+*.webm binary
+*.woff2 binary
+*.ttf binary
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.html text eol=lf

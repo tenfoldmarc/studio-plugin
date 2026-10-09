@@ -1,0 +1,219 @@
+{
+ "configKey": "effects",
+ "jobs": [
+  "Hook",
+  "Explain",
+  "Proof",
+  "CTA"
+ ],
+ "effects": [
+  {
+   "n": 1,
+   "key": "orbit",
+   "name": "Orbit",
+   "job": "Hook",
+   "line": "Your own reels circle around you.",
+   "preview": "previews/effects/orbit.mp4"
+  },
+  {
+   "n": 5,
+   "key": "frame-break",
+   "name": "Frame Break",
+   "job": "Hook",
+   "line": "The video shrinks into a card and you pop out of it.",
+   "preview": "previews/effects/frame-break.mp4"
+  },
+  {
+   "n": 6,
+   "key": "type-wall",
+   "name": "Type Wall",
+   "job": "Hook",
+   "line": "Giant words march behind you and swap as you talk.",
+   "preview": "previews/effects/type-wall.mp4"
+  },
+  {
+   "n": 8,
+   "key": "digital-zoom",
+   "name": "Digital Zoom",
+   "job": "Hook",
+   "line": "A slow creep onto your face, then a hard snap on the key word.",
+   "preview": "previews/effects/digital-zoom.mp4"
+  },
+  {
+   "n": 16,
+   "key": "headline-wall",
+   "name": "Headline Wall",
+   "job": "Hook",
+   "line": "The wall behind you fills with headlines.",
+   "preview": "previews/effects/headline-wall.mp4"
+  },
+  {
+   "n": 17,
+   "key": "zoom-through-cut",
+   "name": "Zoom-Through Cut",
+   "job": "Hook",
+   "line": "The camera dives through you into the next shot.",
+   "preview": "previews/effects/zoom-through-cut.mp4"
+  },
+  {
+   "n": 18,
+   "key": "clone",
+   "name": "Clone",
+   "job": "Hook",
+   "line": "More of you pop up beside you, right on your words.",
+   "preview": "previews/effects/clone.mp4"
+  },
+  {
+   "n": 2,
+   "key": "couch-wall",
+   "name": "Couch Wall",
+   "job": "Explain",
+   "line": "Your reel covers become a grid on the wall behind you.",
+   "preview": "previews/effects/couch-wall.mp4"
+  },
+  {
+   "n": 3,
+   "key": "ui-world",
+   "name": "UI World",
+   "job": "Explain",
+   "line": "An app screen fills the frame and you stand in front of it.",
+   "preview": "previews/effects/ui-world.mp4"
+  },
+  {
+   "n": 7,
+   "key": "the-stack",
+   "name": "The Stack",
+   "job": "Explain",
+   "line": "Data cards with racing bars stack above you.",
+   "preview": "previews/effects/the-stack.mp4"
+  },
+  {
+   "n": 9,
+   "key": "sticky-text",
+   "name": "Sticky Text",
+   "job": "Explain",
+   "line": "A tag stuck to your cap or chest that moves with you.",
+   "preview": "previews/effects/sticky-text.mp4"
+  },
+  {
+   "n": 11,
+   "key": "spotlight",
+   "name": "Spotlight",
+   "job": "Explain",
+   "line": "The room goes dark, you stay lit, the key words land big.",
+   "preview": "previews/effects/spotlight.mp4"
+  },
+  {
+   "n": 13,
+   "key": "freeze-and-label",
+   "name": "Freeze and Label",
+   "job": "Explain",
+   "line": "The picture freezes and labels point at you.",
+   "preview": "previews/effects/freeze-and-label.mp4"
+  },
+  {
+   "n": 14,
+   "key": "phone-mockup",
+   "name": "Phone Mockup",
+   "job": "Explain",
+   "line": "A 3D phone flies in beside you, playing a screen.",
+   "preview": "previews/effects/phone-mockup.mp4"
+  },
+  {
+   "n": 15,
+   "key": "checklist",
+   "name": "Checklist",
+   "job": "Explain",
+   "line": "Each step ticks off as you say it.",
+   "preview": "previews/effects/checklist.mp4"
+  },
+  {
+   "n": 21,
+   "key": "pointer-callout",
+   "name": "Pointer Callout",
+   "job": "Explain",
+   "line": "Cards tied to you by lines that follow you around.",
+   "preview": "previews/effects/pointer-callout.mp4"
+  },
+  {
+   "n": 10,
+   "key": "odometer",
+   "name": "Odometer",
+   "job": "Proof",
+   "line": "Numbers roll up digit by digit, like a mileage counter.",
+   "preview": "previews/effects/odometer.mp4"
+  },
+  {
+   "n": 19,
+   "key": "before-and-after",
+   "name": "Before and After",
+   "job": "Proof",
+   "line": "A wipe line turns your raw clip into the edit.",
+   "preview": "previews/effects/before-and-after.mp4"
+  },
+  {
+   "n": 20,
+   "key": "chart-grow",
+   "name": "Chart Grow",
+   "job": "Proof",
+   "line": "A chart draws behind you and takes off on your word.",
+   "preview": "previews/effects/chart-grow.mp4"
+  },
+  {
+   "n": 4,
+   "key": "freeze-sticker",
+   "name": "Freeze Sticker",
+   "job": "CTA",
+   "line": "Your freeze frame becomes a die-cut sticker with handwritten notes.",
+   "preview": "previews/effects/freeze-sticker.mp4"
+  },
+  {
+   "n": 12,
+   "key": "comment-bubble",
+   "name": "Comment Bubble",
+   "job": "CTA",
+   "line": "The comment types itself, posts, and your reply with the link lands.",
+   "preview": "previews/effects/comment-bubble.mp4"
+  },
+  {
+   "n": 26,
+   "key": "green-screen",
+   "name": "Green Screen",
+   "job": "Explain",
+   "line": "You shrink to the bottom and the whole screen becomes what you're talking about.",
+   "preview": "previews/effects/green-screen.mp4"
+  },
+  {
+   "n": 25,
+   "key": "knockout-tiles",
+   "name": "Knockout Tiles",
+   "job": "Explain",
+   "line": "Name tiles slam onto the wall behind you and get knocked out one by one.",
+   "preview": "previews/effects/knockout-tiles.mp4"
+  },
+  {
+   "n": 23,
+   "key": "timeline-burn",
+   "name": "Timeline Burn",
+   "job": "Hook",
+   "line": "An editing timeline builds in front of you, then catches fire on your word.",
+   "preview": "previews/effects/timeline-burn.mp4"
+  },
+  {
+   "n": 22,
+   "key": "blackout",
+   "name": "Blackout",
+   "job": "Hook",
+   "line": "The lights cut on your line and snap back on the next one.",
+   "preview": "previews/effects/blackout.mp4"
+  },
+  {
+   "n": 24,
+   "key": "pull-back-reveal",
+   "name": "Pull-Back Reveal",
+   "job": "Proof",
+   "line": "The video shrinks into a card in an app window and you watch it get edited.",
+   "preview": "previews/effects/pull-back-reveal.mp4"
+  }
+ ]
+}

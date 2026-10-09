@@ -1,0 +1,35 @@
+{
+ "key": "orbit",
+ "pack": "orbit",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions stay on in the caption style the buyer picked. The near cards pass at chest height, so the captions move to the room under the ring: build.py prints the fx_add.py --caption-y value to use",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0 and add the slot with the --caption-y value build.py prints: the buyer's captions sit under the ring. Look at one reel snapshot inside the slot; if they do not fit there, lower CARD_W or RX, never switch the caption look",
+  "set F_IN to 5 or later and F_OUT at least 45 frames after it and 2 frames before the slot ends, so the slot starts and ends on the plain picture, unless the slot ends on a cut or at the end of the reel",
+  "leave GRADE = None (the reel owns the look)",
+  "COUNTS stays {} unless the buyer gives real view counts: never estimate or round up a number"
+ ],
+ "sounds": {},
+ "steps": [
+  "do ask the buyer for a folder of their own reel cover images (their saved covers, or covers exported from their profile) and copy them into <slot>/covers/ (fx_new.py --buyer-files <folder> does the copy). No covers from the buyer = no Orbit: leave it out and say so",
+  "run onsets.py      # copy the user's reel covers into ./covers  (create the folder; 4 or more images); 1. word onsets as frames -> F_IN, F_OUT, CAPS in build.py",
+  "run prep.py      # 2. cards + ring measured from the cutout (seconds)",
+  "edit LOOK at work/ring.jpg (red face box on the whole head, no yellow near card on it, no card in the red border), read the WARNING lines, fix the CLIP block and run prep.py again until it is right.",
+  "run build.py SAFE=1 CAPTIONS=0      # 3. page with the safe guide",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 1.0,1.5,2.0,2.5,3.0,3.5",
+  "run build.py CAPTIONS=0      # 4. clean page (no guide), then render",
+  "hf render"
+ ],
+ "buyer_folder": {
+  "name": "covers",
+  "min": 4,
+  "what": "the buyer's own reel cover images (jpg, png or webp; 6 fills the default ring)"
+ }
+}

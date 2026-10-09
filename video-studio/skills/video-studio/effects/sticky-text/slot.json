@@ -1,0 +1,26 @@
+{
+ "key": "sticky-text",
+ "pack": "sticky-text",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the reel's captions stay on. A 'chest' tag can sit where the reel's caption band is: look at one snapshot inside the slot, and if they touch, use anchor 'cap' or 'head' or hide the reel captions for the slot (--hide-captions a-b)",
+ "reel_env": [],
+ "in_a_reel": [
+  "keep GRADE = 'none' (the reel owns the look)",
+  "the tag comes on at IN_F at the earliest and leaves 9 frames before the slot ends, so both edges are the plain picture. Give it at least 1.5 s on screen",
+  "the tag text is the buyer's own word or two for the thing they are talking about: no number or claim they do not say"
+ ],
+ "sounds": {},
+ "steps": [
+  "run track.py      # measure the speaker's head, chest and the word starts (about 30 s); read what it prints",
+  "edit the CLIP block in build.py, then build with the guide on; fix every line that starts with !!",
+  "run build.py SAFE=1",
+  "hf lint",
+  "hf snapshot --at 1.0,2.2,3.8      # snapshot at landing + 0.3 s, the middle, and 0.5 s before the end (times in seconds)",
+  "run build.py      # build without the guide, then render",
+  "hf render",
+  "run check.py      # numbers, sheet, lock crops, stills, phone copy"
+ ]
+}

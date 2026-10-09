@@ -1,0 +1,24 @@
+{
+ "key": "freeze-and-label",
+ "pack": "freeze-label",
+ "imported": "2026-10-08",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the voice runs on under the freeze, so the reel's captions stay on. The chips go on clear background first: if work/layout.jpg shows a chip in the caption band, use fewer or shorter labels or hide the reel captions for the slot (--hide-captions a-b)",
+ "reel_env": [],
+ "in_a_reel": [
+  "LOOK at work/freeze_pick.jpg before rendering, every time: eyes open, sharp, a good expression. HOLD = 'auto' can pick a blink; change HOLD until the held frame is right",
+  "start the slot before the freeze word (frame 0 is live picture) and leave 13 frames or more of live picture after RELEASE. RELEASE = None only when the slot ends on a cut or at the end of the reel",
+  "label text is the buyer's own words for what they say in the clip: no number, result or claim they do not say"
+ ],
+ "sounds": {},
+ "steps": [
+  "run bake_freeze.py      # print the words with their start frames and check the cutout is finished",
+  "edit fill the CLIP block in build.py, then build (about 12 s); a line starting with !! is a stop or a warning to act on",
+  "run build.py",
+  "hf lint",
+  "hf render      # render",
+  "run check.py      # numbers, sheet, stills, phone copy"
+ ]
+}

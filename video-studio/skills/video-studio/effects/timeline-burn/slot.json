@@ -1,0 +1,26 @@
+{
+ "key": "timeline-burn",
+ "pack": "timeline-burn",
+ "imported": "2026-10-08",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the timeline's labels are the effect itself, not speech, so the reel's captions stay on in the buyer's style. The timeline sits in the chest band: add the slot with the fx_add.py --caption-y value build.py prints (the captions move to the line above the timeline). If build.py says there is no room for a caption line, add the slot with --captions hide instead",
+ "reel_env": [],
+ "in_a_reel": [
+  "before the first build set FONT, WEIGHT, CASE, TEXT, ACCENT and PALETTE in the STYLE block at the top of build.py to the buyer's caption or overall style (ACCENT = the reel's accent colour)",
+  "BURN_AT is a word the speaker says in the slot. The slot needs 30 frames or more before it (72 for the cursor edits) and 30 after it. Frame 0 and the last frame are plain footage by construction; the effect cannot end on a cut",
+  "DIM darkens the whole picture while the timeline is up and is back before the slot ends. Set DIM = 0 when the reel's overall style is already dark or the buyer does not want the room dimmed",
+  "labels and clip names are generic track names or the speaker's own words: no app name, no logo, no invented names or numbers"
+ ],
+ "sounds": {},
+ "steps": [
+  "run build.py words      # 1. every word with its frame -> BURN_AT in the CLIP block; reel style -> the STYLE block",
+  "run build.py SAFE=1      # 2. measures the face, places the timeline, page with the guide. Read the !! lines, LOOK at work/layout.jpg",
+  "hf lint      # must be 0 errors (a \"file too large\" warning is normal)",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # 3. guide off",
+  "hf render",
+  "run check.py      # 4. frame count, plain edges, burn frame, face, safe zone, sheet, stills, phone copy"
+ ]
+}

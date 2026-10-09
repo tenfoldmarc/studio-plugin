@@ -1,0 +1,18 @@
+{
+  "configKey": "style",
+  "groups": [
+    {"key": "her", "label": "For her"},
+    {"key": "him", "label": "For him"}
+  ],
+  "styles": [
+    {"n": 1, "group": "her", "key": "soft-hours", "name": "Soft Hours", "line": "Cozy and slow. A dim warm room, soft typed captions. Works faceless or on camera.", "captionStyle": "moodboard", "effects": ["phone-mockup", "checklist"], "preview": "previews/styles/soft-hours.mp4", "ready": true},
+    {"n": 2, "group": "her", "key": "glam-cam", "name": "Glam Cam", "line": "Studio beauty close-up. A jump zoom on every new thought, one serif word at a time.", "captionStyle": "vanity", "effects": ["digital-zoom", "ui-world", "phone-mockup"], "preview": "previews/styles/glam-cam.mp4", "ready": true},
+    {"n": 3, "group": "her", "key": "color-block", "name": "Color Block", "line": "A day in the life told in pieces, broken up by flat color cards and huge lowercase words.", "captionStyle": "loud-lowercase", "effects": ["phone-mockup", "freeze-and-label"], "preview": "previews/styles/color-block.mp4", "ready": true},
+    {"n": 4, "group": "her", "key": "camera-shy", "name": "Camera Shy", "line": "A tips list. Quick cuts, a pinned title, your points typed onto the frame. Works faceless or on camera.", "captionStyle": "moodboard", "effects": ["checklist", "odometer", "phone-mockup"], "preview": "previews/styles/camera-shy.mp4", "ready": true},
+
+    {"n": 5, "group": "him", "key": "chalk-talk", "name": "Chalk Talk", "line": "You on a dark studio backdrop, with hand-drawn marker titles and a rounded b-roll card.", "captionStyle": "none", "effects": ["pointer-callout", "sticky-text", "phone-mockup"], "preview": "previews/styles/chalk-talk.mp4", "ready": true},
+    {"n": 6, "group": "him", "key": "fireside", "name": "Fireside", "line": "One locked-off shot, warm lamp light, no cuts. The words do the work.", "captionStyle": "golden-hour", "effects": ["digital-zoom"], "preview": "previews/styles/fireside.mp4", "ready": true},
+    {"n": 7, "group": "him", "key": "raw-tape", "name": "Raw Tape", "line": "A sit-down left alone. A 4:3 picture, a faded film look, small yellow subtitles.", "captionStyle": "golden-hour", "effects": ["digital-zoom"], "preview": "previews/styles/raw-tape.mp4", "ready": true},
+    {"n": 8, "group": "him", "key": "show-and-tell", "name": "Show and Tell", "line": "You in a window at the bottom, a clean light canvas above for labels, cards and the call to action.", "captionStyle": "none", "effects": ["the-stack", "pointer-callout"], "preview": "previews/styles/show-and-tell.mp4", "ready": true}
+  ]
+}

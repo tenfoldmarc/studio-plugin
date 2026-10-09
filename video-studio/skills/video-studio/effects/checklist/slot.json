@@ -1,0 +1,29 @@
+{
+ "key": "checklist",
+ "pack": "checklist",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the card text is the caption while the list is read",
+ "reel_env": [
+  "GRADE=0"
+ ],
+ "in_a_reel": [
+  "the buyer's style wins: set the card's typeface, case and ACCENT from the reel's caption style before building (effects/INDEX.md, \"Restyling an effect's own words\")",
+  "set F_OUT so the card leaves before the slot ends, unless the slot ends on a cut",
+  "KEEP_OUT: add the reel's caption band if you keep the reel captions on"
+ ],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # add -v for the loudness strip; frames for ROWS, F_IN, F_DONE",
+  "run prep.py      # camera drift, head box, free room -> work/prep.json",
+  "edit the CLIP block in build.py (Edit tool)",
+  "run build.py SAFE=1 GRADE=0      # read what it prints: layer, glass/opaque, scale, WARNING lines",
+  "hf lint",
+  "hf snapshot --at <8+ times: build, each say+0.1s, each tick+0.1s, done+0.15s, end>",
+  "run build.py GRADE=0      # without SAFE",
+  "hf render",
+  "run check.py      # frame count, phone copy, work/final/sheet.jpg + ticks.jpg + edge.jpg"
+ ]
+}

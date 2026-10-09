@@ -1,0 +1,37 @@
+{
+ "key": "headline-wall",
+ "pack": "headline-wall",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the cards sit on the wall behind the speaker, so the reel's captions stay on. If cards reach the caption band, add that band to KEEP_OUT and run prep.py layout again",
+ "reel_env": [
+  "GRADE=0"
+ ],
+ "in_a_reel": [
+  "set PUSH = 1 and BUMP = 1 (the slot must hand back unmoved footage at both edges)",
+  "set F_OUT at least 12 frames before the slot ends, unless the slot ends on a cut or at the end of the reel",
+  "start the slot a few frames before F_START, so its first frame is plain footage"
+ ],
+ "sounds": {
+  "assets_fx/impact-bass-short.mp3": {
+   "from": "impact-bass-1",
+   "duration": 0.9,
+   "fade_out": [
+    0.27,
+    0.63
+   ]
+  }
+ },
+ "steps": [
+  "run onsets.py      # 1. word onsets as frames -> fill HEADLINES, HEROES, F_* in build.py",
+  "run prep.py      # 2. track + matte + layout (about 1 to 2 min). LOOK at work/layout.jpg (and work/trackcheck.jpg if the camera moves). Set WALL / HERO_FIRST_SIDE if needed, then",
+  "run prep.py layout      # re-layout only (seconds). Repeat until the picture is right",
+  "run build.py SAFE=1 GRADE=0      # 3. page with the safe guide",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 0.5,1.0,1.5,2.0,2.5,3.0",
+  "run build.py GRADE=0      # 4. clean page (no guide), then render",
+  "hf render"
+ ]
+}

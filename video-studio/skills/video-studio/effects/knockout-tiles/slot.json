@@ -1,0 +1,27 @@
+{
+ "key": "knockout-tiles",
+ "pack": "knockout-tiles",
+ "imported": "2026-10-08",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the tiles, receipts and total are the effect itself, not captions: the reel's captions keep running through the slot. Before building, set the STYLE block at the top of build.py to the reel's caption / overall style (typeface, case, weight, colours, order of wall spots)",
+ "reel_env": [],
+ "in_a_reel": [
+  "RECEIPTS_ON stays False unless the speaker names amounts; the total is the sum of the receipts and is never typed",
+  "start the slot 6 frames or more before the first name and leave 12 frames after the last piece: build.py says how many frames it needs. Leave F_IN / F_OUT at None so both edges are the plain picture",
+  "after ANY change to the CLIP block run prep.py again and LOOK at work/layout.jpg: no piece on a window, shelf or furniture (set WALL), none shrunk under 0.8"
+ ],
+ "sounds": {},
+ "steps": [
+  "do ask which names go on the tiles and, for receipts, which amounts: only names and amounts the speaker says in this clip or the buyer gave you. Never invent a name, a price or a count, never draw a logo. No spoken list = leave Knockout Tiles out and say so",
+  "run prep.py words      # 1. every word with its frame -> edit STYLE and CLIP in build.py",
+  "run prep.py      # 2. measures the cutout, places every piece -> work/layout.jpg (LOOK)",
+  "run build.py SAFE=1      # 3. page with the guide; prints every beat and the snapshot times",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # 4. guide off",
+  "hf render",
+  "run check.py      # 5. frame count, plain edges, face, work/check/sheet.jpg, phone copy"
+ ]
+}

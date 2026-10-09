@@ -1,0 +1,29 @@
+{
+ "key": "the-stack",
+ "pack": "the-stack",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions stay on in the caption style the buyer picked, in the band this layout leaves on the speaker's chest: build.py prints the fx_add.py --caption-y value to use",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0 and add the slot with the --caption-y value build.py prints: the buyer's captions sit in the caption band of the window. Look at one reel snapshot inside the slot; a tall caption style needs fewer card rows",
+  "set F_IN to 9 or later and F_OUT before the slot ends, so the slot starts and ends on the plain picture. F_OUT = None only when the slot ends on a cut or at the end of the reel",
+  "leave the GRADE switch off (the reel owns the look)",
+  "ACCENT is the buyer's brand colour or the reel's accent colour"
+ ],
+ "sounds": {},
+ "steps": [
+  "do get the figures from the buyer: every title, label, value and unit in CARDS comes from what is said in the clip or from figures the buyer gives. Never invent, estimate or round up a number, a name, a tool or a ranking. No figures from the buyer = no Stack: leave it out and say so",
+  "run onsets.py      # 1. word onsets as frames -> F_IN, F_OUT, at, win_at, CAPS in build.py",
+  "run measure.py      # 2. head from the cutout alpha -> work/head.json; LOOK at work/head.jpg",
+  "run build.py SAFE=1 CAPTIONS=0      # 3. page with the safe guide; read what it prints",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 0.5,1.0,1.5,2.0,3.0,4.0",
+  "run build.py CAPTIONS=0      # 4. clean page (no guide), then render",
+  "hf render"
+ ]
+}

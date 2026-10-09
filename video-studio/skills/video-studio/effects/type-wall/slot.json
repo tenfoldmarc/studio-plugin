@@ -1,0 +1,36 @@
+{
+ "key": "type-wall",
+ "pack": "type-wall",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the wall is the caption: the row over the head says every word as it is spoken",
+ "reel_env": [],
+ "in_a_reel": [
+  "the buyer's style wins: set the wall typeface, INK and ACCENT from the reel's caption style before building (effects/INDEX.md, \"Restyling an effect's own words\")",
+  "set IN_FRAME to the frame of the first wall word, a few frames after the slot starts, so the slot's first frame is the plain room",
+  "set OUT_FRAME a few frames before the slot ends (the room has to be back), unless the slot ends on a cut or at the end of the reel",
+  "the speaker sits on or behind furniture: draw its top edge in KEEP, or the speaker floats on the wall"
+ ],
+ "sounds": {
+  "assets_fx/impact-bass-short.mp3": {
+   "from": "impact-bass-1",
+   "duration": 0.9,
+   "fade_out": [
+    0.27,
+    0.63
+   ]
+  }
+ },
+ "steps": [
+  "run prep.py      # measure the speaker, then LOOK at work/measure.jpg (yellow line on top of the speaker's head, blue tint = everywhere the speaker goes)",
+  "run onsets.py -v      # 3. word frames from the audio; read the per-frame loudness strip for every wall word",
+  "edit the CLIP block in build.py: PHRASES always, KEEP when the speaker sits on or behind something.",
+  "run build.py SAFE=1      # build with the guide on, lint, look at snapshots (one per swap, one at the end); read its row table and any \"!!\" lines",
+  "hf lint",
+  "hf snapshot --at <times in seconds, comma separated>",
+  "run build.py      # render",
+  "hf render"
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "key": "chart-grow",
+ "pack": "chart-grow",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the chart sits on the wall behind the speaker, so the reel's captions stay on and carry the words (built with CAPTIONS=0: no tag on the chart)",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "keep PUNCH = 1.0 and GRADE = 'none' (the reel owns the look and the slot must hand back unmoved footage at both edges)",
+  "start the slot at least 1 s before the KICK word and leave 1.5 s or more after it. The chart is gone before the slot ends unless the slot ends on a cut or at the end of the reel",
+  "FIGURES, X_LABELS and TAG stay off unless the buyer gives real ones: never invent, estimate or round up a number. The default is a shape, not a claim"
+ ],
+ "sounds": {},
+ "steps": [
+  "run measure.py      # words with measured start frames, where the speaker is, camera still or moving (about 1 minute)",
+  "edit the CLIP block in build.py: KICK at least. FIGURES, X_LABELS and TAG stay off unless the speaker gave real ones",
+  "run build.py SAFE=1 CAPTIONS=0      # prints kick frame, where the chart sits, clearances, every warning starts with !!",
+  "hf lint",
+  "hf snapshot --at 1.2,3.0,3.6      # use your own times: mid draw, kick + 0.15 s, landing + 0.3 s",
+  "run build.py CAPTIONS=0      # guide off (it must print \"clean\")",
+  "hf render",
+  "run check.py      # frame count, plain first and last frame, kick frame against the word, sound level, sheet, stills, phone copy"
+ ]
+}

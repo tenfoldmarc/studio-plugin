@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Creator Studio: Studio Picker</title>
+<meta name="theme-color" content="#09090A">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Gothic:wdth@75..100&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,400..800;1,400..600&family=Martian+Mono:wdth,wght@75..112.5,400..700&display=swap">
+<script>
+/* Motion gate. Everything sits in its final state by default. Entrance motion only runs under .anim
+   (never with ?qa=1, never with reduced motion, never in a hidden tab). */
+(function () {
+  var r = document.documentElement;
+  var qa = /[?&]qa=1(&|$)/.test(location.search);
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  r.className += ' js' + (reduce ? ' noauto' : '') + (!qa && !reduce && !document.hidden ? ' anim' : '');
+})();
+</script>
+<style>
+/* ---------- The Studio at night: dark ground, cream plates, orange is light. Same set as the sales page. ---------- */
+@font-face {
+  font-family: 'LG Fallback';
+  src: local('Impact'), local('HelveticaNeue-CondensedBold'), local('Roboto Condensed Bold'), local('Arial Narrow Bold');
+  size-adjust: 80%;
+}
+:root {
+  --ground: #151517;
+  --black: #09090A;
+  --cream: #F4EDE0;
+  --cream-2: #DDD5C6;
+  --ink: #160903;
+  --ink-2: #47352A;
+  --rust: #9A3F12;
+  --orange: #FF5B1F;
+  --orange-press: #E04A12;
+  --taupe: #B4AA98;
+  --line: rgba(244, 237, 224, .15);
+  --line-2: rgba(244, 237, 224, .3);
+
+  --title: 'League Gothic', 'LG Fallback', Impact, 'Arial Narrow', sans-serif;
+  --body: 'Libre Franklin', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --gutter: 16px;
+  --wide: 1200px;
+  --cols: 2;
+  --gap: 12px;
+  --bar: 72px;
+  --out: cubic-bezier(.16, 1, .3, 1);
+}
+@media (min-width: 560px) { :root { --cols: 3; --gap: 16px; --gutter: 24px; } }
+@media (min-width: 860px) { :root { --cols: 4; --gutter: 40px; --bar: 80px; } }
+@media (min-width: 1100px) { :root { --cols: 5; --gap: 18px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--ground); scrollbar-color: #4a4338 var(--black); scroll-padding-top: 16px; scroll-padding-bottom: calc(var(--bar) + 24px); }
+body {
+  margin: 0; color: var(--cream); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  padding-bottom: calc(var(--bar) + env(safe-area-inset-bottom, 0px));
+}
+/* A practical lamp off the top right corner, and a little film grain over the ground. */
+.set { position: fixed; inset: 0; z-index: -1; pointer-events: none; background:
+  radial-gradient(900px 520px at 88% -8%, rgba(255, 91, 31, .13), rgba(255, 91, 31, 0) 62%),
+  radial-gradient(700px 600px at -10% 30%, rgba(180, 170, 152, .07), rgba(180, 170, 152, 0) 60%),
+  var(--ground); }
+.set::after { content: ''; position: absolute; inset: 0; opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+img, video { max-width: 100%; display: block; }
+h1, h2, h3, p { margin: 0; }
+button { font: inherit; color: inherit; }
+::selection { background: var(--orange); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; border-radius: 3px; }
+[hidden] { display: none !important; }
+.wrap { max-width: var(--wide); margin: 0 auto; padding: 0 var(--gutter); }
+.skip { position: absolute; left: 8px; top: -60px; z-index: 50; background: var(--cream); color: var(--ink); padding: 10px 14px; border-radius: 4px; font-weight: 650; }
+.skip:focus { top: 8px; }
+
+.t { font-family: var(--title); font-weight: 400; text-transform: uppercase; line-height: .9; letter-spacing: .012em; text-wrap: balance; }
+.mono { font-family: var(--mono); font-stretch: 80%; font-size: 10.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.job { font-family: var(--mono); font-stretch: 80%; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink); background: var(--cream); padding: 3px 7px 2px; border-radius: 2px; white-space: nowrap; line-height: 1.3; }
+.lamp { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; font-family: var(--mono); font-stretch: 78%; font-size: 12.5px;
+  font-weight: 600; letter-spacing: .07em; text-transform: uppercase; line-height: 1.2; color: var(--orange); }
+.lamp::before { content: ''; width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 91, 31, .22), 0 0 16px 4px rgba(255, 91, 31, .75); }
+
+/* ---------- Top letterbox bar ---------- */
+.top { height: 44px; background: var(--black); border-bottom: 1px solid var(--line); }
+.top .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--title); font-size: 20px; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap; line-height: 1; }
+.top .mono { color: var(--taupe); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.top .mono i { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 10px 2px rgba(255, 91, 31, .8); }
+@keyframes tally { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.anim .top .mono i { animation: tally 2.2s ease-in-out infinite; }
+
+/* ---------- Opening ---------- */
+.intro { padding-top: 30px; padding-bottom: 6px; }
+.title { font-size: clamp(60px, 15.5vw, 124px); line-height: .86; }
+.lede { margin-top: 12px; color: var(--cream-2); font-size: 18px; text-wrap: pretty; }
+@keyframes rackin { from { filter: blur(18px); opacity: 0; transform: scale(1.04); } to { filter: blur(0); opacity: 1; transform: none; } }
+.anim .title { animation: rackin 1s var(--out) both; transform-origin: 0 60%; }
+.anim .lede { animation: rackin .8s var(--out) .15s both; }
+
+/* Two ways in. Only on screen once an overall style exists. */
+.ways { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 26px; }
+.way {
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-start; text-align: left; cursor: pointer;
+  padding: 16px 16px 14px; border-radius: 8px; border: 1px solid var(--line-2); background: rgba(9, 9, 10, .35); color: var(--cream);
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s var(--out);
+}
+.way b { font-size: clamp(25px, 6.4vw, 40px); font-weight: 400; display: flex; align-items: center; gap: 10px; }
+.way b::before { content: ''; width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1.5px var(--taupe); }
+.way span { font-size: 14.5px; line-height: 1.3; color: var(--cream-2); }
+.way:hover { border-color: var(--cream); }
+.way[aria-selected="true"] { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+.way[aria-selected="true"] span { color: var(--ink-2); }
+.way[aria-selected="true"] b::before { background: var(--orange); box-shadow: 0 0 0 3px rgba(255, 91, 31, .22), 0 0 14px 3px rgba(255, 91, 31, .7); }
+
+/* ---------- Scenes ---------- */
+main { padding-bottom: 56px; }
+.sec { padding-top: 44px; scroll-margin-top: 8px; }
+.sec:focus { outline: none; }
+.slate { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+.clap { position: relative; width: 58px; height: 26px; flex: none; }
+.clap i, .clap::after { content: ''; position: absolute; left: 0; width: 58px; height: 9px; border-radius: 1.5px;
+  background: repeating-linear-gradient(-58deg, var(--cream) 0 7px, var(--black) 7px 14px); }
+.clap::after { bottom: 0; background: repeating-linear-gradient(58deg, var(--cream) 0 7px, var(--black) 7px 14px); }
+.clap i { bottom: 10px; transform-origin: 3px 100%; transition: transform .13s cubic-bezier(.6, 0, 1, .7); }
+.slate.armed .clap i { transform: rotate(-24deg); transition: none; }
+.slate-f { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding-bottom: 1px; color: var(--taupe); border-bottom: 1px solid var(--line); height: 26px; white-space: nowrap; }
+.slate-f b { font-weight: 600; color: var(--cream); }
+.slate-f span + span::before { content: ''; display: inline-block; width: 1px; height: 9px; background: var(--line-2); margin-right: 10px; vertical-align: -1px; }
+.slate-f .r { margin-left: auto; color: var(--orange); font-weight: 600; }
+.slate-f .r::before { display: none !important; }
+@keyframes clapline { 0% { border-bottom-color: var(--orange); } 100% { border-bottom-color: var(--line); } }
+.slate.clapped .slate-f { animation: clapline .9s ease-out both; }
+.h2 { font-size: clamp(44px, 11.5vw, 76px); }
+.note { margin-top: 10px; color: var(--cream-2); font-size: 16.5px; max-width: 34em; text-wrap: pretty; }
+.sec-hd { margin-bottom: 22px; }
+
+/* ---------- The grid of clips ---------- */
+.grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--gap); }
+.card { position: relative; display: flex; min-width: 0; transition: opacity .6s var(--out), transform .8s var(--out), filter .6s var(--out); transition-delay: calc(var(--i, 0) * 45ms); }
+.anim .card.soft { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(8px); }
+.pick {
+  position: relative; display: flex; flex-direction: column; width: 100%; min-width: 0; padding: 0; margin: 0; border: 0; text-align: left; cursor: pointer;
+  background: var(--cream); color: var(--ink); border-radius: 10px; overflow: hidden; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 0 1px rgba(244, 237, 224, .22), 0 22px 34px -22px rgba(0, 0, 0, .95);
+  transition: transform .22s var(--out), box-shadow .22s ease, background-color .18s ease;
+}
+.pick:focus-visible { border-radius: 10px; outline-offset: 4px; }
+@media (hover: hover) { .pick:hover { transform: translateY(-3px); } }
+.pick:active { transform: translateY(1px); }
+.clip { position: relative; display: block; width: 100%; aspect-ratio: 9 / 16; background: #000; overflow: hidden; }
+.clip img, .clip video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.clip video { opacity: 0; transition: opacity .18s ease; }
+.card.on .clip video, .card.noposter .clip video { opacity: 1; }
+.clip::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(9, 9, 10, .34) 0%, rgba(9, 9, 10, 0) 20%, rgba(9, 9, 10, 0) 78%, rgba(9, 9, 10, .4) 100%); }
+.prog { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(244, 237, 224, .22); opacity: 0; z-index: 1; }
+.prog i { display: block; height: 100%; width: 0; background: var(--orange); }
+.card.on .prog { opacity: 1; }
+
+/* No clip yet: a film leader card. */
+.blank { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 14px; text-align: center; color: var(--cream);
+  background: repeating-linear-gradient(-58deg, rgba(244, 237, 224, .055) 0 16px, rgba(244, 237, 224, 0) 16px 32px), radial-gradient(120% 80% at 50% 0%, #2a2420, #151312); }
+.blank b { font-family: var(--title); font-weight: 400; font-size: clamp(34px, 9vw, 46px); text-transform: uppercase; line-height: .9; letter-spacing: .02em; text-wrap: balance; }
+.blank i { font-style: normal; color: var(--taupe); }
+/* The "no captions" choice: an empty frame, nothing striped, nothing promised. */
+.blank.quiet { background: radial-gradient(120% 80% at 50% 0%, #25201d, #151312); color: var(--taupe); }
+.blank.quiet::before { content: ''; position: absolute; inset: 12px; border: 1.5px dashed rgba(244, 237, 224, .22); border-radius: 6px; }
+
+/* The pick mark: an unlit lamp that lights when picked. Round = pick one, square = pick any. */
+.tick { position: absolute; top: 9px; right: 9px; z-index: 2; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(9, 9, 10, .45); box-shadow: inset 0 0 0 1.5px rgba(244, 237, 224, .9); color: transparent; transition: background-color .15s ease, box-shadow .2s ease, transform .25s var(--out); }
+.card[data-kind="effect"] .tick { border-radius: 7px; }
+.tick svg { width: 15px; height: 15px; }
+.pick[aria-checked="true"] .tick { background: var(--orange); color: var(--ink); box-shadow: 0 0 0 3px rgba(255, 91, 31, .28), 0 0 18px 4px rgba(255, 91, 31, .8); transform: scale(1.08); }
+
+.plate { display: flex; flex-direction: column; gap: 5px; flex: 1; padding: 11px 12px 13px; min-width: 0; }
+.nm { font-family: var(--title); font-size: 27px; line-height: .92; letter-spacing: .02em; text-transform: uppercase; text-wrap: balance; }
+.k { font-family: var(--mono); font-stretch: 80%; font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--rust); line-height: 1.2; margin-top: 2px; }
+.ln { font-size: 13.5px; line-height: 1.32; color: var(--ink-2); text-wrap: pretty; }
+.pick[aria-checked="true"] { background: var(--orange); box-shadow: 0 0 0 3px var(--orange), 0 0 46px -6px rgba(255, 91, 31, .75), 0 22px 34px -22px rgba(0, 0, 0, .95); }
+.pick[aria-checked="true"] .ln, .pick[aria-checked="true"] .k { color: var(--ink); }
+.pick[aria-disabled="true"] { cursor: default; background: var(--cream-2); }
+.pick[aria-disabled="true"]:hover { transform: none; }
+.pick[aria-disabled="true"] .tick { display: none; }
+@media (min-width: 860px) { .nm { font-size: 29px; } .ln { font-size: 14px; } }
+
+/* Clip buttons, same family as the sales page reel. */
+.ov { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 9 / 16; pointer-events: none; z-index: 3; }
+.vbtn { position: absolute; bottom: 12px; display: none; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 99px;
+  cursor: pointer; background: var(--cream); color: var(--ink); pointer-events: auto; box-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
+.vbtn::after { content: ''; position: absolute; inset: -7px; }
+.vbtn:focus-visible { outline-color: var(--orange); border-radius: 99px; }
+.vbtn svg { width: 14px; height: 14px; flex: none; }
+.snd { left: 9px; }
+.ply { right: 9px; }
+.vbtn .i-on, .vbtn[aria-pressed="true"] .i-off { display: none; }
+.vbtn[aria-pressed="true"] .i-on { display: block; }
+.card.on .snd, .card.hasclip:focus-within .snd { display: inline-flex; }
+.noauto .card.hasclip .ply, .touch .card.hasclip .ply { display: inline-flex; }
+
+/* Effects: one flat grid. Above it, the one optional switch and the select-all. */
+.fxbar { display: flex; align-items: center; justify-content: space-between; gap: 6px 24px; flex-wrap: wrap; padding: 0 0 12px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.sw { display: inline-flex; align-items: center; gap: 12px; min-width: 0; background: none; border: 0; padding: 6px 0; cursor: pointer; text-align: left;
+  color: var(--cream-2); font-size: 15.5px; line-height: 1.25; }
+.sw i { position: relative; flex: none; width: 42px; height: 24px; border-radius: 99px; background: rgba(9, 9, 10, .45); box-shadow: inset 0 0 0 1.5px var(--line-2);
+  transition: background-color .18s ease, box-shadow .18s ease; }
+.sw i::after { content: ''; position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--taupe); transition: transform .22s var(--out), background-color .18s ease; }
+.sw:hover { color: var(--cream); }
+.sw[aria-checked="true"] { color: var(--cream); }
+.sw[aria-checked="true"] i { background: var(--orange); box-shadow: 0 0 0 3px rgba(255, 91, 31, .22), 0 0 16px 2px rgba(255, 91, 31, .6); }
+.sw[aria-checked="true"] i::after { transform: translateX(18px); background: var(--ink); }
+.sw small { display: block; margin-top: 3px; font-size: 13px; color: var(--taupe); }
+.all { margin-left: auto; background: none; border: 0; padding: 8px 0 8px 8px; cursor: pointer; color: var(--cream); white-space: nowrap;
+  font-family: var(--mono); font-stretch: 80%; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  text-decoration: underline; text-decoration-color: var(--orange); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.all:hover { color: var(--orange); }
+.tweak { display: block; margin: 20px 0 0; padding-left: 0; }
+@media (min-width: 1100px) { #sec-styles { --cols: 4; } }
+
+/* Hook / Middle / End on a picked effect, only while the switch is on. */
+.parts { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 3; display: none; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;
+  transition: transform .22s var(--out); }
+.byparts .card.picked .parts { display: grid; }
+.byparts .card.picked .plate { padding-bottom: 48px; }
+.part { position: relative; height: 30px; padding: 1px 0 0; border: 1.5px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer;
+  font-family: var(--mono); font-stretch: 76%; font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
+.part::after { content: ''; position: absolute; inset: -7px -2px; }
+.part[aria-pressed="true"] { background: var(--ink); color: var(--cream); }
+.part[aria-pressed="false"] { border-color: rgba(22, 9, 3, .45); color: rgba(22, 9, 3, .7); }
+.part:focus-visible { outline-color: var(--ink); outline-offset: 2px; }
+@media (hover: hover) { .card:hover .parts { transform: translateY(-3px); } }
+
+.oops { margin-top: 40px; padding: 22px; border-radius: 8px; background: var(--cream); color: var(--ink); max-width: 34em; }
+.oops b { font-family: var(--title); font-weight: 400; font-size: 34px; text-transform: uppercase; display: block; line-height: 1; margin-bottom: 8px; }
+
+/* ---------- Bottom letterbox bar: what is picked, and the one button ---------- */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--black); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px); box-shadow: 0 -8px 24px -14px rgba(0, 0, 0, .8); }
+.bar .wrap { height: var(--bar); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.sum { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sum-k { color: var(--taupe); }
+.sum-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 0; min-width: 0; }
+.chip { background: none; border: 0; padding: 2px 0; cursor: pointer; color: var(--cream); font-family: var(--title); font-size: 23px; line-height: 1; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.chip.none { color: var(--taupe); }
+.chip:hover { color: var(--orange); }
+.chip + .chip { padding-left: 12px; border-left: 1px solid var(--line-2); }
+.msg { color: var(--orange); font-weight: 650; font-size: 14px; line-height: 1.25; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; flex: none; min-height: 50px; padding: 9px 20px 7px; border: 0; border-radius: 4px; cursor: pointer;
+  background: var(--orange); color: var(--ink); font-family: var(--title); font-size: 25px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  box-shadow: 0 16px 38px -14px rgba(255, 91, 31, .75), inset 0 1px 0 rgba(255, 255, 255, .3);
+  transition: transform .16s var(--out), background-color .16s ease, box-shadow .25s ease; }
+.btn:hover { background: #FF6A33; }
+.btn:active { transform: translateY(2px); background: var(--orange-press); }
+.btn[aria-busy="true"] { opacity: .7; pointer-events: none; }
+.btn.is-saved { background: transparent; color: var(--cream); box-shadow: inset 0 0 0 1.5px var(--line-2); }
+.btn svg { width: 17px; height: 17px; display: none; }
+.btn.is-saved svg { display: block; color: var(--orange); }
+@media (max-width: 559px) { .sum-k { display: none; } .chip { font-size: 20px; } .chip + .chip { padding-left: 0; border-left: 0; } .sum-v { flex-direction: column; } .sum-v.three .chip { font-size: 17px; padding: 1px 0; }
+  .btn { font-size: 23px; padding-left: 16px; padding-right: 16px; } }
+@media (min-width: 860px) { .chip { font-size: 28px; } .sum-v.three .chip { font-size: 24px; } .btn { min-height: 56px; min-width: 300px; font-size: 29px; } }
+@media (min-width: 860px) and (max-width: 1099px) { .btn { min-width: 220px; } }
+
+/* ---------- After the save ---------- */
+dialog { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: visible; }
+dialog::backdrop { background: rgba(9, 9, 10, .84); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.sheet { background: var(--cream); border-radius: 10px; padding: 30px 24px 26px; box-shadow: 0 0 0 1px rgba(244, 237, 224, .4), 0 40px 80px -20px #000, 0 0 90px -20px rgba(255, 91, 31, .5); }
+.sheet .lamp { color: var(--rust); }
+.sheet h2 { font-size: clamp(54px, 15vw, 88px); margin-top: 14px; }
+.go { margin-top: 14px; font-size: 21px; line-height: 1.3; text-wrap: balance; }
+.go b { font-weight: 800; background: var(--orange); padding: 1px 7px 2px; border-radius: 3px; white-space: nowrap; }
+.recap { margin-top: 16px; color: var(--ink-2); font-size: 11.5px; }
+.later { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(22, 9, 3, .16); font-size: 15px; line-height: 1.4; color: var(--ink-2); text-wrap: pretty; }
+.later q { color: var(--ink); font-weight: 650; }
+.paste { display: flex; gap: 8px; margin-top: 18px; align-items: stretch; }
+.paste textarea { flex: 1; min-width: 0; resize: none; border: 1.5px solid var(--ink); border-radius: 4px; background: #FBF7EF; color: var(--ink); padding: 10px 12px;
+  font-family: var(--mono); font-stretch: 85%; font-size: 13px; line-height: 1.45; }
+.paste button, .ghost { border: 1.5px solid var(--ink); border-radius: 4px; background: var(--ink); color: var(--cream); cursor: pointer; padding: 9px 16px 7px;
+  font-family: var(--title); font-size: 22px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+.ghost { margin-top: 22px; background: transparent; color: var(--ink); min-height: 46px; }
+.ghost:hover { background: var(--ink); color: var(--cream); }
+.sheet :focus-visible { outline-color: var(--ink); }
+@media (max-width: 559px) { .paste { flex-direction: column; } .paste button { min-height: 44px; } }
+@media (min-width: 560px) { .sheet { padding: 40px 40px 34px; } }
+@keyframes sheetin { from { opacity: 0; transform: translateY(18px) scale(.97); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+.anim dialog[open] .sheet { animation: sheetin .5s var(--out) both; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style>
+<!-- A snapshot of the catalog, used only when this page is opened as a plain file (no server). -->
+<script src="data/catalog.js"></script>
+</head>
+<body>
+<div class="set" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to the clips</a>
+
+<header class="top">
+  <div class="wrap">
+    <span class="brand">Claude Creator Studio</span>
+    <span class="mono"><i></i>Studio picker</span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="intro wrap">
+    <h1 class="t title">Pick your look.</h1>
+    <p class="lede"><span id="hint">Hover a clip to watch it.</span> Pick what you like. Hit save.</p>
+
+    <div class="ways" id="ways" role="tablist" aria-label="Two ways to pick" hidden>
+      <button class="way" type="button" role="tab" id="way-preset" aria-controls="sec-styles" aria-selected="false">
+        <b class="t">Pick one overall style</b><span>One pick. Captions and effects chosen for you.</span>
+      </button>
+      <button class="way" type="button" role="tab" id="way-custom" aria-controls="own" aria-selected="true">
+        <b class="t">Build my own</b><span>Your captions. Your effects.</span>
+      </button>
+    </div>
+    <noscript><p class="oops"><b>This page needs JavaScript.</b>Turn it on and reload, or just tell Claude which captions and effects you want.</p></noscript>
+    <p class="oops" id="oops" hidden><b>The clips did not load.</b>Go back to Claude and say <q>open the picker</q>.</p>
+  </section>
+
+  <section class="sec wrap" id="sec-styles" tabindex="-1" aria-labelledby="h-styles" hidden>
+    <div class="slate"><span class="clap" aria-hidden="true"><i></i></span><div class="slate-f mono"><span>Scene <b>01</b></span><span>Overall style</span><span class="r">Pick one</span></div></div>
+    <div class="sec-hd">
+      <h2 class="t h2" id="h-styles">Pick a style.</h2>
+      <p class="note">One pick sets your captions, your effects and your pace.</p>
+    </div>
+    <div class="grid" id="styles" role="radiogroup" aria-labelledby="h-styles"></div>
+    <button class="all tweak" type="button" id="tweak" aria-expanded="false" aria-controls="own" hidden>Change its captions or effects</button>
+  </section>
+
+  <div id="own">
+    <section class="sec wrap" id="sec-captions" tabindex="-1" aria-labelledby="h-captions">
+      <div class="slate"><span class="clap" aria-hidden="true"><i></i></span><div class="slate-f mono"><span>Scene <b id="n-captions">01</b></span><span>Captions</span><span class="r">Pick one</span></div></div>
+      <div class="sec-hd"><h2 class="t h2" id="h-captions">Your captions.</h2></div>
+      <div class="grid" id="captions" role="radiogroup" aria-labelledby="h-captions"></div>
+    </section>
+
+    <section class="sec wrap" id="sec-effects" tabindex="-1" aria-labelledby="h-effects">
+      <div class="slate"><span class="clap" aria-hidden="true"><i></i></span><div class="slate-f mono"><span>Scene <b id="n-effects">02</b></span><span>Effects</span><span class="r">Pick any</span></div></div>
+      <div class="sec-hd">
+        <h2 class="t h2" id="h-effects">Your effects.</h2>
+        <p class="note">Pick as many as you like. Claude only uses one where it fits the line you're saying.</p>
+      </div>
+      <div class="fxbar">
+        <button class="sw" type="button" role="switch" aria-checked="false" id="parts-sw">
+          <i aria-hidden="true"></i>
+          <span>Use different effects in different parts of my video<small id="parts-tip" hidden>Tap Hook, Middle or End on an effect to put it there. Tap none and it can go anywhere.</small></span>
+        </button>
+        <button class="all" type="button" id="all">Select all</button>
+      </div>
+      <div class="grid" id="effects" role="group" aria-labelledby="h-effects"></div>
+    </section>
+  </div>
+</main>
+
+<div class="bar" role="region" aria-label="Your picks">
+  <div class="wrap">
+    <div class="sum">
+      <span class="mono sum-k" id="sum-k">Your picks</span>
+      <div class="sum-v" id="sum"></div>
+      <span class="msg" id="msg" role="status" aria-live="polite"></span>
+    </div>
+    <button class="btn" type="button" id="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11"/></svg><span id="save-t">Save my picks</span></button>
+  </div>
+</div>
+
+<dialog id="done" aria-labelledby="done-h">
+  <div class="sheet">
+    <p class="lamp" id="done-lamp">Saved</p>
+    <h2 class="t" id="done-h">That's a wrap.</h2>
+    <div id="done-saved">
+      <p class="go">Go back to Claude and say <b>edit it</b>.</p>
+    </div>
+    <div id="done-paste" hidden>
+      <div class="paste">
+        <textarea id="line" rows="2" readonly aria-label="Your picks, ready to paste into Claude"></textarea>
+        <button type="button" id="copy">Copy</button>
+      </div>
+      <p class="go">Then say <b>edit it</b>.</p>
+    </div>
+    <p class="recap mono" id="recap"></p>
+    <p class="later">Want to switch later? Tell Claude <q>switch my captions</q> or <q>open the picker</q>.</p>
+    <button class="ghost" type="button" id="keep">Keep picking</button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  var D = document, R = D.documentElement;
+  var qs = new URLSearchParams(location.search);
+  var FILE = location.protocol === 'file:';
+  var SHOW_ALL = qs.get('all') === '1';
+  var STORE = 'ccs-studio-picks';
+
+  var mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var mqTouch = window.matchMedia('(hover: none)');
+  var reduce = mqReduce.matches;
+  var lastPointer = mqTouch.matches ? 'touch' : 'mouse';
+  var sawTouch = false;
+
+  var C = null;                                   // the catalog
+  var by = { caption: {}, effect: {}, style: {} };
+  var S = {
+    mode: 'custom', style: null, captionStyle: null, effects: {},
+    partsOn: false,                               // the "different parts of my video" switch
+    parts: {},                                    // effect key -> { hook: true, middle: false, end: false }: the parts tapped for it. None tapped = anywhere
+    before: null,                                 // the captions and effects from before an overall style was picked
+    tweak: false                                  // an overall style is picked and its captions/effects are open
+  };
+  var PARTS = [{ key: 'hook', label: 'Hook' }, { key: 'middle', label: 'Middle' }, { key: 'end', label: 'End' }];
+  var savedSig = null;                            // what the picks file holds right now
+  var online = !FILE;                             // false once the server stops answering
+  var sound = false;
+  var cur = null;                                 // the one card that is playing
+
+  var ICON = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>',
+    sound: '<svg class="i-off" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9.5v5h3.6L12 19V5L6.6 9.5H3z"/><path d="M16 9l5 6m0-6l-5 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>' +
+           '<svg class="i-on" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9.5v5h3.6L12 19V5L6.6 9.5H3z"/><path d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>',
+    play: '<svg class="i-off" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a.8.8 0 001.2.7l11-6.8a.8.8 0 000-1.4l-11-6.8A.8.8 0 008 5.2z"/></svg>' +
+          '<svg class="i-on" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.2" height="14" rx="1"/><rect x="13.8" y="5" width="4.2" height="14" rx="1"/></svg>'
+  };
+
+  function $(id) { return D.getElementById(id); }
+  function el(tag, cls, text) { var n = D.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function noop() {}
+
+  /* ---------------------------------------------------------------- clips: one plays at a time */
+  function videoOf(card) { return card.querySelector('video'); }
+
+  function stop(card) {
+    if (!card) return;
+    var v = videoOf(card);
+    if (v) v.pause();
+    card.classList.remove('on');
+    var p = card.querySelector('.ply');
+    if (p) p.setAttribute('aria-pressed', 'false');
+    if (cur === card) cur = null;
+  }
+
+  function play(card) {
+    var v = videoOf(card);
+    if (!v) return;
+    if (cur && cur !== card) stop(cur);
+    cur = card;
+    v.muted = !sound;
+    try { v.currentTime = 0; } catch (e) {}
+    var p = v.play();
+    if (p && p.then) {
+      p.then(function () { if (cur !== card) v.pause(); }).catch(function () {
+        if (cur !== card || v.muted) return;
+        v.muted = true;                            // the browser wants a click before sound: play it silent
+        v.play().catch(noop);
+      });
+    }
+    var b = card.querySelector('.ply');
+    if (b) b.setAttribute('aria-pressed', 'true');
+  }
+
+  function setSound(on) {
+    sound = on;
+    var all = D.querySelectorAll('.snd');
+    for (var i = 0; i < all.length; i++) all[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (cur) { var v = videoOf(cur); if (v) v.muted = !on; }
+  }
+
+  var watcher = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { if (e.intersectionRatio >= 0.1) e.target.classList.remove('soft'); return; }
+      if (e.target !== cur) return;
+      var r = cur.getBoundingClientRect();           /* only stop a clip that has really left the screen */
+      if (r.bottom <= 0 || r.top >= window.innerHeight) stop(cur);
+    });
+  }, { threshold: [0, 0.1] }) : null;
+  D.addEventListener('visibilitychange', function () { if (D.hidden && cur) stop(cur); });
+  D.addEventListener('pointerdown', function (e) {
+    lastPointer = e.pointerType || 'mouse';
+    if (lastPointer === 'touch' && !sawTouch) { sawTouch = true; device(); }
+  }, true);
+
+  /* ---------------------------------------------------------------- one card */
+  function makeCard(item, kind, i) {
+    var card = el('div', 'card');
+    card.dataset.kind = kind;
+    card.dataset.key = item.key;
+    card.style.setProperty('--i', String(i % 5));
+    var locked = kind === 'style' && !item.ready;
+
+    var pick = el('button', 'pick');
+    pick.type = 'button';
+    pick.setAttribute('role', kind === 'effect' ? 'checkbox' : 'radio');
+    pick.setAttribute('aria-checked', 'false');
+    if (locked) pick.setAttribute('aria-disabled', 'true');
+
+    var clip = el('span', 'clip');
+    var v = null;
+    if (item.preview) {
+      card.classList.add('hasclip');
+      if (item.poster) {
+        var im = new Image();
+        im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; im.width = 540; im.height = 960; im.src = item.poster;
+        clip.appendChild(im);
+      } else {
+        card.classList.add('noposter');
+      }
+      v = el('video');
+      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+      v.setAttribute('disablepictureinpicture', '');
+      v.tabIndex = -1;
+      v.preload = item.poster ? 'none' : 'metadata';
+      v.src = item.preview + (item.poster ? '' : '#t=0.5');
+      clip.appendChild(v);
+      var prog = el('span', 'prog'), fill = el('i');
+      prog.appendChild(fill);
+      clip.appendChild(prog);
+      v.addEventListener('playing', function () { if (cur === card) card.classList.add('on'); });
+      v.addEventListener('timeupdate', function () { if (v.duration) fill.style.width = (v.currentTime / v.duration * 100).toFixed(1) + '%'; });
+    } else {
+      var blank = el('span', 'blank' + (item.none ? ' quiet' : ''));
+      blank.setAttribute('aria-hidden', 'true');
+      blank.appendChild(el('b', null, item.name));
+      if (!item.none) blank.appendChild(el('i', 'mono', locked ? 'Not built yet' : 'Clip on the way'));
+      clip.appendChild(blank);
+    }
+    var tick = el('span', 'tick');
+    tick.setAttribute('aria-hidden', 'true');
+    tick.innerHTML = ICON.check;
+    clip.appendChild(tick);
+    pick.appendChild(clip);
+
+    var plate = el('span', 'plate');
+    plate.appendChild(el('span', 'nm', item.name));
+    if (item.label) plate.appendChild(el('span', 'k', item.label));
+    if (item.line) plate.appendChild(el('span', 'ln', item.line));
+    pick.appendChild(plate);
+    card.appendChild(pick);
+
+    if (kind === 'effect') {                       // Hook / Middle / End, shown only while the switch is on
+      var row = el('div', 'parts');
+      row.setAttribute('role', 'group');
+      row.setAttribute('aria-label', 'Where ' + item.name + ' can be used');
+      PARTS.forEach(function (p) {
+        var b = el('button', 'part', p.label);
+        b.type = 'button';
+        b.dataset.part = p.key;
+        b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', function () { togglePart(item.key, p.key); });
+        row.appendChild(b);
+      });
+      card.appendChild(row);
+    }
+
+    if (v) {
+      var ov = el('div', 'ov');
+      var snd = el('button', 'vbtn snd');
+      snd.type = 'button'; snd.innerHTML = ICON.sound;
+      snd.setAttribute('aria-pressed', 'false'); snd.setAttribute('aria-label', 'Sound');
+      snd.title = 'Sound';
+      var ply = el('button', 'vbtn ply');
+      ply.type = 'button'; ply.innerHTML = ICON.play;
+      ply.setAttribute('aria-pressed', 'false'); ply.setAttribute('aria-label', 'Play the ' + item.name + ' clip');
+      ov.appendChild(snd); ov.appendChild(ply);
+      card.appendChild(ov);
+
+      snd.addEventListener('click', function () {
+        setSound(!sound);
+        if (cur !== card) play(card);
+      });
+      ply.addEventListener('click', function () {
+        if (cur === card && !v.paused) stop(card); else play(card);
+      });
+      card.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch' && !reduce) play(card); });
+      card.addEventListener('pointerleave', function (e) {
+        if (e.pointerType === 'touch' || reduce) return;
+        var a = D.activeElement;
+        if (a && card.contains(a) && a.matches(':focus-visible')) return;      // the keyboard is still on this card
+        stop(card);
+      });
+      pick.addEventListener('focus', function () { if (!reduce && pick.matches(':focus-visible')) play(card); });
+      card.addEventListener('focusout', function (e) {
+        if (reduce || card.contains(e.relatedTarget)) return;
+        if (cur === card && !card.matches(':hover')) stop(card);
+      });
+    }
+
+    pick.addEventListener('click', function () {
+      if (locked) return;
+      var was = pick.getAttribute('aria-checked') === 'true';
+      choose(kind, item.key);
+      if (v && lastPointer === 'touch' && !reduce) {       // a tap also plays the clip
+        if (kind === 'effect' && was) stop(card); else play(card);
+      }
+    });
+    pick.addEventListener('keydown', function (e) {
+      if ((e.key === 'm' || e.key === 'M') && v) { setSound(!sound); if (cur !== card) play(card); return; }
+      var dir = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 'up', ArrowDown: 'down', Home: 'home', End: 'end' }[e.key];
+      if (!dir) return;
+      var next = neighbour(pick, dir);
+      if (next) { e.preventDefault(); next.focus(); }
+    });
+
+    if (watcher) { if (R.classList.contains('anim')) card.classList.add('soft'); watcher.observe(card); }
+    return card;
+  }
+
+  /* Arrow keys walk the grid the way it looks on screen. */
+  function neighbour(pick, dir) {
+    var grid = pick.closest('.grid');
+    var list = Array.prototype.slice.call(grid.querySelectorAll('.pick'));
+    var i = list.indexOf(pick);
+    if (dir === 'home') return list[0];
+    if (dir === 'end') return list[list.length - 1];
+    if (dir === 1 || dir === -1) return list[i + dir] || null;
+    var me = pick.getBoundingClientRect(), best = null, bestD = Infinity;
+    list.forEach(function (p) {
+      var r = p.getBoundingClientRect();
+      var dy = dir === 'down' ? r.top - me.top : me.top - r.top;
+      if (dy < 10) return;
+      var d = dy * 4 + Math.abs(r.left - me.left);
+      if (d < bestD) { bestD = d; best = p; }
+    });
+    return best;
+  }
+
+  /* ---------------------------------------------------------------- state */
+  function effectKeys() { return C.effects.filter(function (e) { return S.effects[e.key]; }).map(function (e) { return e.key; }); }
+
+  /* The parts tapped for an effect. A new pick starts with none tapped, which means it can go anywhere. */
+  function noParts() { var m = {}; PARTS.forEach(function (p) { m[p.key] = false; }); return m; }
+  function partsOf(key) { return S.parts[key] || (S.parts[key] = noParts()); }
+  function anyPart(key) { var m = partsOf(key); return PARTS.some(function (p) { return m[p.key]; }); }
+
+  function setEffect(key, on) {
+    if (on) { if (!S.effects[key]) { S.effects[key] = true; S.parts[key] = noParts(); } }
+    else { delete S.effects[key]; delete S.parts[key]; }
+  }
+
+  function choose(kind, key) {
+    if (kind === 'caption') S.captionStyle = key;
+    else if (kind === 'effect') setEffect(key, !S.effects[key]);
+    else if (kind === 'style' && S.style === key) {   // a second click on the picked style takes it off again
+      var was = S.before || { captionStyle: null, effects: {}, parts: {} };
+      S.style = null; S.tweak = false; S.before = null;
+      S.captionStyle = was.captionStyle; S.effects = was.effects; S.parts = was.parts;
+    }
+    else if (kind === 'style') {                   // an overall style brings its own captions and effects
+      var st = by.style[key];
+      if (!S.style) S.before = { captionStyle: S.captionStyle, effects: S.effects, parts: S.parts };
+      S.style = key;
+      if (by.caption[st.captionStyle]) S.captionStyle = st.captionStyle;
+      S.effects = {}; S.parts = {};
+      st.effects.forEach(function (k) { if (by.effect[k]) setEffect(k, true); });
+    }
+    say('');
+    sync();
+  }
+
+  /* Hook / Middle / End on one picked effect: tap a part to put the effect there, tap it again to take it off. */
+  function togglePart(key, part) {
+    var m = partsOf(key);
+    m[part] = !m[part];
+    say('');
+    sync();
+  }
+
+  /* null while the switch is off (effects can land anywhere), else the picked effects under each part.
+     An effect with no part tapped is listed under every part: it can go anywhere. */
+  function sections() {
+    if (!S.partsOn) return null;
+    var fx = effectKeys(), out = {};
+    PARTS.forEach(function (p) { out[p.key] = fx.filter(function (k) { return partsOf(k)[p.key] || !anyPart(k); }); });
+    return out;
+  }
+
+  function payload() {
+    if (!S.captionStyle) return null;
+    var style = null;
+    if (S.mode === 'preset') {
+      var st = by.style[S.style];
+      if (!st || !st.ready) return null;
+      style = st.key;
+    }
+    return { mode: style ? 'preset' : 'custom', style: style, captionStyle: S.captionStyle, effects: effectKeys(), effectSections: sections() };
+  }
+  function sig(p) { return p ? JSON.stringify([p.mode, p.style, p.captionStyle, p.effects, p.effectSections]) : ''; }
+
+  function summary() {
+    var st = by.style[S.style], cap = by.caption[S.captionStyle], n = effectKeys().length, out = [];
+    if (S.mode === 'preset') {
+      out.push({ text: st ? st.name + ' style' : 'No style yet', none: !st, to: 'sec-styles' });
+      if (!st) return out;
+    }
+    out.push({ text: !cap ? 'Pick your captions' : cap.none ? cap.name : cap.name + ' captions', none: !cap, to: 'sec-captions' });
+    out.push({ text: (n ? n + (n === 1 ? ' effect' : ' effects') : 'No effects') + (S.partsOn && n ? ' by part' : ''), none: !n, to: 'sec-effects' });
+    return out;
+  }
+
+  function recap() {
+    var text = summary().map(function (x) { return x.text; }).join(', '), sec = sections();
+    if (sec && effectKeys().length) text += ' (' + PARTS.map(function (p) { return p.label + ' ' + sec[p.key].length; }).join(', ') + ')';
+    return text;
+  }
+
+  function pasteLine(p) {
+    var fx = p.effectSections
+      ? 'effects by part: ' + PARTS.map(function (pt) { return pt.key + ' = ' + (p.effectSections[pt.key].join(', ') || 'none'); }).join('; ')
+      : 'effects = ' + (p.effects.join(', ') || 'none');
+    return 'Use these picks: ' + (p.mode === 'preset' ? 'style = ' + p.style + '; ' : '') + 'captions = ' + p.captionStyle + '; ' + fx;
+  }
+
+  function sync() {
+    var cards = D.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i], k = c.dataset.key, kind = c.dataset.kind;
+      var on = kind === 'caption' ? S.captionStyle === k : kind === 'effect' ? !!S.effects[k] : S.style === k;
+      c.querySelector('.pick').setAttribute('aria-checked', on ? 'true' : 'false');
+      if (kind === 'effect') {
+        c.classList.toggle('picked', on);
+        var m = on ? partsOf(k) : null, btns = c.querySelectorAll('.part');
+        for (var b = 0; b < btns.length; b++) btns[b].setAttribute('aria-pressed', m && m[btns[b].dataset.part] ? 'true' : 'false');
+      }
+    }
+    /* pick-one grids take one tab stop: the picked card, or the first one */
+    var groups = D.querySelectorAll('[role="radiogroup"]');
+    for (var g = 0; g < groups.length; g++) {
+      var picks = groups[g].querySelectorAll('.pick');
+      var home = groups[g].querySelector('.pick[aria-checked="true"]') || picks[0];
+      for (var j = 0; j < picks.length; j++) picks[j].tabIndex = picks[j] === home ? 0 : -1;
+    }
+    var full = C.effects.length > 0 && C.effects.every(function (e) { return S.effects[e.key]; });
+    $('all').textContent = full ? 'Clear' : 'Select all';
+    $('all').setAttribute('aria-label', full ? 'Clear all effects' : 'Select all effects');
+    $('parts-sw').setAttribute('aria-checked', S.partsOn ? 'true' : 'false');
+    $('parts-tip').hidden = !S.partsOn;
+    $('effects').classList.toggle('byparts', S.partsOn);
+
+    /* what is on screen: with an overall style picked, its captions and effects stay folded until asked for */
+    var preset = S.mode === 'preset', st = preset ? by.style[S.style] : null;
+    if (!st) S.tweak = false;
+    $('sec-styles').hidden = !preset;
+    $('own').hidden = preset && !S.tweak;
+    $('tweak').hidden = !st;
+    $('tweak').setAttribute('aria-expanded', S.tweak ? 'true' : 'false');
+    $('tweak').textContent = S.tweak ? 'Hide its captions and effects' : 'Change its captions or effects';
+    $('n-captions').textContent = preset ? '02' : '01';
+    $('n-effects').textContent = preset ? '03' : '02';
+
+    var sum = $('sum'), list = summary();
+    sum.textContent = '';
+    sum.classList.toggle('three', list.length > 2);
+    list.forEach(function (p) {
+      var b = el('button', 'chip' + (p.none ? ' none' : ''), p.text);
+      b.type = 'button';
+      b.addEventListener('click', function () { go(p.to, true); });
+      sum.appendChild(b);
+    });
+
+    var p = payload(), saved = !!p && sig(p) === savedSig;
+    $('save').classList.toggle('is-saved', saved);
+    $('save-t').textContent = saved ? 'Saved' : 'Save my picks';
+
+    if (FILE) { try { localStorage.setItem(STORE, JSON.stringify({ mode: S.mode, style: S.style, captionStyle: S.captionStyle, effects: effectKeys(), effectSections: sections() })); } catch (e) {} }
+  }
+
+  function setMode(mode) {
+    S.mode = mode === 'preset' && !$('ways').hidden ? 'preset' : 'custom';
+    if (S.mode === 'custom') { S.style = null; S.before = null; }   // building your own drops the overall style, the picks stay
+    $('way-preset').setAttribute('aria-selected', S.mode === 'preset' ? 'true' : 'false');
+    $('way-custom').setAttribute('aria-selected', S.mode === 'custom' ? 'true' : 'false');
+    $('way-preset').tabIndex = S.mode === 'preset' ? 0 : -1;
+    $('way-custom').tabIndex = S.mode === 'custom' ? 0 : -1;
+    if (cur) stop(cur);
+    say('');
+    sync();
+  }
+
+  function say(text) { $('msg').textContent = text; $('sum').hidden = !!text; $('sum-k').hidden = !!text; }
+
+  /* Scroll to a section and put the keyboard on its picked card. */
+  function go(id, smooth) {
+    var sec = $(id);
+    if (!sec) return;
+    if (sec.parentNode === $('own') && $('own').hidden && S.mode === 'preset' && by.style[S.style]) { S.tweak = true; sync(); }
+    if (sec.hidden || sec.parentNode.hidden) return;
+    var target = sec.querySelector('.pick[aria-checked="true"]') || sec.querySelector('.pick:not([aria-disabled])');
+    sec.scrollIntoView({ block: 'start', behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    if (!target) { sec.focus({ preventScroll: true }); return; }
+    target.focus({ preventScroll: true });
+    if (!smooth) {
+      var r = target.getBoundingClientRect(), bar = $('save').closest('.bar').offsetHeight;
+      if (r.bottom > window.innerHeight - bar || r.top < 0) target.scrollIntoView({ block: 'center' });
+    }
+  }
+
+  /* ---------------------------------------------------------------- build the page from the catalog */
+  function render() {
+    C.captions.forEach(function (c) { by.caption[c.key] = c; });
+    C.effects.forEach(function (e) { by.effect[e.key] = e; });
+    var styles = C.styles.filter(function (s) { return SHOW_ALL || s.ready; });
+    styles.forEach(function (s) { by.style[s.key] = s; });
+
+    var caps = $('captions');
+    C.captions.forEach(function (c, i) { caps.appendChild(makeCard(c, 'caption', i)); });
+
+    var fx = $('effects');                         // one flat grid: an effect can be used anywhere in a reel
+    C.effects.forEach(function (e, i) { fx.appendChild(makeCard(e, 'effect', i)); });
+
+    if (styles.length) {
+      var box = $('styles');
+      styles.forEach(function (s, i) { box.appendChild(makeCard(s, 'style', i)); });
+      $('ways').hidden = false;
+    }
+  }
+
+  function apply(picks) {
+    if (!picks) return;
+    if (by.caption[picks.captionStyle]) S.captionStyle = picks.captionStyle;
+    S.effects = {}; S.parts = {};
+    (picks.effects || []).forEach(function (k) { if (by.effect[k]) setEffect(k, true); });
+    var sec = picks.effectSections;                // absent in picks saved before parts existed: effects land anywhere
+    S.partsOn = !!sec && typeof sec === 'object';
+    if (S.partsOn) effectKeys().forEach(function (k) {
+      var m = {}, n = 0;
+      PARTS.forEach(function (p) { m[p.key] = Array.isArray(sec[p.key]) && sec[p.key].indexOf(k) !== -1; n += m[p.key] ? 1 : 0; });
+      S.parts[k] = n && n < PARTS.length ? m : noParts();      // under every part (or none) = anywhere: nothing tapped
+    });
+    if (picks.mode === 'preset' && by.style[picks.style] && by.style[picks.style].ready) { S.mode = 'preset'; S.style = picks.style; }
+  }
+
+  function start(catalog, picks) {
+    C = catalog;
+    if (C.parts && C.parts.length) PARTS = C.parts;
+    render();
+    apply(picks);
+    if (picks && picks.updated) savedSig = sig(payload());
+    var tab = qs.get('tab');
+    var fresh = !picks || (!picks.updated && !picks.captionStyle);
+    var hasReady = C.styles.some(function (s) { return s.ready; });
+    var mode = tab === 'styles' ? 'preset' : (S.mode === 'preset' || (!tab && fresh && hasReady)) ? 'preset' : 'custom';
+    var st = mode === 'preset' ? by.style[S.style] : null;
+    if (st) {                                      // open the captions and effects when they were changed, or asked for
+      var own = C.effects.filter(function (e) { return st.effects.indexOf(e.key) !== -1; }).map(function (e) { return e.key; });
+      var changed = S.captionStyle !== st.captionStyle || effectKeys().join() !== own.join() || S.partsOn;
+      S.tweak = changed || tab === 'captions' || tab === 'effects';
+    }
+    setMode(mode);
+    if (tab === 'captions' || tab === 'effects' || tab === 'styles') {
+      requestAnimationFrame(function () { go('sec-' + tab, false); });
+    }
+    armSlates();
+  }
+
+  function armSlates() {
+    if (!R.classList.contains('anim') || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        setTimeout(function () { e.target.classList.remove('armed'); e.target.classList.add('clapped'); }, 220);
+      });
+    }, { threshold: 1 });
+    var slates = D.querySelectorAll('.slate');
+    for (var i = 0; i < slates.length; i++) { slates[i].classList.add('armed'); io.observe(slates[i]); }
+  }
+
+  /* ---------------------------------------------------------------- save */
+  var dlg = $('done');
+  function showDone(kind, p, lost) {
+    var paste = kind === 'paste';
+    $('done-lamp').textContent = paste ? (lost ? 'Not saved yet' : 'One more step') : 'Saved';
+    $('done-h').textContent = paste ? 'Paste this into Claude.' : "That's a wrap.";
+    $('done-saved').hidden = paste;
+    $('done-paste').hidden = !paste;
+    $('line').value = pasteLine(p);
+    $('line').rows = Math.max(2, Math.min(9, Math.ceil(pasteLine(p).length / (window.innerWidth < 560 ? 27 : 40))));
+    $('copy').textContent = 'Copy';
+    $('recap').textContent = recap();
+    $('recap').hidden = paste;
+    if (cur) stop(cur);
+    if (dlg.showModal) { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
+    if (paste) { $('line').focus(); $('line').select(); } else $('keep').focus();
+  }
+  function closeDone() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  $('keep').addEventListener('click', closeDone);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) closeDone(); });
+  $('copy').addEventListener('click', function () {
+    var t = $('line'), done = function () { $('copy').textContent = 'Copied'; };
+    t.focus(); t.select();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t.value).then(done, function () { try { if (D.execCommand('copy')) done(); } catch (e) {} });
+    else { try { if (D.execCommand('copy')) done(); } catch (e) {} }
+  });
+
+  $('save').addEventListener('click', function () {
+    var p = payload();
+    if (!p) {
+      if (S.mode === 'preset' && !by.style[S.style]) { say('Pick a style first.'); go('sec-styles', true); }
+      else { say('Pick a caption style first.'); go('sec-captions', true); }
+      return;
+    }
+    if (!online) return showDone('paste', p, !FILE);
+    var btn = $('save');
+    btn.setAttribute('aria-busy', 'true');
+    fetch('/api/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j && j.ok, j: j || {} }; }); })
+      .then(function (res) {
+        btn.removeAttribute('aria-busy');
+        if (!res.ok) { say(res.j.error || 'That did not save. Try again.'); return; }
+        savedSig = sig(p);
+        sync();
+        showDone('saved', p);
+      })
+      .catch(function () {
+        btn.removeAttribute('aria-busy');
+        online = false;                            // the picker's server is gone: hand over a line to paste instead
+        showDone('paste', p, true);
+      });
+  });
+
+  $('way-preset').addEventListener('click', function () { setMode('preset'); });
+  $('way-custom').addEventListener('click', function () { setMode('custom'); });
+  $('tweak').addEventListener('click', function () {
+    S.tweak = !S.tweak;
+    sync();
+    if (S.tweak) go('sec-captions', true);
+  });
+  $('parts-sw').addEventListener('click', function () { S.partsOn = !S.partsOn; say(''); sync(); });
+  $('all').addEventListener('click', function () {
+    var full = C.effects.every(function (e) { return S.effects[e.key]; });
+    C.effects.forEach(function (e) { setEffect(e.key, !full); });
+    say('');
+    sync();
+  });
+  $('ways').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    setMode(S.mode === 'preset' ? 'custom' : 'preset');
+    $(S.mode === 'preset' ? 'way-preset' : 'way-custom').focus();
+  });
+
+  /* ---------------------------------------------------------------- how the clips are watched on this device */
+  function device() {
+    var touch = mqTouch.matches || sawTouch;
+    reduce = mqReduce.matches;
+    R.classList.toggle('noauto', reduce);
+    R.classList.toggle('touch', touch);
+    $('hint').textContent = reduce ? 'Press play on a clip to watch it.' : touch ? 'Tap a clip to watch it.' : 'Hover a clip to watch it.';
+    if (reduce && cur) stop(cur);
+  }
+  device();
+  [mqReduce, mqTouch].forEach(function (m) { if (m.addEventListener) m.addEventListener('change', device); else if (m.addListener) m.addListener(device); });
+
+  /* ---------------------------------------------------------------- load */
+  function fail() { $('oops').hidden = false; $('own').hidden = true; D.querySelector('.bar').hidden = true; }
+
+  if (FILE) {
+    if (!window.STUDIO_CATALOG) { fail(); return; }
+    var kept = null;
+    try { kept = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) {}
+    start(window.STUDIO_CATALOG, kept);
+  } else {
+    /* Tell the picker's server this page is open, and when it closes. */
+    var me = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var ping = function () { fetch('/api/ping?p=' + me, { cache: 'no-store' }).catch(noop); };
+    ping();
+    setInterval(ping, 10000);
+    window.addEventListener('pageshow', function (e) { if (e.persisted) ping(); });
+    window.addEventListener('pagehide', function () {
+      try { fetch('/api/bye', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p: me }) }).catch(noop); } catch (e) {}
+    });
+
+    var get = function (url) { return fetch(url, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(url); return r.json(); }); };
+    Promise.all([get('/api/catalog'), get('/api/picks')]).then(function (res) { start(res[0], res[1]); }).catch(fail);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+ "key": "couch-wall",
+ "pack": "couch-wall",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions carry the words; the grid is background behind the speaker",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "set F_IN to 8 or later and F_OUT at least 45 frames after it and 2 frames before the slot ends, so the slot starts and ends on the plain room",
+  "COUNTS stays {} unless the buyer gives real view counts: never estimate or round up a number"
+ ],
+ "sounds": {},
+ "steps": [
+  "do ask the buyer for a folder of their own reel cover images (their saved covers, or covers exported from their profile) and copy them into <slot>/covers/ (fx_new.py --buyer-files <folder> does the copy). No covers from the buyer = no Couch Wall: leave it out and say so",
+  "run onsets.py      # copy the user's reel covers into ./covers  (create the folder; 4 or more images); 1. word onsets as frames -> F_IN, F_OUT, CAPS in build.py",
+  "run prep.py      # 2. covers, camera track, wall matte, fg.webm (about 3 min). LOOK at work/wall.jpg. If the cyan area is wrong, edit WALL / IN_FRONT / BEHIND / WALL_TOL, then",
+  "run prep.py wall      # re-measure only (20 s); repeat until right, then run. prep.py once more WITHOUT \"wall\" so fg.webm is baked from the final matte",
+  "run build.py SAFE=1 CAPTIONS=0      # 3. page with the safe guide",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 0.5,1.0,1.5,2.0,2.5,3.0",
+  "run build.py CAPTIONS=0      # 4. clean page (no guide), then render",
+  "hf render"
+ ],
+ "buyer_folder": {
+  "name": "covers",
+  "min": 4,
+  "what": "the buyer's own reel cover images (jpg, png or webp; 9 or more looks best)"
+ }
+}

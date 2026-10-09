@@ -1,0 +1,30 @@
+{
+ "key": "zoom-through-cut",
+ "pack": "zoom-through",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions run straight through the transition",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "make the slot ACROSS the cut: --from about 0.5 s before it, --to about 0.5 s after it (the move is 18 frames centred on the cut, each side needs at least 11 frames). fx_new.py --project records the cut frame, the words and the cutout by itself: do not run two_shot.py",
+  "set CREEP_A = 1 and CREEP_B = 1 (the slot must hand back unmoved footage at both edges) and leave GRADE_A / GRADE_B at None",
+  "after the reel render, look at every frame of the move: frames_check.py --at with 6 to 8 times from 0.3 s before the cut to 0.3 s after it",
+  "outside a reel (two separate files): fx_new.py zoom-through-cut <slot> --src <shot A> --in <sec> --frames <N> --no-cutout --no-transcribe, then fx_run.py <slot> two_shot.py --src <shot B> --in <sec> --frames <N>"
+ ],
+ "sounds": {},
+ "steps": [
+  "run prep.py      # measure, then LOOK at work/measure.jpg (yellow cross on dark flat fabric, green line under the speaker's chin)",
+  "edit the CLIP block in build.py (caption words and times from words.json, points only if the cross is wrong)",
+  "run bake.py sheet      # bake: half-size contact sheet first (about 30s), full bake when it looks right (2 to 4 min); look at work/bake/sheet.jpg",
+  "run bake.py      # writes assets/plate.mp4",
+  "run build.py SAFE=1 CAPTIONS=0      # compose, check, render",
+  "hf lint",
+  "hf snapshot --at <6 to 8 times incl. the frames around the cut>",
+  "run build.py CAPTIONS=0",
+  "hf render"
+ ]
+}

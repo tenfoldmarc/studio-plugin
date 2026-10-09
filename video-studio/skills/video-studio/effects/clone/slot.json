@@ -1,0 +1,37 @@
+{
+ "key": "clone",
+ "pack": "clone",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions carry the words",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "set VIGNETTE = 0 and set EXIT_F about 14 frames before the slot ends"
+ ],
+ "sounds": {
+  "assets_fx/impact-bass-short.mp3": {
+   "from": "impact-bass-1",
+   "duration": 0.9,
+   "fade_out": [
+    0.27,
+    0.63
+   ]
+  }
+ },
+ "steps": [
+  "run prep.py      # 20 s: head anchor, widest pose, word hits, grid frames in work/prep/",
+  "edit look at work/prep/grid_*.jpg and work/onsets.txt, fill the CLIP block in build.py",
+  "run bake.py      # 2 to 4 min, heavy: fg.webm + clone_*.webm. Read its report (below)",
+  "run build.py SAFE=1 CAPTIONS=0",
+  "hf lint",
+  "hf snapshot --at 1.2,2.4,3.6",
+  "run build.py CAPTIONS=0",
+  "hf lint",
+  "hf render",
+  "run check.py      # frame count, per-frame diff vs a-roll, contact sheets, phone copy"
+ ]
+}

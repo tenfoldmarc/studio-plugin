@@ -1,0 +1,25 @@
+{
+ "key": "odometer",
+ "pack": "odometer",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the label repeats the speaker's words: hide the reel captions just for the words the label shows (--hide-captions a-b), or build with CAPTIONS=0 for the number alone",
+ "reel_env": [],
+ "in_a_reel": [
+  "set GRADE = 'none' in the CLIP block (the reel owns the look)",
+  "set OUT about 0.25 s before the slot ends, unless the slot ends on a cut or at the end of the reel"
+ ],
+ "sounds": {},
+ "steps": [
+  "run measure.py      # words with measured start / end, where the speaker's head is",
+  "edit the CLIP block in build.py",
+  "run build.py SAFE=1      # prints lock frame, panel position, label times, warnings (!!)",
+  "hf lint",
+  "hf snapshot --at 0.2,1.0,2.0      # use: roll, lock+0.1, lock+0.6, last 0.1 s",
+  "run build.py      # guide off",
+  "hf render",
+  "run check.py      # frame count, text-behind-the speaker test, tick timing, sheet, stills, phone copy"
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "key": "ui-world",
+ "pack": "ui-world",
+ "imported": "2026-10-07",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions stay on in the caption style the buyer picked. The shot is moved down under the screen, so the captions move to the room band: build.py prints the fx_add.py --caption-y value to use",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0 and add the slot with the --caption-y value build.py prints: the buyer's captions sit in the room band under the screen. Look at one reel snapshot inside the slot",
+  "set F_IN above 0 and set F_OUT before the slot ends, so the first and last frame are plain footage, unless the slot ends on a cut or at the end of the reel",
+  "SCREEN: the packaged chat screen with the buyer's own words, or the buyer's own picture or screen recording copied into assets/. Never a screen, post or page that is not theirs",
+  "look at both shoulders against the screen on a snapshot before rendering: the cutout decides this effect"
+ ],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # 1. word onsets as frames -> fill the CLIP block in build.py",
+  "run prep.py      # 2. measure the speaker + bake the clean cutout (1 to 2 min). LOOK at work/measure.jpg: cyan = head top, yellow = neck, pink = chest line. Pink off the speaker's chest -> set EDGE",
+  "run build.py SAFE=1 CAPTIONS=0      # 3. page with the safe guide; read the WARNING lines it prints",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at 0.2,1.0,2.0,3.0,4.0      # (pick the times so one lands just after each of your frames: frame / 30)",
+  "run build.py CAPTIONS=0      # 4. clean page (no guide), then render",
+  "hf render"
+ ]
+}

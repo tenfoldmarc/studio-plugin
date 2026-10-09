@@ -1,0 +1,28 @@
+{
+ "key": "pull-back-reveal",
+ "pack": "pull-back-reveal",
+ "imported": "2026-10-08",
+ "cutout": "none",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the checklist, window title, counter and label are the effect itself: set the STYLE block at the top of build.py to the reel's caption / overall style before building. The reel's own captions are hidden while the slot plays (they sit mid-frame, half off the small card); the effect draws the spoken words on the card from words.json, so set cap_font, cap_weight, cap_case, cap_size, cap_color and cap_mark in STYLE to the buyer's caption style. CAPTIONS=0 draws none",
+ "reel_env": [],
+ "in_a_reel": [
+  "start the slot 2 to 4 frames before the line and leave F_IN = 3 and F_OUT = 'auto': the first and last frame are the plain picture and almost no spoken word falls outside the card. F_OUT = 'cut' only where the reel itself cuts on the slot's last frame",
+  "set FACE from a frame of assets/aroll.mp4 and look at one SAFE=1 snapshot: the checklist must not sit on the face (shorter steps make a narrower panel)",
+  "the slot needs about 105 frames plus 15 for the way back; build.py says how many when it is short",
+  "WINDOW_TITLE and PANEL_TAG are plain text in the buyer's words: no logo, no real product's interface"
+ ],
+ "sounds": {},
+ "steps": [
+  "do read the reel's own edit list (edl.json / plan.json) and write STEPS and SHOTS from it: only steps that were really done and the real length of every shot in frames. COUNT_TO, COUNT_LABEL and COUNT_NAME are only what the speaker says in this clip. Never invent a step, a count, a number or a name, never draw a logo. Nothing true to show = leave Pull-Back Reveal out and say so",
+  "run onsets.py      # 1. every word with its frame",
+  "edit the STYLE block and the CLIP block in build.py (true steps and shot lengths from the reel's edit list)",
+  "run build.py SAFE=1      # 2. page with the guide; prints every beat, the caption lines, the snapshot times",
+  "hf lint      # must be 0 errors",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # 3. guide off",
+  "hf render",
+  "run check.py      # 4. frame count, plain edges, work/check/sheet.jpg, phone copy"
+ ]
+}

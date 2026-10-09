@@ -1,0 +1,31 @@
+{
+ "key": "digital-zoom",
+ "pack": "digital-zoom",
+ "imported": "2026-10-07",
+ "cutout": "measure",
+ "hi": "optional",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0, so the reel's own captions carry the words in the caption style the buyer picked. build.py prints whether the chin stays clear of them at the tightest zoom. If it does not (a close-up), use a smaller scale, or build with captions on (fill CAPS) and add the slot with --captions hide",
+ "reel_env": [
+  "GRADE=0",
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [
+  "build with CAPTIONS=0: the reel's captions stay on over the zoom, so leave the CAPS list alone (it is only for a stand-alone clip)",
+  "end the ZOOMS list with a pull back to 1.0 before the slot ends, unless the slot ends on a cut",
+  "make the slot with --hi when the original clip is wider than 1080 px"
+ ],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # 1. onset frame of every word; then edit the CLIP block",
+  "run track.py      # 2. eye track. LOOK at work/track_check.jpg (cross between the speaker's eyes in every tile)",
+  "run build.py GRADE=0 CAPTIONS=0      # 3. camera + index.html. Read the printout: caps, scale per frame, the reel captions line",
+  "run bake.py      # 4. assets/zoom.mp4, 1 to 3 min (PY bake.py --frames 80-90 previews a few frames first)",
+  "hf lint      # 5. must be 0 errors",
+  "run build.py SAFE=1 GRADE=0 CAPTIONS=0",
+  "hf snapshot --at 1.2,2.9,3.6      # use your own times: one just after each landing",
+  "run build.py GRADE=0 CAPTIONS=0      # 6. guide off again, same switches as the render",
+  "hf render --video-frame-format png",
+  "run post.py      # 7. frame count, renders/<slot>-phone.mp4, stills, work/qa/sheet_*.jpg"
+ ]
+}
