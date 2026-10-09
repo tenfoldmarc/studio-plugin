@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Turns raw 9:16 talking-head clips into a finished Instagram reel in the look the creator saved in the Studio Picker: one of 19 caption styles, or one of 8 overall styles, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'open the picker', or runs /video-studio."
+description: "Claude Creator Studio. Turns raw 9:16 talking-head clips into a finished Instagram reel in the look the creator saved in the Studio Picker: one of 19 caption styles, or one of 8 overall styles, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
@@ -66,6 +66,10 @@ Read the STATUS lines:
   stop until the script prints `READY`. On Windows they paste the winget line into their own PowerShell window,
   then quit Claude Code completely and reopen it.
 - Sound effects `MISSING` (offline) is fine: the reel just has no sound effects until they are there.
+- `STATUS update AVAILABLE`: a newer version of the Studio is out. Ask the buyer once, before you start: "There's
+  an update for the Studio with fixes. Want me to install it? It takes a minute." Yes, or any time they say
+  "update the Studio": run `PY "SK/scripts/update.py"`, pass on what it prints, and have them start a new chat.
+  No: carry on with the edit.
 - `clean cutout NOT SET UP` is fine for captions on their own. Almost every effect needs it, and so do the looks that
   go behind the speaker (Bold captions, Chalk Talk, Show and Tell). Get it the first time the picks hold an
   effect or one of those looks: `setup.py --matting`, one time, about 105 MB.

@@ -485,6 +485,14 @@ def main():
     with open(skillenv.platform_file(state), 'w', encoding='utf-8') as f:
         json.dump(record, f, indent=1)
         f.write('\n')
+    # A newer version of the Studio? Asked once a day, never in the way: offline or anything odd says nothing.
+    try:
+        import update
+        line = update.check(state)
+        if line and 'AVAILABLE' in line:
+            say(line)
+    except (ImportError, OSError, ValueError):
+        pass
     say('READY' if ready else 'NOT READY')
     return 0 if ready else 1
 
