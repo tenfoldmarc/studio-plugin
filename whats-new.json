@@ -1,4 +1,5 @@
 {
   "1.17.0": "The Studio can now update itself. Say: update the Studio.",
-  "1.18.0": "Test update. Nothing changed in the Studio."
+  "1.18.0": "Test update. Nothing changed in the Studio.",
+  "1.19.0": "A test update so you can try updating from inside Claude. Nothing changed in the Studio."
 }
