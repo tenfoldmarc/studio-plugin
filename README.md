@@ -6,18 +6,16 @@ This is the plugin for buyers of Claude Creator Studio. The walkthrough videos a
 
 ## Install in the Claude desktop app
 
-This one install covers Claude Code and Claude Cowork.
-
-1. Open the Claude desktop app.
-2. Go to **Customize**, then **Plugins**.
-3. Choose **Add**, then **Add marketplace**.
-4. Paste this and confirm:
+1. Open the Claude desktop app and go to the **Code** tab.
+2. Click the **+** next to the message box, then **Plugins**, then **Browse plugins**.
+3. Click **Add** in the top right, then **Add marketplace**, then **Add from a repository**.
+4. Paste this link and click **Sync**:
 
 ```
-tenfoldmarc/studio-plugin
+https://github.com/tenfoldmarc/studio-plugin
 ```
 
-5. Find **Claude Creator Studio** in the list and choose **Install**.
+5. Install **Claude Creator Studio** from the list.
 6. Start a new chat and type:
 
 ```
@@ -46,9 +44,13 @@ Then open Claude Code and type `/video-studio setup`.
 
 Fixes and new effects arrive as updates to this plugin. Your picks and your own style are kept.
 
-**Desktop app:** Customize, Plugins, open the Creator Studio source, then **Check for updates**. Turn on **Sync automatically** there and you never have to think about it again.
+**The easy way:** when there is a new version, Claude tells you and asks if you want it. Say yes. You can also say this at any time:
 
-**Terminal:** each line is one paste.
+```
+update the Studio
+```
+
+**From a terminal instead:** each line is one paste.
 
 ```bash
 claude plugin marketplace update creator-studio
