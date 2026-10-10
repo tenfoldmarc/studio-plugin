@@ -66,10 +66,13 @@ Read the STATUS lines:
   stop until the script prints `READY`. On Windows they paste the winget line into their own PowerShell window,
   then quit Claude Code completely and reopen it.
 - Sound effects `MISSING` (offline) is fine: the reel just has no sound effects until they are there.
-- `STATUS update AVAILABLE`: a newer version of the Studio is out. Ask the buyer once, before you start: "There's
-  an update for the Studio with fixes. Want me to install it? It takes a minute." Yes, or any time they say
-  "update the Studio": run `PY "SK/scripts/update.py"`, pass on what it prints, and have them start a new chat.
-  No: carry on with the edit.
+- `STATUS update AVAILABLE`: a newer version of the Studio is out. This comes first, before the setup questions,
+  the picker or any edit. Ask it on its own: "There's an update for the Studio with fixes. Want me to install it?
+  It takes a minute."
+  - Yes, or any time they say "update the Studio": run `PY "SK/scripts/update.py"` right away, pass on what it
+    prints, tell them to start a new chat, and stop. Nothing else in this chat: the new chat carries on from
+    where they were, on the new version.
+  - No: carry on, and do not ask again in this chat.
 - `clean cutout NOT SET UP` is fine for captions on their own. Almost every effect needs it, and so do the looks that
   go behind the speaker (Bold captions, Chalk Talk, Show and Tell). Get it the first time the picks hold an
   effect or one of those looks: `setup.py --matting`, one time, about 105 MB.

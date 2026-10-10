@@ -112,8 +112,10 @@ def check(state=None, force=False):
     if not latest or as_tuple(latest) <= as_tuple(have):
         return f'STATUS update NONE ({have} is the newest)'
     what = f' What is new: {note}' if note else ''
-    return (f'STATUS update AVAILABLE {have} -> {latest}.{what} Ask the buyer once: "There is an update for the Studio '
-            f'with fixes. Want me to install it? It takes a minute." On yes: PY "{skillenv.shell_path(os.path.abspath(__file__))}"')
+    return (f'STATUS update AVAILABLE {have} -> {latest}.{what} Ask the buyer now, before anything else and on its own: '
+            f'"There is an update for the Studio with fixes. Want me to install it? It takes a minute." On yes, run this '
+            f'right away and then stop (no setup questions, no picker, no edit in this chat): '
+            f'PY "{skillenv.shell_path(os.path.abspath(__file__))}"')
 
 
 def claude_program():
@@ -175,7 +177,7 @@ def update():
         say(manual(marketplace) + '   (what the update said: ' + out[-160:].replace('\n', ' ') + ')')
         return 2
     say(f'STATUS update DONE {have} -> {got[0]}. Tell the buyer: "Updated. Start a new chat and you are on the new '
-        'version. Your picks and your style are untouched."')
+        'version. Your picks and your style are untouched." Then stop: do nothing else in this chat.')
     return 0
 
 
