@@ -29,6 +29,17 @@ SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP = 'video-studio'
 HYPERFRAMES = 'hyperframes@0.8.34'
 MIN_NODE = 22
+# The skill's own Node, only when the computer has no Node 22+: setup.py fetches this exact version from nodejs.org
+# into <state>/node and checks the download against the SHA-256 nodejs.org publishes for it (SHASUMS256.txt of that
+# version). Windows always gets the x64 build (it also runs on Windows on ARM, like the x64 Python the skill asks for).
+OWN_NODE = 'v22.23.2'
+OWN_NODE_SHA256 = {
+    'darwin-arm64.tar.gz': '61130f394c1630d211dd50aecc4353d379480f36d3ac913cd85dbba1aed585c6',
+    'darwin-x64.tar.gz': '58e99022c2ff89395576cc7fd4d98cea24bb68081475d5f88b801ee8729fb026',
+    'linux-arm64.tar.gz': '013b59cfd2819703a6f4a14ab891fc46fc2a4e3f5bcd92de3fb4929b43e35b30',
+    'linux-x64.tar.gz': 'b294a556e639d64338823920e5866c21c02741742d2e1529ee1a225c1ec9252a',
+    'win-x64.zip': '1177b4137ba5adaa56354ae40f1080c7450e8ae09cecb47da459d1c52ac99f97',
+}
 MIN_PY = (3, 10)      # what the README asks for
 OLDEST_PY = (3, 9)    # what the pinned packages still install on (the system Python of many Macs); never refused
 SCHEMA = 1
@@ -236,6 +247,30 @@ def models_dir(state=None):
     return os.path.join(state or state_dir(), 'models')
 
 
+def node_dir(state=None):
+    """Where the skill's own Node lives, when setup.py had to fetch one."""
+    return os.path.join(state or state_dir(), 'node')
+
+
+def own_node_build(osn, arch):
+    """-> the nodejs.org build for this system ('darwin-arm64.tar.gz'), or None when the skill has no pin for it."""
+    if osn == 'windows':
+        return 'win-x64.zip'
+    system = {'macos': 'darwin', 'linux': 'linux'}.get(osn)
+    name = f'{system}-{arch}.tar.gz'
+    return name if name in OWN_NODE_SHA256 else None
+
+
+def own_node(state=None, osn=None):
+    """-> the node program of the skill's own copy, or None when there is none."""
+    osn = osn or os_name()[0]
+    for d in sorted(glob.glob(os.path.join(node_dir(state), 'node-v*')), reverse=True):
+        cand = os.path.join(d, 'node.exe') if osn == 'windows' else os.path.join(d, 'bin', 'node')
+        if os.path.isfile(cand):
+            return cand
+    return None
+
+
 def venv_python(base, osn):
     pm = _pm(osn)
     if osn == 'windows':
@@ -371,11 +406,12 @@ def nvm_node22(environ=None, home=None):
     return cand, v
 
 
-def find_node(osn=None, environ=None, home=None):
+def find_node(osn=None, environ=None, home=None, state=None):
     """-> (node path or None, version text, on_path).
     macOS / Linux with nvm: nvm's Node 22 first, as `nvm use 22` did before (same Node as the zsh scripts used).
     Otherwise the node on PATH when it is new enough. Otherwise look in Homebrew / the Windows installer folder /
-    other version managers and take Node 22 if it is there, else the newest."""
+    other version managers and take Node 22 if it is there, else the newest. Last, the skill's own copy in the
+    state folder (setup.py fetches it when the computer has none)."""
     osn = osn or os_name()[0]
     best = (None, '', False)
     p = shutil.which('node')
@@ -399,6 +435,11 @@ def find_node(osn=None, environ=None, home=None):
     if found:
         _, _, cand, v = max(found)
         return cand, v, False
+    own = own_node(state, osn)
+    if own:
+        v = _node_version(own)
+        if node_major(v) >= MIN_NODE:
+            return own, v, False
     return best
 
 

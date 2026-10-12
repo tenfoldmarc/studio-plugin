@@ -49,22 +49,32 @@ you deliver: one caption look from the first frame to the last, in the buyer's s
 `SK` is this skill's folder (the one holding this file): `${CLAUDE_SKILL_DIR}`, or the base directory Claude Code
 gave you when it loaded the skill. `SK` is read-only: never write into it.
 
-Run the setup script with whichever Python the machine has. Try in order until one prints STATUS lines:
-`python3 "SK/scripts/setup.py"`, then `python "SK/scripts/setup.py"`, then `py -3 "SK/scripts/setup.py"`.
-(On Windows `python3` is often a Store stub that prints "Python was not found": try the next one.) It takes a few
-seconds, a minute or two the very first time while it builds its own Python environment (say so). None of them
-runs: Python is missing. Give the fix and stop (Windows: paste `winget install --id Python.Python.3.12 -e` into
-PowerShell, then quit Claude Code completely and reopen it. Mac: download the installer from
-https://www.python.org/downloads/ and run it. Linux: `sudo apt install python3 python3-venv`).
+Run the setup check. The buyer does not need Python, Node or ffmpeg on the computer: the Studio gets its own copy
+of whatever is missing, into `ST`, with no password and nothing installed system-wide.
+- Mac and Linux: `sh "SK/scripts/start.sh"`. Always this one. Never run a bare `python3` on a Mac: without Apple's
+  developer tools it opens an "install developer tools" window.
+- Windows: try in order until one prints STATUS lines: `python3 "SK/scripts/setup.py"`, then
+  `python "SK/scripts/setup.py"`, then `py -3 "SK/scripts/setup.py"`. (`python3` is often a Store stub that prints
+  "Python was not found": try the next one.) None of them runs: there is no Python, so run
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "SK/scripts/start.ps1"`. It gets the Studio its own Python
+  and then runs the setup.
+
+It takes a few seconds, a few minutes the very first time while it downloads what is missing and builds its own
+Python environment (say so). Only when it prints `STATUS python MISSING`, or `start.ps1` fails in any other way:
+give the fix and stop (Windows: paste `winget install --id Python.Python.3.12 -e` into PowerShell, then quit
+Claude Code completely and reopen it. Mac: download the installer from https://www.python.org/downloads/ and run
+it. Linux: `sudo apt install python3 python3-venv`).
 
 Read the STATUS lines:
 - `STATUS state <folder>` is `ST`, the buyer's own Studio folder. Everything this skill keeps lives there (its
   Python, `.platform.json`, `config.json`, `studio-picks.json`, sound effects). It is outside the skill on purpose,
   so an update never wipes their picks.
-- node / python `MISSING`, or ffmpeg `MISSING` (only when its own copy could not be fetched): the line ends with
-  the steps for THIS machine, written for someone who has never used a terminal. Pass them on word for word and
-  stop until the script prints `READY`. On Windows they paste the winget line into their own PowerShell window,
-  then quit Claude Code completely and reopen it.
+- node, python or ffmpeg `MISSING` (only when the Studio could not fetch its own copy: no internet, or a system
+  there is no build for): the line ends with the steps for THIS machine, written for someone who has never used a
+  terminal. Pass them on word for word and stop until the script prints `READY`. On Windows they paste the winget
+  line into their own PowerShell window, then quit Claude Code completely and reopen it.
+- `the download did not finish, trying again (attempt 2 of 3)`: a download got stuck and the Studio started it
+  again by itself. Nothing to do. Only the `OK` or `MISSING` line that follows counts.
 - Sound effects `MISSING` (offline) is fine: the reel just has no sound effects until they are there.
 - `STATUS update AVAILABLE`: a newer version of the Studio is out. This comes first, before the setup questions,
   the picker or any edit. Ask it on its own: "There's an update for the Studio with fixes. Want me to install it?
@@ -81,7 +91,8 @@ Read the STATUS lines:
 
 What a new buyer downloads, and when (one time each; how long depends on their connection, so say the size, not
 a time):
-- at setup: the skill's Python environment, about 0.25 GB.
+- at setup: the skill's Python environment, about 0.25 GB. On a computer that has none of its own, also Python
+  (about 25 MB on a Mac, 46 MB on Windows), Node (about 50 MB) and ffmpeg (about 45 to 75 MB).
 - at the first edit: the speech model, about 0.5 GB at step 1 and 1.4 GB more at step 4. HyperFrames (the
   renderer), about 0.4 GB, the first time `HF` or `layout.py` runs, then its browser (about 0.2 GB) at the first
   snapshot or render and its quick-cutout model (about 0.2 GB) at step 5.

@@ -16,8 +16,10 @@ Optional:   --state <dir>   keep the skill's working files in that folder (defau
   1. ffmpeg + ffprobe: the ones on PATH, else the ones in the usual install folders (used by their full path), else
      the skill gets its own copy into its Python environment (static-ffmpeg, pinned; 42 to 142 MB by system)
   2. Node 22+ (HyperFrames renders with it; an nvm / Homebrew / installer copy is picked up even when an older
-     Node is the default)
-  3. Python 3.10+ and a venv in the state folder with faster-whisper + Pillow (transcription, head tracking)
+     Node is the default; with none the skill gets its own copy into the state folder, pinned and checksum-checked)
+  3. Python 3.10+ and a venv in the state folder with faster-whisper + Pillow (transcription, head tracking).
+     A computer with no Python at all starts through start.sh / start.ps1, which fetch the skill its own Python
+     first and then run this script with it.
   4. Sound effects (not bundled: the Pixabay license forbids redistributing the files)
   5. The picks file (what the buyer chose in the Studio Picker): found, or not saved yet
 
@@ -26,12 +28,16 @@ everything is ready. Writes <state>/.platform.json (os, arch, the venv Python, h
 scripts and SKILL.md read the right commands instead of detecting again. Nothing is sent anywhere.
 """
 import datetime
+import hashlib
 import json
 import os
 import shutil
 import subprocess
 import sys
+import tarfile
+import time
 import urllib.request
+import zipfile
 
 sys.dont_write_bytecode = True   # no __pycache__ next to the scripts: a plugin's folder is not ours to write in
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -105,11 +111,16 @@ def check_ffmpeg(osn):
 
 
 # The skill's own ffmpeg + ffprobe, only when the computer has none. static-ffmpeg is a small pip package that
-# downloads one ready-made build for this system into the skill's Python environment (inside the state folder):
-# about 42 MB on an Apple Silicon Mac, 53 MB on an Intel Mac, 72 MB on Windows, 142 MB on Linux. Pinned, and
-# installed without its dependency list because that list names a publishing tool the download does not use.
+# keeps one ready-made build for this system in the skill's Python environment (inside the state folder): about
+# 42 MB on an Apple Silicon Mac, 53 MB on an Intel Mac, 72 MB on Windows, 142 MB on Linux. Pinned, and installed
+# without its dependency list because that list names a publishing tool the download does not use.
+# The package says where its build comes from and where it goes, and hands back the two paths. The download itself
+# is done here with fetch(): the package's own download waits ten minutes on a connection that has stopped and
+# never tries again (2026-10-11: one sat at 26 MB until setup gave up on ffmpeg after 15 silent minutes).
 OWN_FFMPEG = ['static-ffmpeg==3.0']
 OWN_FFMPEG_NEEDS = ['requests>=2,<3', 'filelock>=3', 'progress==1.6.1']
+OWN_FFMPEG_WHERE = ('from static_ffmpeg import run\n'
+                    'print("URL=" + run.get_platform_http_zip())\nprint("DIR=" + run.get_platform_dir())\n')
 OWN_FFMPEG_FETCH = ('from static_ffmpeg import run\n'
                     'ff, fp = run.get_or_fetch_platform_executables_else_raise()\n'
                     'print("FFMPEG=" + ff)\nprint("FFPROBE=" + fp)\n')
@@ -119,50 +130,151 @@ OWN_FFMPEG_SIZE = {'macos': 'about 45 MB on an Apple Silicon Mac, 55 MB on an In
 
 def own_ffmpeg(py, osn):
     """-> (ok, ffmpeg, ffprobe): the skill's own copy, fetched once. Falls back to the install steps when it cannot
-    be fetched (offline, a system the package has no build for)."""
-    def fetch_paths():
+    be fetched (offline, a download that stops three times in a row, a system the package has no build for)."""
+    def ask(code):
+        """Run a few lines with the skill's Python -> {KEY: value} from the KEY=value lines they print."""
         try:
-            r = subprocess.run([py, '-c', OWN_FFMPEG_FETCH], **skillenv.TEXT, timeout=900)
+            r = subprocess.run([py, '-c', code], **skillenv.TEXT, timeout=120)
         except (OSError, subprocess.SubprocessError):
-            return None, None
-        got = dict(l.split('=', 1) for l in (r.stdout or '').splitlines() if l.startswith(('FFMPEG=', 'FFPROBE=')))
-        ff, fp = got.get('FFMPEG'), got.get('FFPROBE')
-        return (ff, fp) if r.returncode == 0 and ff and fp and os.path.isfile(ff) and os.path.isfile(fp) else (None, None)
+            return {}
+        if r.returncode != 0:
+            return {}
+        return dict(l.split('=', 1) for l in (r.stdout or '').splitlines()
+                    if l.startswith(('URL=', 'DIR=', 'FFMPEG=', 'FFPROBE=')))
+
+    def there(folder):
+        """The build is unpacked in the package's folder: its own "all here" mark, and the program itself."""
+        return bool(folder) and os.path.isfile(os.path.join(folder, 'installed.crumb')) and any(
+            os.path.isfile(os.path.join(folder, n)) for n in ('ffmpeg', 'ffmpeg.exe'))
+
+    def get(url, folder):
+        """Download the build and unpack it the way the package does: the zip holds one folder named after the
+        system, and the mark is written last so a run that was cut off starts over."""
+        if not url or not folder:
+            return False
+        archive = folder + '.zip'
+        try:
+            os.makedirs(os.path.dirname(folder), exist_ok=True)
+            if not fetch(url, archive, tries=3, what='ffmpeg'):
+                return False
+            shutil.rmtree(folder, ignore_errors=True)   # our own leftovers from a run that was cut off
+            unpack(archive, os.path.dirname(folder))
+            if any(os.path.isfile(os.path.join(folder, n)) for n in ('ffmpeg', 'ffmpeg.exe')):
+                with open(os.path.join(folder, 'installed.crumb'), 'w', encoding='utf-8') as f:
+                    f.write(f'installed from {url} by setup.py on {datetime.datetime.now()}')
+        except (OSError, zipfile.BadZipFile):
+            return False
+        finally:
+            if os.path.isfile(archive):
+                os.remove(archive)   # our own download, nothing of the user's
+        return there(folder)
 
     if not py:
         say(f"STATUS ffmpeg MISSING -> {fix('ffmpeg', osn)}")
         return False, None, None
-    try:
-        have = subprocess.run([py, '-c', 'import static_ffmpeg'], capture_output=True, timeout=120).returncode == 0
-    except (OSError, subprocess.SubprocessError):
-        have = False
-    ff, fp = fetch_paths() if have else (None, None)
-    if not ff:
+    where = ask(OWN_FFMPEG_WHERE)           # {} until the package is in the skill's Python
+    ready = there(where.get('DIR'))
+    if not ready:
         say(f'STATUS ffmpeg: none found on this computer, getting the skill its own copy ({OWN_FFMPEG_SIZE[osn]}, one time)')
-        subprocess.run([py, '-m', 'pip', 'install', '-q', '--no-deps'] + OWN_FFMPEG, **skillenv.TEXT)
-        subprocess.run([py, '-m', 'pip', 'install', '-q'] + OWN_FFMPEG_NEEDS, **skillenv.TEXT)
-        ff, fp = fetch_paths()
-    if ff:
-        ver, lacking = ffmpeg_facts(ff)
-        if not lacking:
-            say(f"STATUS ffmpeg OK ({ver}, the skill's own copy)")
-            return True, ff, fp
+        if not where:
+            subprocess.run([py, '-m', 'pip', 'install', '-q', '--no-deps'] + OWN_FFMPEG, **skillenv.TEXT)
+            subprocess.run([py, '-m', 'pip', 'install', '-q'] + OWN_FFMPEG_NEEDS, **skillenv.TEXT)
+            where = ask(OWN_FFMPEG_WHERE)
+        ready = get(where.get('URL'), where.get('DIR'))
+    if ready:                               # the package finds its mark, so it only hands back the paths
+        got = ask(OWN_FFMPEG_FETCH)
+        ff, fp = got.get('FFMPEG'), got.get('FFPROBE')
+        if ff and fp and os.path.isfile(ff) and os.path.isfile(fp):
+            ver, lacking = ffmpeg_facts(ff)
+            if not lacking:
+                say(f"STATUS ffmpeg OK ({ver}, the skill's own copy)")
+                return True, ff, fp
     say(f"STATUS ffmpeg MISSING (the skill could not get its own copy: no internet, or no build for this system) -> {fix('ffmpeg', osn)}")
     return False, None, None
 
 
 # ------------------------------------------------------------------ 2. node
-def check_node(osn):
-    node, ver, on_path = skillenv.find_node(osn)
+OWN_NODE_SIZE = {'macos': 'about 50 MB', 'linux': 'about 55 MB', 'windows': 'about 36 MB'}
+
+
+def sha256_of(path):
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for block in iter(lambda: f.read(1 << 20), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def unpack(archive, into):
+    """Unpack a .tar.gz or .zip that has already passed its SHA-256 check."""
+    if archive.endswith('.zip'):
+        with zipfile.ZipFile(archive) as z:
+            z.extractall(into)
+        return
+    with tarfile.open(archive) as t:
+        if hasattr(tarfile, 'data_filter'):
+            t.extractall(into, filter='data')
+        else:                                   # a Python from before the filters existed (3.9.6 on many Macs)
+            t.extractall(into)
+
+
+def own_node(osn, state, arch):
+    """-> (node, version, npx) of the skill's own Node, fetched once into the state folder, or (None, '', None)
+    when it cannot be fetched (offline, a system nodejs.org has no build for, a download that fails its check)."""
+    build = skillenv.own_node_build(osn, arch)
+    if not build:
+        return None, '', None
+    name = f'node-{skillenv.OWN_NODE}-{build}'
+    root = skillenv.node_dir(state)
+    folder = os.path.join(root, name[:-len('.zip' if build.endswith('.zip') else '.tar.gz')])
+    archive, tmp = os.path.join(root, name), os.path.join(root, '.unpack')
+    os.makedirs(root, exist_ok=True)
+    try:
+        if not fetch(f'https://nodejs.org/dist/{skillenv.OWN_NODE}/{name}', archive, tries=3, what='node'):
+            return None, '', None
+        if sha256_of(archive) != skillenv.OWN_NODE_SHA256[build]:
+            say('STATUS node: the download did not pass its check, so it was not used')
+            return None, '', None
+        for d in (tmp, folder):                 # our own leftovers from a run that was cut off, nothing of the user's
+            shutil.rmtree(d, ignore_errors=True)
+        unpack(archive, tmp)
+        os.replace(os.path.join(tmp, os.path.basename(folder)), folder)
+    except (OSError, tarfile.TarError, zipfile.BadZipFile):
+        return None, '', None
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        if os.path.isfile(archive):
+            os.remove(archive)
+    node = skillenv.own_node(state, osn)
+    ver = skillenv._node_version(node) if node else ''
+    npx = skillenv.npx_command(node, osn) if node else None
+    if skillenv.node_major(ver) >= skillenv.MIN_NODE and npx:
+        return node, ver, npx
+    return None, '', None
+
+
+def check_node(osn, state, arch):
+    """-> (ok, node, version, npx). A Node 22+ already on the computer is used as it is. With none (or only an
+    older one) the skill gets its own copy; the install steps are only printed when that cannot be fetched."""
+    node, ver, on_path = skillenv.find_node(osn, state=state)
     if node and skillenv.node_major(ver) >= skillenv.MIN_NODE:
         npx = skillenv.npx_command(node, osn)
         if npx:
-            say(f'STATUS node OK ({ver})' if on_path else f'STATUS node OK ({ver}, using {node})')
+            if node == skillenv.own_node(state, osn):
+                say(f"STATUS node OK ({ver}, the skill's own copy)")
+            else:
+                say(f'STATUS node OK ({ver})' if on_path else f'STATUS node OK ({ver}, using {node})')
             return True, node, ver, npx
-        say(f"STATUS node found ({ver}) but npx is missing next to it -> reinstall Node: {fix('node', osn)}")
-        return False, node, ver, None
-    have = f'found {ver}, need {skillenv.MIN_NODE}+' if ver else 'not found'
-    say(f"STATUS node MISSING or < {skillenv.MIN_NODE} ({have}) -> {fix('node', osn)}")
+    have = f'found {ver}, need {skillenv.MIN_NODE}+' if ver else 'none found on this computer'
+    if node and skillenv.node_major(ver) >= skillenv.MIN_NODE:
+        have = f'found {ver} but npx is missing next to it'
+    say(f'STATUS node: {have}, getting the skill its own copy ({OWN_NODE_SIZE[osn]}, one time)')
+    own, own_ver, npx = own_node(osn, state, arch)
+    if own:
+        say(f"STATUS node OK ({own_ver}, the skill's own copy)")
+        return True, own, own_ver, npx
+    say(f"STATUS node MISSING or < {skillenv.MIN_NODE} (the skill could not get its own copy: no internet, or no "
+        f"build for this system) -> {fix('node', osn)}")
     return False, None, ver, None
 
 
@@ -250,20 +362,47 @@ def check_python(info, state):
 
 
 # ------------------------------------------------------------------ 4. sound effects
-def fetch(url, dest):
-    tmp = dest + '.part'
+STALL = 45   # seconds with nothing arriving before a download counts as stuck (a connection can hang with no error)
+
+
+def download(url, tmp):
+    """One try at url -> tmp. True only when the whole file arrived."""
+    got = 0
     try:
-        with urllib.request.urlopen(url, timeout=30) as r, open(tmp, 'wb') as f:
-            shutil.copyfileobj(r, f)
-    except Exception:   # no certificates in a python.org macOS install, offline, proxy... try the system curl
-        curl = shutil.which('curl')
-        if curl:
-            subprocess.run([curl, '-fsSL', url, '-o', tmp], capture_output=True)
-    if os.path.isfile(tmp) and os.path.getsize(tmp) > 0:
-        os.replace(tmp, dest)
-        return True
+        with urllib.request.urlopen(url, timeout=STALL) as r, open(tmp, 'wb') as f:
+            size = r.headers.get('Content-Length') or ''
+            for block in iter(lambda: r.read(1 << 16), b''):
+                f.write(block)
+                got += len(block)
+        return got > 0 and (not size.isdigit() or got == int(size))   # a connection closed early is not the file
+    except Exception:   # no certificates in a python.org macOS install, offline, proxy, a stuck connection
+        if got:
+            return False                    # it was arriving and then stopped: curl would do no better
+    curl = shutil.which('curl')             # nothing arrived at all: try the system curl
+    if not curl:
+        return False
+    try:
+        r = subprocess.run([curl, '-fsSL', '--connect-timeout', '20', '--speed-limit', '1024',
+                            '--speed-time', str(STALL), url, '-o', tmp], capture_output=True)
+    except OSError:
+        return False
+    return r.returncode == 0 and os.path.isfile(tmp) and os.path.getsize(tmp) > 0
+
+
+def fetch(url, dest, tries=1, what=None):
+    """Download url to dest. A try that stops arriving for STALL seconds is given up, and with tries > 1 the
+    download is started again, with a STATUS line under the name `what` so nobody is staring at silence."""
+    tmp = dest + '.part'
+    for attempt in range(1, tries + 1):
+        if attempt > 1:
+            if what:
+                say(f'STATUS {what}: the download did not finish, trying again (attempt {attempt} of {tries})')
+            time.sleep(3)
+        if download(url, tmp):
+            os.replace(tmp, dest)
+            return True
     if os.path.isfile(tmp):
-        os.remove(tmp)   # our own empty partial download, nothing of the user's
+        os.remove(tmp)   # our own partial download, nothing of the user's
     return False
 
 
@@ -320,7 +459,7 @@ def check_matting(py, state, install):
         if not model:
             os.makedirs(skillenv.models_dir(state), exist_ok=True)
             say('STATUS clean cutout: downloading the matting model (about 105 MB, one time)')
-            fetch(RVM_URL, os.path.join(skillenv.models_dir(state), RVM_MODEL))
+            fetch(RVM_URL, os.path.join(skillenv.models_dir(state), RVM_MODEL), tries=3, what='clean cutout')
         model, libs = matting_ready(py, state)
     if model and libs:
         say('STATUS clean cutout OK')
@@ -457,7 +596,7 @@ def main():
         f'STATUS config MISSING -> first run: ask the two setup questions, then save {config}')
 
     ff_ok, ffmpeg, ffprobe = check_ffmpeg(osn)
-    node_ok, node, node_ver, npx = check_node(osn)
+    node_ok, node, node_ver, npx = check_node(osn, state, info['arch'])
     py_ok, py = check_python(info, state)
     if ff_ok is None:                       # no usable ffmpeg on this computer: the skill gets its own copy
         ff_ok, ffmpeg, ffprobe = own_ffmpeg(py if py_ok else None, osn)
