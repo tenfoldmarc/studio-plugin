@@ -48,6 +48,9 @@
 - Never put a file path inside an ffmpeg filter (drive colons break it). Pass files with `-i`.
 - Smart App Control or antivirus can block the image library HyperFrames loads, or make ffmpeg fail once with
   `spawn EBUSY`. Retry once, then tell the buyer what Windows blocked.
+- Transcription dies with `Library cublas64_12.dll is not found or cannot be loaded`: the PC has an NVIDIA card, so
+  Whisper's default device ('auto') chose CUDA, but the CUDA toolkit is not installed. The scripts pass
+  `device='cpu'`; do the same in any one-off `WhisperModel(...)` call (a re-transcribed snippet, for example).
 - Windows on ARM: the transcription engine has no ARM build; `setup.py` asks for the x64 Python.
 - Helper files ending in `.sh` inside `effects/` are notes from the Mac builds. Do not run them: run the ffmpeg and
   HyperFrames commands they contain directly.

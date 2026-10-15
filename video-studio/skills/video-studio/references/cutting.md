@@ -19,7 +19,8 @@ People repeat a line until it lands. Rebuild what they meant to say from the tak
   can invent a word at a cut.
 - Two segments in a row from the same angle: punch one in (zoom 1.3 to 1.9, `cx` / `cy` on the chest). Sharp when
   the source is 4K, soft above about 1.4 on a 1080 source.
-- Not sure about a name or the comment keyword: transcribe just that snippet again with the names in the prompt.
+- Not sure about a name or the comment keyword: transcribe just that snippet again with the names in the prompt
+  (`WhisperModel('medium.en', device='cpu', compute_type='int8')`; never leave the device on 'auto', see gotchas.md).
 
 ```json
 [{"id": "hook", "clip": "c1", "in": 12.66, "out": 15.72, "zoom": 1.0, "cx": 0.5, "cy": 0.5, "line": "Everybody's talking about..."},

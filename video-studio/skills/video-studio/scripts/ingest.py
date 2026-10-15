@@ -74,7 +74,9 @@ def main():
     stack = ['-filter_complex', f'vstack={len(sheets)}'] if len(sheets) > 1 else []
     subprocess.run([FF, '-loglevel', 'error', '-y', *ins, *stack, os.path.join(work, 'sheets.jpg')], check=True)
 
-    m = WhisperModel('small.en', compute_type='int8')
+    # device='cpu': the default 'auto' picks CUDA on any PC with an NVIDIA card and then dies on the first clip with
+    # "Library cublas64_12.dll is not found" unless the CUDA toolkit happens to be installed
+    m = WhisperModel('small.en', device='cpu', compute_type='int8')
     lines = []
     for cid, f in sources.items():
         wav = os.path.join(work, f'{cid}.wav')

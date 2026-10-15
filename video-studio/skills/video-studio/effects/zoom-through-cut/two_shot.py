@@ -105,7 +105,7 @@ if not a.no_transcribe:
     try:
         from faster_whisper import WhisperModel
         subprocess.run([FF, '-v', 'error', '-y', '-i', AROLL, '-vn', '-ac', '1', '-ar', '16000', 'work/aroll.wav'], check=True)
-        model = WhisperModel('medium.en', compute_type='int8')
+        model = WhisperModel('medium.en', device='cpu', compute_type='int8')   # cpu, not 'auto': see scripts/ingest.py
         segs, _ = model.transcribe('work/aroll.wav', word_timestamps=True, vad_filter=False, initial_prompt=a.prompt)
         ws = [{'text': w.word.strip(), 'start': round(w.start, 3), 'end': round(w.end, 3)} for s in segs for w in s.words]
         json.dump(ws, open('words.json', 'w'), indent=1)

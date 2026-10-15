@@ -4,5 +4,6 @@
   "1.19.0": "A test update so you can try updating from inside Claude. Nothing changed in the Studio.",
   "1.20.0": "A test update so you can see how updating works. Nothing changed in the Studio.",
   "1.21.0": "When you say yes to an update, it installs right away.",
-  "1.22.0": "Setup now gets its own Python and Node when your Mac has none, and a download that gets stuck retries by itself."
+  "1.22.0": "Setup now gets its own Python and Node when your Mac has none, and a download that gets stuck retries by itself.",
+  "1.23.0": "Fixes a crash on the first transcription on Windows PCs with an NVIDIA graphics card."
 }

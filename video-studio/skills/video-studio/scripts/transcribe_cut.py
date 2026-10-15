@@ -23,7 +23,7 @@ os.makedirs(os.path.join(proj, 'work'), exist_ok=True)
 prompt = sys.argv[2] if len(sys.argv) > 2 else 'Claude, Claude Code, skill.'
 subprocess.run([skillenv.tool('ffmpeg'), '-loglevel', 'error', '-y', '-i', os.path.join(proj, 'assets', 'aroll.mp4'), '-vn', '-ac', '1',
                 '-ar', '16000', wav], check=True)
-m = WhisperModel('medium.en', compute_type='int8')
+m = WhisperModel('medium.en', device='cpu', compute_type='int8')   # cpu, not 'auto': see ingest.py
 s, _ = m.transcribe(wav, word_timestamps=True, vad_filter=False, initial_prompt=prompt)
 ws = []
 for x in s:
