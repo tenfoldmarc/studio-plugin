@@ -42,6 +42,11 @@ OWN_NODE_SHA256 = {
 }
 MIN_PY = (3, 10)      # what the README asks for
 OLDEST_PY = (3, 9)    # what the pinned packages still install on (the system Python of many Macs); never refused
+# The newest Python the pinned packages install on everywhere. Checked 2026-10-15 with pip dry runs per system:
+# 3.14 has no onnxruntime for Intel Macs, 3.15 has no ctranslate2 for anything. A newer Python on the computer is
+# skipped and the Studio uses its own pinned 3.12 (start.sh / start.ps1). Raise this only after the same check.
+NEWEST_PY = (3, 13)
+OWN_PY_MAC_PKG = 'https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg'   # Apple Silicon + Intel
 SCHEMA = 1
 # subprocess.run(..., **TEXT): capture output as UTF-8 text. Plain text mode decodes with the Windows code page
 # (cp1252) and crashes on ffmpeg printing a file name like "Angel" with an accented A.

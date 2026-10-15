@@ -17,7 +17,7 @@ Optional:   --state <dir>   keep the skill's working files in that folder (defau
      the skill gets its own copy into its Python environment (static-ffmpeg, pinned; 42 to 142 MB by system)
   2. Node 22+ (HyperFrames renders with it; an nvm / Homebrew / installer copy is picked up even when an older
      Node is the default; with none the skill gets its own copy into the state folder, pinned and checksum-checked)
-  3. Python 3.10+ and a venv in the state folder with faster-whisper + Pillow (transcription, head tracking).
+  3. Python 3.10 to 3.13 and a venv in the state folder with faster-whisper + Pillow (transcription, head tracking).
      A computer with no Python at all starts through start.sh / start.ps1, which fetch the skill its own Python
      first and then run this script with it.
   4. Sound effects (not bundled: the Pixabay license forbids redistributing the files)
@@ -66,11 +66,11 @@ def fix(what, osn):
                  'linux': 'install Node 22 LTS from https://nodejs.org (or: nvm install 22). apt\'s own nodejs is often too old',
                  'windows': 'step 1, open PowerShell from the Start menu and paste: winget install --id OpenJS.NodeJS.LTS -e . '
                             f'Step 2, {RESTART}'},
-        'python': {'macos': 'step 1, download the macOS installer from https://www.python.org/downloads/ and run it. '
-                            'Step 2, run the skill again. (With Homebrew instead: brew install python)',
+        'python': {'macos': f'step 1, download Python 3.12 from {skillenv.OWN_PY_MAC_PKG} and open it to install. '
+                            'Step 2, run the skill again. (With Homebrew instead: brew install python@3.12)',
                    'linux': 'sudo apt install python3 python3-venv',
                    'windows': f'winget install --id Python.Python.3.12 -e   ({RESTART})'},
-        'venv': {'macos': 'brew install python',
+        'venv': {'macos': 'brew install python@3.12',
                  'linux': 'sudo apt install python3-venv',
                  'windows': f'winget install --id Python.Python.3.12 -e   ({RESTART})'},
     }
@@ -280,17 +280,40 @@ def check_node(osn, state, arch):
 
 # ------------------------------------------------------------------ 3. python + venv
 def base_python():
-    """The interpreter to build the venv with: this one when it is 3.10+, otherwise a newer one on PATH, otherwise
-    this one anyway when it is 3.9 (the old setup.sh used whatever `python3` was, and 3.9 still works)."""
-    if sys.version_info[:2] >= skillenv.MIN_PY:
-        return sys.executable, sys.version_info[:2]
-    for minor in range(14, 9, -1):
+    """The interpreter to build the venv with: this one when it is 3.10 to NEWEST_PY, otherwise one of those on PATH,
+    otherwise this one anyway when it is 3.9 (the old setup.sh used whatever `python3` was, and 3.9 still works).
+    A Python newer than NEWEST_PY is never used: the transcription engine has no build for it."""
+    here = sys.version_info[:2]
+    if skillenv.MIN_PY <= here <= skillenv.NEWEST_PY:
+        return sys.executable, here
+    for minor in range(skillenv.NEWEST_PY[1], skillenv.MIN_PY[1] - 1, -1):
         p = shutil.which(f'python3.{minor}')
         if p:
             return p, (3, minor)
-    if sys.version_info[:2] >= skillenv.OLDEST_PY:
-        return sys.executable, sys.version_info[:2]
-    return None, sys.version_info[:2]
+    if skillenv.OLDEST_PY <= here < skillenv.MIN_PY:
+        return sys.executable, here
+    return None, here
+
+
+def venv_version(venv):
+    """(major, minor) the venv was built with, read from its pyvenv.cfg, or None."""
+    try:
+        with open(os.path.join(venv, 'pyvenv.cfg'), encoding='utf-8') as f:
+            for line in f:
+                key, _, value = line.partition('=')
+                if key.strip() in ('version', 'version_info'):
+                    major, minor = value.strip().split('.')[:2]
+                    return int(major), int(minor)
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def starter_command(osn):
+    """How to run the setup through start.sh / start.ps1, which get the Studio its own Python 3.12."""
+    if osn == 'windows':
+        return f'powershell -NoProfile -ExecutionPolicy Bypass -File "{os.path.join(skillenv.SKILL_DIR, "scripts", "start.ps1")}"'
+    return f'sh "{os.path.join(skillenv.SKILL_DIR, "scripts", "start.sh")}"'
 
 
 # Versions are pinned so a new upstream release cannot break installs (same pins as the setup.sh hotfix). PyAV 19
@@ -331,6 +354,12 @@ def check_python(info, state):
         say('STATUS python venv OK')
         return True, py
     base, ver = base_python()
+    if not base and ver > skillenv.NEWEST_PY:
+        newest = '.'.join(map(str, skillenv.NEWEST_PY))
+        say(f'STATUS python TOO NEW (this is {ver[0]}.{ver[1]}, the transcription engine has no build past {newest} '
+            f'yet) -> run the setup through the starter instead, it gets the Studio its own Python 3.12: '
+            f'{starter_command(osn)}')
+        return False, None
     if not base:
         say(f"STATUS python MISSING or too old (this is {ver[0]}.{ver[1]}, need 3.10+) -> {fix('python', osn)}")
         return False, None
@@ -339,11 +368,17 @@ def check_python(info, state):
             f'build) -> install the x64 Python: winget install --id Python.Python.3.12 -e --architecture x64   ({RESTART})')
         return False, None
     venv = os.path.join(state, '.venv')
+    built_with = venv_version(venv) if py else None
+    if py and not (built_with and skillenv.OLDEST_PY <= built_with <= skillenv.NEWEST_PY):
+        py = None   # broken and made with a Python the packages do not install on: repairing it would fail every time
     if py:   # the venv is there but its packages are missing or broken: repair it in place
         say(f'STATUS python venv: repairing {venv} (faster-whisper + Pillow, ~1 min)')
     else:
-        say(f'STATUS python venv: creating {venv} (faster-whisper + Pillow, ~1 min)')
-        r = subprocess.run([base, '-m', 'venv', venv], **skillenv.TEXT)
+        rebuild = os.path.isdir(venv)
+        say(f"STATUS python venv: {'rebuilding' if rebuild else 'creating'} {venv} with Python {ver[0]}.{ver[1]} "
+            '(faster-whisper + Pillow, ~1 min)')
+        # --clear empties a broken old venv first, so nothing from the old Python is left behind
+        r = subprocess.run([base, '-m', 'venv'] + (['--clear'] if rebuild else []) + [venv], **skillenv.TEXT)
         py = skillenv.find_venv_python(state, osn)
         if r.returncode != 0 or not py:
             say(f"STATUS python venv FAILED (could not create it) -> {fix('venv', osn)}")

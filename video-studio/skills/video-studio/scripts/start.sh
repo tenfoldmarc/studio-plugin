@@ -8,7 +8,8 @@
 # and then runs setup.py with it:
 #   1. the skill's own environment in the state folder (every run after the first one ends here)
 #   2. the skill's own Python in the state folder (fetched by an earlier run of this file)
-#   3. a Python 3.9+ already on the computer
+#   3. a Python 3.9 to 3.13 already on the computer (a newer one is skipped: the transcription engine has no
+#      build for it, see NEWEST_PY in skillenv.py)
 #   4. none: it fetches the skill its own Python into <state>/python (python-build-standalone, pinned, about
 #      25 MB on a Mac, checked against its SHA-256). Nothing is installed system-wide and no password is asked.
 # It prints the same STATUS lines as setup.py. When no Python can be had it prints STATUS python MISSING with the
@@ -49,8 +50,10 @@ for a in "$@"; do
   prev="$a"
 done
 
-runs() {      # is this a working Python 3.9 or newer?
-  [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import sys; sys.exit(0 if sys.version_info[:2] >= (3, 9) else 1)' >/dev/null 2>&1
+runs() {      # is this a working Python 3.9 to 3.13, one the pinned packages install on? (NEWEST_PY in skillenv.py)
+  # also for the Studio's own environment: one built on a newer Python is left to setup.py, which keeps it when it
+  # works and rebuilds it when it does not, but setup.py itself must run on a Python it can build with
+  [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import sys; sys.exit(0 if (3, 9) <= sys.version_info[:2] <= (3, 13) else 1)' >/dev/null 2>&1
 }
 
 PY=''
@@ -70,7 +73,7 @@ fi
 
 missing() {   # $1 = why
   case "$OS" in
-    Darwin) steps='step 1, download the macOS installer from https://www.python.org/downloads/ and run it. Step 2, run the skill again' ;;
+    Darwin) steps='step 1, download Python 3.12 from https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg and open it to install. Step 2, run the skill again' ;;
     *)      steps='sudo apt install python3 python3-venv' ;;
   esac
   echo "STATUS python MISSING ($1) -> $steps"
@@ -92,7 +95,7 @@ if [ -z "$PY" ]; then
       *) missing "the skill has no Python of its own for this system ($ARCH)" ;;
     esac
   fi
-  echo 'STATUS python: none found on this computer, getting the skill its own copy (about 25 MB on a Mac, 60 MB on Linux, one time)'
+  echo 'STATUS python: none on this computer it can use (it needs 3.9 to 3.13), getting the skill its own copy (about 25 MB on a Mac, 60 MB on Linux, one time)'
   mkdir -p "$STATE" || missing "could not create $STATE"
   part="$STATE/python.tar.gz.part"
   new="$STATE/python.unpack"

@@ -6,7 +6,8 @@
 # but what Windows 10 and 11 ship (PowerShell, tar). It finds a Python in this order and runs setup.py with it:
 #   1. the skill's own environment in the state folder (every run after the first one ends here)
 #   2. the skill's own Python in the state folder (fetched by an earlier run of this file)
-#   3. a Python 3.9+ already on the computer (python, then py -3)
+#   3. a Python 3.9 to 3.13 already on the computer (python, then py -3; a newer one is skipped: the transcription
+#      engine has no build for it, see NEWEST_PY in skillenv.py)
 #   4. none: it fetches the skill its own Python into <state>\python (python-build-standalone, pinned, about
 #      46 MB, checked against its SHA-256). Nothing is installed system-wide and no admin rights are asked.
 #      Always the x64 build: the transcription engine has no Windows ARM build, and x64 runs on Windows on ARM.
@@ -41,10 +42,12 @@ for ($i = 0; $i -lt $args.Count; $i++) {
 }
 
 function Test-Python([string]$Py) {
-    # is this a working Python 3.9 or newer? (the Store placeholder prints "Python was not found" and fails here)
+    # is this a working Python 3.9 to 3.13, one the pinned packages install on? (NEWEST_PY in skillenv.py; the Store
+    # placeholder prints "Python was not found" and fails here). Also for the Studio's own environment: setup.py keeps
+    # one built on a newer Python when it works, but setup.py itself must run on a Python it can build with.
     if (-not $Py -or -not (Test-Path -LiteralPath $Py -PathType Leaf)) { return $false }
     try {
-        & $Py -c "import sys; sys.exit(0 if sys.version_info[:2] >= (3, 9) else 1)" *> $null
+        & $Py -c "import sys; sys.exit(0 if (3, 9) <= sys.version_info[:2] <= (3, 13) else 1)" *> $null
         return ($LASTEXITCODE -eq 0)
     } catch { return $false }
 }
@@ -75,7 +78,7 @@ if (-not $Py) {
 }
 
 if (-not $Py) {
-    Write-Output 'STATUS python: none found on this computer, getting the skill its own copy (about 46 MB, one time)'
+    Write-Output 'STATUS python: none on this computer it can use (it needs 3.9 to 3.13), getting the skill its own copy (about 46 MB, one time)'
     $tar = Get-Command tar -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $tar) { Stop-Missing 'the skill could not unpack its own copy: this Windows has no tar' }
     try { New-Item -ItemType Directory -Force -Path $State | Out-Null } catch { Stop-Missing "could not create $State" }

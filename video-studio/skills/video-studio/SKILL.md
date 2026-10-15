@@ -62,8 +62,12 @@ of whatever is missing, into `ST`, with no password and nothing installed system
 It takes a few seconds, a few minutes the very first time while it downloads what is missing and builds its own
 Python environment (say so). Only when it prints `STATUS python MISSING`, or `start.ps1` fails in any other way:
 give the fix and stop (Windows: paste `winget install --id Python.Python.3.12 -e` into PowerShell, then quit
-Claude Code completely and reopen it. Mac: download the installer from https://www.python.org/downloads/ and run
-it. Linux: `sudo apt install python3 python3-venv`).
+Claude Code completely and reopen it. Mac: download Python 3.12 from
+https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg and open it. Linux:
+`sudo apt install python3 python3-venv`).
+
+Never install a Python yourself to get past setup, and never the newest one: the transcription engine only
+installs on Python 3.9 to 3.13. A newer Python on the computer is fine to leave there, the Studio skips it.
 
 Read the STATUS lines:
 - `STATUS state <folder>` is `ST`, the buyer's own Studio folder. Everything this skill keeps lives there (its
@@ -73,6 +77,8 @@ Read the STATUS lines:
   there is no build for): the line ends with the steps for THIS machine, written for someone who has never used a
   terminal. Pass them on word for word and stop until the script prints `READY`. On Windows they paste the winget
   line into their own PowerShell window, then quit Claude Code completely and reopen it.
+- `STATUS python TOO NEW`: the Python that ran the setup is newer than the transcription engine supports. Run the
+  command at the end of the line (the starter script). It gets the Studio its own Python 3.12. Nothing to install.
 - `the download did not finish, trying again (attempt 2 of 3)`: a download got stuck and the Studio started it
   again by itself. Nothing to do. Only the `OK` or `MISSING` line that follows counts.
 - Sound effects `MISSING` (offline) is fine: the reel just has no sound effects until they are there.
