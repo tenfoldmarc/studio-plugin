@@ -901,6 +901,15 @@ def motion(entries, scope='', base=0.0, end=None, where='Motion'):
             args = _jsjson(m.get('from') if isinstance(m.get('from'), dict) else {}) + ',' + _jsjson(v)
         else:
             v.setdefault('duration', .3)
+            if tw == 'from' and any(k in v for k in ('opacity', 'autoAlpha')):
+                # The engine hides an element until its moment (autoAlpha 0), so a from() would animate opacity from
+                # 0 to that hidden 0 and the element would never show. Opacity goes as its own fromTo, ending at 1.
+                timing = {k: v[k] for k in ('duration', 'ease', 'stagger', 'delay', 'repeat', 'yoyo', 'repeatDelay') if k in v}
+                fade = {k: v.pop(k) for k in ('opacity', 'autoAlpha') if k in v}
+                out.append(f'tl.fromTo({_jsjson(sel)},{_jsjson(fade)},'
+                           f'{_jsjson({**{k: 1 for k in fade}, **timing, "immediateRender": False})},{t:.3f});')
+                if not set(v) - set(timing):
+                    continue
             args = _jsjson(v)
         out.append(f'tl.{tw}({_jsjson(sel)},{args},{t:.3f});')
     return out

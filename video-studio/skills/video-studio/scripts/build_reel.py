@@ -99,7 +99,7 @@ def main():
         if not mine:
             sys.exit(f'No picks saved yet ({picks_path}) and no saved style. Open the Studio Picker '
                      '(PY scripts/picker.py) or build a style from an example (references/replicate.md).')
-        picks = {'mode': 'custom', 'style': None, 'captionStyle': 'none', 'effects': []}
+        picks, picks_path = {'mode': 'custom', 'style': None, 'captionStyle': 'none', 'effects': []}, 'nowhere (the style alone)'
     style = picks.get('style') if picks.get('mode') == 'preset' else None
     caption = picks.get('captionStyle') or 'none'
 
