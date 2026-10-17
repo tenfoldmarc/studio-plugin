@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 .platform.json
 node_modules/
+ci/out/

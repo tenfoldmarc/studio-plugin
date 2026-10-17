@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
@@ -50,7 +50,15 @@ What that means on every edit:
 Read the style's `style.md` at the start of every edit (`my_styles.py show` prints where it is). Check the finished
 reel against this rule before you deliver: one caption look from the first frame to the last, in the buyer's style.
 
-## Step 0: setup check (every run)
+## Step 0: the quiet check (every run) and the setup (first run only)
+
+Two different things, never mixed up:
+- **The setup** (the welcome, the two folder questions, building their first style) happens ONCE, the first time,
+  when `STATUS config MISSING` shows. After that it never comes back by itself. It runs again only when the buyer
+  asks: "set up the Studio again", "redo the setup", `/video-studio setup` ("First run only" below says how).
+- **The quiet check** below runs at the start of every chat that uses the Studio. It takes a few seconds and the
+  buyer does not see it: do not announce it, do not repeat setup questions, do not list what it found. Speak only
+  when it needs them (an update to offer, something missing to fix).
 
 `SK` is this skill's folder (the one holding this file): `${CLAUDE_SKILL_DIR}`, or the base directory Claude Code
 gave you when it loaded the skill. `SK` is read-only: never write into it.
@@ -66,7 +74,7 @@ of whatever is missing, into `ST`, with no password and nothing installed system
   and then runs the setup.
 
 It takes a few seconds, a few minutes the very first time while it downloads what is missing and builds its own
-Python environment (say so). Only when it prints `STATUS python MISSING`, or `start.ps1` fails in any other way:
+Python environment (say so that first time only). Only when it prints `STATUS python MISSING`, or `start.ps1` fails in any other way:
 give the fix and stop (Windows: paste `winget install --id Python.Python.3.12 -e` into PowerShell, then quit
 Claude Code completely and reopen it. Mac: download Python 3.12 from
 https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg and open it. Linux:
@@ -125,7 +133,12 @@ after the project folder (`"renders/<slug>-v1.mp4"`): `HF` and both check script
 ### First run only
 
 `/video-studio setup` (or "set up the Studio") is how a new buyer starts. Run Step 0, then the three steps below.
-Do not ask for clips until they have a style. Run again later, it only repeats what is still missing.
+Do not ask for clips until they have a style.
+
+When a buyer who is already set up asks for the setup again ("set up the video studio", "redo my setup",
+`/video-studio setup`): run Step 0, then show what they have in two plain lines (the clips folder and the projects
+folder, their saved styles and which is the default) and ask what they want to change: the folders, a new style,
+or their default. Change only that. Never wipe their styles, picks or folders.
 
 `STATUS config MISSING`:
 1. Say: "Welcome to Claude Creator Studio. Two quick questions, then we build your editing style. This only

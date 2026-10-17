@@ -627,8 +627,10 @@ def main():
             say(line)
     except (ImportError, OSError, ValueError):
         pass
-    say(f'STATUS config FOUND {config}' if os.path.isfile(config) else
-        f'STATUS config MISSING -> first run: ask the two setup questions, then save {config}')
+    # a config.json that only holds the default style (written by my_styles.py before the setup questions) is not done
+    asked = (skillenv._read_json(config, {}) or {}).get('clipsDir')
+    say(f'STATUS config FOUND {config}' if asked else
+        f'STATUS config MISSING -> first run: ask the two setup questions, then save {config} (keep any keys in it)')
 
     ff_ok, ffmpeg, ffprobe = check_ffmpeg(osn)
     node_ok, node, node_ver, npx = check_node(osn, state, info['arch'])

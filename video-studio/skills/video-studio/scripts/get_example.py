@@ -139,9 +139,12 @@ def have_yt_dlp(update=False):
     if ok and not update:
         return True
     say('getting the link downloader (yt-dlp, about 3 MB, one time)...' if not ok else 'updating the link downloader...')
-    r = subprocess.run([sys.executable, '-m', 'pip', 'install', '--quiet', '--disable-pip-version-check', '--upgrade',
-                        'yt-dlp'], timeout=600, **skillenv.TEXT)
-    return r.returncode == 0
+    try:
+        r = subprocess.run([sys.executable, '-m', 'pip', 'install', '--quiet', '--disable-pip-version-check', '--upgrade',
+                            'yt-dlp'], timeout=600, **skillenv.TEXT)
+    except (OSError, subprocess.SubprocessError):
+        return ok
+    return r.returncode == 0 or ok
 
 
 def from_link(src, name=None):
@@ -179,10 +182,16 @@ def from_link(src, name=None):
             have_yt_dlp(update=True)        # most other failures are an out-of-date downloader: update once, try again
             continue
         break
-    if any(x in err for x in ('login', 'log in', 'cookies', 'rate-limit', 'rate limit')):
+    if browser and any(x in err for x in ('could not copy', 'decrypt', 'dpapi', 'app-bound', 'permission denied',
+                                              'operation not permitted', 'unsupported browser')):
+        say(f'STATUS example FAILED: {browser}\'s login could not be read on this computer (Chrome and Edge on '
+            'Windows lock it, and Safari needs Full Disk Access on a Mac). Try Firefox if they use it, or ask the buyer '
+            'to download the video and drop the file in.')
+    elif any(x in err for x in ('login', 'log in', 'cookies', 'rate-limit', 'rate limit')):
         say('STATUS example FAILED LOGIN: this post only shows to someone logged in. Ask the buyer: "Can I use your '
-            'browser\'s login to fetch it? Nothing is saved." On yes, run again with --browser <their browser>. Or they '
-            'download the video themselves and drop the file in.')
+            'browser\'s login to fetch it? Nothing is saved." On yes, run again with --browser <their browser> '
+            '(on Windows, Firefox works best: Chrome and Edge lock their login there). Or they download the video '
+            'themselves and drop the file in.')
     elif any(x in err for x in gone):
         say('STATUS example FAILED: that post is private or was taken down. Ask for another link, or the video file.')
     else:

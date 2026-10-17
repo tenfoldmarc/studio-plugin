@@ -1,0 +1,62 @@
+# The Studio's first run and one full edit on real Windows, Intel Mac and Apple Silicon machines (ci/e2e.py).
+# Runs on a push to a test branch or by hand. Never on main: buyers get updates from main, and this is a check
+# before anything goes there.
+name: studio-e2e
+
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows-x64
+          - os: macos-15-intel
+            name: mac-intel
+          - os: macos-latest
+            name: mac-apple-silicon
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      # A buyer's computer has none of what a GitHub machine comes with. Take the usual Python, Node and ffmpeg off
+      # the PATH so the Studio has to find or fetch its own, as it would on a fresh computer.
+      - name: Hide preinstalled tools (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $keep = ($env:PATH -split ';') | Where-Object { $_ -notmatch 'python|Python|hostedtoolcache|nodejs|ffmpeg|Git\\usr\\bin|Strawberry' }
+          "PATH=$($keep -join ';')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Hide preinstalled tools (Mac)
+        if: runner.os == 'macOS'
+        run: echo "PATH=/usr/bin:/bin:/usr/sbin:/sbin" >> "$GITHUB_ENV"
+
+      # The test driver itself needs a Python; the Studio is not given it (it is not on the PATH the Studio sees).
+      - name: First run and one full edit (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          E2E_OUT: ${{ github.workspace }}\ci\out
+        run: |
+          $py = Get-ChildItem 'C:\hostedtoolcache\windows\Python\3.12*\x64\python.exe' | Select-Object -First 1
+          & $py.FullName ci/e2e.py
+          exit $LASTEXITCODE
+      - name: First run and one full edit (Mac)
+        if: runner.os == 'macOS'
+        env:
+          E2E_OUT: ${{ github.workspace }}/ci/out
+        run: /usr/bin/python3 ci/e2e.py
+
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ matrix.name }}
+          path: ci/out
+          if-no-files-found: warn
