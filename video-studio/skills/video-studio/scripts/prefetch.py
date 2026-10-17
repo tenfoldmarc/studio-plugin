@@ -11,7 +11,7 @@ What it gets, one time each (about 3 GB in all, how long depends on their connec
               by building and rendering a one-second test page
   cutout      the quick person cutout model (about 170 MB), by cutting out one test frame
   matting     the clean cutout (about 105 MB, setup.py --matting): almost every effect and the behind-the-speaker looks
-The parts run side by side. A part that is already there takes a second. Running it twice is harmless, and a part
+The parts run side by side (the renderer before the cutout, which needs it installed). A part that is already there takes a second. Running it twice is harmless, and a part
 that failed is simply tried again next time (or at the first edit, which downloads whatever is still missing).
 State: <state folder>/prefetch.json, the full output in <state folder>/prefetch.log.
 """
@@ -190,7 +190,16 @@ def main():
         if p not in todo:
             print(f'STATUS prefetch {p} DONE (already there)', flush=True)
             results[p] = True
-    threads = [threading.Thread(target=one, args=(p,)) for p in todo]
+    # renderer and cutout both start HyperFrames: two first-time npx installs at once trip over each other (seen on an
+    # Intel Mac), so those two run one after the other in one thread; speech and matting run beside them
+    def chain(parts):
+        for p in parts:
+            one(p)
+
+    hf = [p for p in ('renderer', 'cutout') if p in todo]
+    threads = [threading.Thread(target=one, args=(p,)) for p in todo if p not in hf]
+    if hf:
+        threads.append(threading.Thread(target=chain, args=(hf,)))
     for t in threads:
         t.start()
     for t in threads:
