@@ -89,12 +89,21 @@ if (-not $Py) {
     }
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri $PyUrl -OutFile $part -UseBasicParsing
+        # .NET first for the same reason as the checksum below; Invoke-WebRequest only if that is refused
+        try { (New-Object Net.WebClient).DownloadFile($PyUrl, $part) }
+        catch { Invoke-WebRequest -Uri $PyUrl -OutFile $part -UseBasicParsing }
     } catch {
         if (Test-Path -LiteralPath $part) { Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue }
         Stop-Missing 'the skill could not get its own copy: no internet'
     }
-    $got = (Get-FileHash -LiteralPath $part -Algorithm SHA256).Hash.ToLower()
+    # .NET, not Get-FileHash: started from PowerShell 7 (pwsh), Windows PowerShell 5.1 inherits pwsh's module path and
+    # cannot load the module Get-FileHash lives in (seen on a fresh Windows machine). .NET is always there.
+    $got = ''
+    try {
+        $stream = [IO.File]::OpenRead($part)
+        try { $got = ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($stream))).Replace('-', '').ToLower() }
+        finally { $stream.Dispose() }
+    } catch { $got = '' }
     if ($got -ne $PySha256) {
         Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue
         Stop-Missing 'the download did not pass its check, so it was not used'
