@@ -180,9 +180,10 @@ The type facts of the caption styles, for matching:
 | Outline | Bebas Neue | the same, drawn hollow | capitals | white | none |
 
 When a detail matters and this table is not enough, read the style's own function in `SK/engine/captions.py`
-(read only). A buyer's own style goes over this table. When they have one (`ST/my-style.json`, built from an
-example or a description, `references/replicate.md`), the reel's captions are their own custom spec, not one of
-these: restyle an effect's words to the values in that spec (`font`, `weight`, `case`, `color`, `accent`, `plate`).
+(read only). A buyer's own style goes over this table. When the reel is in one of their saved styles with a custom
+caption spec (`references/my-styles.md`, built from an example or a description, `references/replicate.md`), the
+reel's captions are their own spec, not one of these: restyle an effect's words to the values in that spec (`font`,
+`weight`, `case`, `color`, `accent`, `plate`), and match its `motion` where the effect's words animate in.
 
 ## The list
 

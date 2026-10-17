@@ -1,7 +1,7 @@
 # GIFs
 
 Only when the buyer asks for them: "add a GIF when I say X", "put some GIFs in this one", or "always use GIFs"
-(then write it into `ST/my-style.md` and do it on every reel). Never on your own.
+(then write it into the style's `style.md` and do it on every reel in that style). Never on your own.
 
 ## Which lines get one
 

@@ -641,7 +641,13 @@ def main():
         check_fx(py if py_ok else None, fx_keys(sys.argv[1:]))
     picks = skillenv.picks_file(state)
     say(f'STATUS picks FOUND {picks}' if os.path.isfile(picks) else
-        f'STATUS picks MISSING -> open the Studio Picker (scripts/picker.py) and wait for the save')
+        'STATUS picks MISSING (fine when they have a saved style)')
+    have = skillenv.saved_styles(state)
+    if have:
+        say('STATUS styles ' + ', '.join(s['name'] + (' (default)' if s['default'] else '') for s in have))
+    else:
+        say('STATUS styles NONE -> first run: build their first style (SKILL.md, "First run only")'
+            if not os.path.isfile(picks) else 'STATUS styles NONE (the Picker picks are used)')
     ready = ff_ok and node_ok and py_ok
 
     sp = skillenv.shell_path

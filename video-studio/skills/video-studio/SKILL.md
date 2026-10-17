@@ -1,19 +1,24 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Turns raw 9:16 talking-head clips into a finished Instagram reel in the look the creator saved in the Studio Picker: one of 19 caption styles, or one of 8 overall styles, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Claude Creator Studio. Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
 
-Raw clips in, finished reel out, in the look the buyer picked. They set up once, pick in the Studio Picker, and
-from then on drop clips in and say "edit it". They never open an editor: they watch a phone copy and give notes. They can change their editing style at any point if they tell you to.
+Raw clips in, finished reel out, in the buyer's own editing style. They show you reels whose editing they love (links
+or files, mixing captions from one and motion from another), or describe it, or pick from the Studio's built-in
+looks. You rebuild that look on their clips and save it under a name they choose. They can keep several styles
+("Cozy Talk", "Hype") and from then on drop clips in and say "edit these in Cozy Talk", or just "edit it" for their
+default. They never open an editor: they watch a phone copy and give notes.
 
 Read before the first edit: `references/cutting.md` (takes, dead air, fixing the transcript),
 `references/captions.md` (the 19 caption styles, how to mark words, where captions go),
-`references/checks.md` (footage check, self-check, safe zone). Read `references/styles.md` when the picks hold an
-overall style, `effects/INDEX.md` when they hold effects, `references/gotchas.md` when a build or render misbehaves.
-Read `references/replicate.md` the moment the buyer shows an example or describes a look of their own.
-Read `references/gifs.md` when the buyer asks for GIFs (you can find them yourself and place them on the right lines).
+`references/checks.md` (footage check, self-check, safe zone), `references/my-styles.md` (the saved styles).
+Read `references/replicate.md` and `references/motion.md` the moment the buyer shows an example or describes a look
+of their own: you can rebuild nearly any talking-head or voice-over edit, animation included. Read
+`references/styles.md` when the picks hold an overall style, `effects/INDEX.md` when they hold effects,
+`references/gotchas.md` when a build or render misbehaves, `references/gifs.md` when the buyer asks for GIFs (you
+can find them yourself and place them on the right lines).
 
 ## The buyer's style wins. Read this first.
 
@@ -22,11 +27,11 @@ style beats all of it.
 
 Order of precedence, highest first:
 1. What the buyer asks for on this reel.
-2. An example they gave or a style they described. You study it and REPLICATE it, and it becomes their own style
-   (`ST/my-style.md` + `ST/my-style.json`, see "When the buyer shows an example or describes a style"). Once it
-   exists, every "edit it" uses it without asking until told otherwise, and the built-in caption styles and effects are only used
-   where the buyer asks for them.
-3. Their saved picks: the overall style or the caption style in `ST/studio-picks.json`.
+2. The saved style this reel is in: the one they named ("edit it in Cozy Talk"), else their default style
+   (`references/my-styles.md`). A style built from their examples or words is REPLICATED, not mapped onto the
+   nearest built-in look (see "Building a style"). The built-in caption styles and effects are only used where the
+   style or the buyer asks for them.
+3. The Studio Picker picks in `ST/studio-picks.json`, when they have no saved style.
 4. An effect's own default look. Always last.
 
 What that means on every edit:
@@ -39,10 +44,11 @@ What that means on every edit:
 - **Effects are suggestions.** They are a base for buyers who do not know what they want yet. Use a picked one only where it fits the clip and the line. Drop one rather than force it
   against the style, and say why in one line. Tweak the look of the effects to make sense with the clip you are editing. Meaning the words being spoken, the person saying the words, etc.
 - **A note from the buyer is an instruction.** "Make it white", "less zoom", "no sounds": do it on this reel. If
-  they say "always", write it into `ST/my-style.md` so every later reel follows it.
+  they say "always", write it into the style the reel is in (style.json when it is a setting, its style.md
+  "Standing notes" when it is a rule for you) so every later reel in that style follows it.
 
-Read `ST/my-style.md` at the start of every edit when it exists. Check the finished reel against this rule before
-you deliver: one caption look from the first frame to the last, in the buyer's style.
+Read the style's `style.md` at the start of every edit (`my_styles.py show` prints where it is). Check the finished
+reel against this rule before you deliver: one caption look from the first frame to the last, in the buyer's style.
 
 ## Step 0: setup check (every run)
 
@@ -118,22 +124,37 @@ after the project folder (`"renders/<slug>-v1.mp4"`): `HF` and both check script
 
 ### First run only
 
-`/video-studio setup` (or "set up the Studio") is how a new buyer starts: run Step 0, do the first-run steps below, then
-open the Studio Picker. Do not ask for clips yet. When the picks are saved, say they are ready and that the next step
-is to drop clips in and say "edit it". Run again later, it only repeats what is still missing. The person can skip picking options from the studio picker and send you an example or multiple examples of video editing styles. You should study the videos or pictures provided so you can replicate the style.
+`/video-studio setup` (or "set up the Studio") is how a new buyer starts. Run Step 0, then the three steps below.
+Do not ask for clips until they have a style. Run again later, it only repeats what is still missing.
 
 `STATUS config MISSING`:
-1. Say: "Welcome to Claude Creator Studio. Two quick questions, then you pick your look. This only happens once."
-2. Ask in one message: where their raw clips usually land (default `~/Downloads`) and where reel projects should
-   live (default `~/reel-edits`).
-3. Save `ST/config.json`: `{"clipsDir": "~/Downloads", "projectsDir": "~/reel-edits", "setupDate": "YYYY-MM-DD"}`.
+1. Say: "Welcome to Claude Creator Studio. Two quick questions, then we build your editing style. This only
+   happens once."
+2. Ask in one message: where their raw clips usually land (default `~/Downloads`; you check there for new clips
+   every time they say "edit it") and where finished reel projects should live (default `~/reel-edits`).
+3. Save `ST/config.json`: `{"clipsDir": "~/Downloads", "projectsDir": "~/reel-edits", "setupDate": "YYYY-MM-DD"}`
+   (keep any other keys already in it).
 
-`STATUS picks MISSING` (or the buyer asks for the picker): open it, see the next section.
+No saved style yet (`my_styles.py list` says so) and no picks: build their first style. Ask in ONE message:
+
+> "Now your editing style. The best way: send me links to 1 to 3 reels whose editing you love (Instagram, TikTok,
+> YouTube Shorts all work), or drop the video files in. You can mix: captions from one, the animations from another,
+> overlays from a third, just tell me what you like in each. No examples handy? Describe the look in your own words,
+> or I can open the Studio's built-in looks and you pick one."
+
+- Links, files or a description: "Building a style" below.
+- Built-in looks: the Studio Picker below; when they save, `my_styles.py save "<a name they like>" --from-picks`.
+- Either way, ask what to call it ("Cozy Talk", "Hype", their brand name). Propose one if they do not care.
+
+Then set expectations once, in these words or close: "Your first edit takes a bit longer and we'll go back and forth
+once or twice to dial the style in. After that, you drop clips in and say: edit them in <name>." Then ask for clips.
 
 ## The Studio Picker
 
 A local page where the buyer picks one overall style, or their own caption style and effects, with a preview clip
-on every card. It runs on their computer only.
+on every card. It runs on their computer only. It is also how a buyer with a style built from examples adds the
+Studio's effects to it: open the effects tab, then `my_styles.py save "<style>" --with-picks` keeps their own
+captions and adds the picked effects.
 
 ```
 PY "SK/scripts/picker.py" --until-saved                  first run, "open the picker", "change my style"
@@ -153,30 +174,32 @@ its own captions unless `captionStyle` differs from the one that style comes wit
 A one-off ("try Karaoke on this one") does not touch the saved picks: `build_reel.py --caption karaoke` or
 `--style fireside`.
 
-## When the buyer shows an example or describes a style
+## Building a style (from examples, links or words)
 
-The picker is for buyers who do not know what they want yet. A buyer who hands you a reel they like, a pin, a
-screenshot, or says what they want in their own words, has given you the brief. Replicate it. The built-in
+The picker is for buyers who do not know what they want yet. A buyer who sends a link to a reel they like, a file,
+a pin, a screenshot, or says what they want in their own words, has given you the brief. Replicate it. The built-in
 caption styles and effects step aside: you do not map their example onto the nearest one, you rebuild the look
-itself. `references/replicate.md` has every field and command. The procedure:
+itself, animation included. This works at setup and any time later ("make me a new style like this reel").
+`references/replicate.md` has every field and command, `references/motion.md` every kind of movement. The procedure:
 
-1. **Study the whole thing.** `PY "SK/scripts/study.py" "<example file>"` on the file they dropped in. It lays
-   EVERY beat out on contact sheets and measures the cuts, the pace, the speech rate and where the sound jumps.
-   Look at every sheet, top to bottom, not three stills. A still shows type, colour and layout but not rhythm or
-   sound: ask one question, or pick calm defaults and say so.
-   A link to a post (a reel, a short, a pin): get the video's direct address with your Apify tool, run
-   `PY "SK/scripts/get_example.py" --direct "<address>"`, and study the file it prints. No Apify tool: tell the
-   buyer "Links need Apify connected. The walkthrough in your portal shows how. Or drop the video file in here."
-2. **Write it down** in `ST/my-style.md`, one plain line per area: type, colour, captions (place, words at once,
-   plate, what the spoken word and the key word do), caption motion, pace, framing, graphic elements, sound.
-3. **Rebuild it on THEIR clips.** Their words, their takes, their length. Copy the rhythm, not the timing.
-   - Rebuild it with a custom caption spec, your own layers and the whole-reel settings
-     (`references/replicate.md` has every field).
+1. **Get and study every example.** `PY "SK/scripts/get_example.py" "<link or file>" ["<link 2>" ...]`, then
+   `PY "SK/scripts/study.py" "<file>"` on each file it prints. Look at every sheet AND every motion strip
+   (`motion_01.jpg` ...): the sheets show what is on screen, the strips show how it moves. A still shows type,
+   colour and layout but not motion or sound: ask one question, or pick calm defaults and say so. Several
+   examples: ask in ONE message what they want from each (replicate.md, "Several examples: mix and match").
+2. **Name it and write it down.** `PY "SK/scripts/my_styles.py" new "<name>"`, then its `style.md`: one plain line
+   per area (type, colour, captions, caption motion, pace, framing, graphic elements, sound, effects) and where each
+   came from.
+3. **Rebuild it on THEIR clips.** Their words, their takes, their length. Copy the rhythm, not the timing. Start the
+   project in that style (`init_project.py "<project>" --my-style "<name>"`) and write the look into its plan.json:
+   a custom caption spec with its motion, your own layers, the grade, reel motion, sounds.
 4. **Check it side by side.** `PY "SK/scripts/side_by_side.py" "<example file>" "<project>" "renders/<slug>-v1.mp4"`
-   puts example frames over frames of the final render. Fix what is off, once. Then give the buyer the sheet and
-   a plain list: what matches, and what could not be matched.
-5. **It becomes theirs.** Save the spec in `ST/my-style.json` (captions, always-on layers, grade, css) and the
-   notes in `ST/my-style.md`. `build_reel.py` reads it on every build from then on, above the saved picks.
+   puts example frames over frames of the final render. Also take snapshots in the MIDDLE of an entrance and compare
+   them with the motion strip. Fix what is off, once. Then give the buyer the sheet and a plain list: what matches,
+   and what could not be matched.
+5. **Dial it in, then save it.** Their notes go into the reel; when they are happy:
+   `PY "SK/scripts/my_styles.py" save "<name>" --from-project "<project>"`. Say: "Saved as <name>. Next time, drop
+   clips in and say: edit them in <name>." The first saved style is the default (plain "edit it").
 
 What is copied and what never is: the LOOK and the STRUCTURE are replicated (type feel, colours, layout, rhythm,
 motion). Never the example's footage, music, voice, logo, handle, name or words, and never a claim that the result
@@ -184,8 +207,8 @@ is by or with whoever made it. Typeface: the nearest face the skill ships or an 
 never a paid font file, and you say which face stands in.
 
 Be straight about the limits (`references/replicate.md` lists them): no music is added, the speaker is not moved
-into a panel or onto a page outside the overall styles and effects that do that, caption and layer motion is the
-set of entrances the engine has. Say what could not be matched. Never fake it.
+into a panel or onto a page outside the overall styles and effects that do that, no speed ramps or 3D. Say what
+could not be matched. Never fake it.
 
 ## Hard rules
 
@@ -205,6 +228,10 @@ set of entrances the engine has. Say what could not be matched. Never fake it.
 ## Workflow ("edit it")
 
 `<project>` = `<projectsDir>/<short-slug>/`. Clips = the files the buyer names, else the newest videos in `clipsDir`.
+Style = the saved style they name ("edit these in Hype": `my_styles.py list` shows the names, a part of one is
+enough), else their default. No saved style and no picks: "First run only" above. Several styles, none named, and
+the clips could suit more than one: ask which, in one line. Read the style's `style.md` before step 2: its pace,
+framing and standing notes decide the cut.
 
 ```
 1. PY "SK/scripts/ingest.py" "<project>" <clips or folder> [--newest 5]
@@ -217,14 +244,16 @@ set of entrances the engine has. Say what could not be matched. Never fake it.
 5. PY "SK/scripts/layout.py" "<project>"         where the speaker is -> layout.json. LOOK at work/layout/check.jpg:
        the green box must run from the top of the head to the chin. A line "CHECK THE HEAD BOX" means it is a guess
        (a picture or poster behind the head can pull it up): fix it before going on (references/captions.md)
-6. PY "SK/scripts/init_project.py" "<project>"   fonts, project files, starter plan.json
-       write the pinned title (and any on-screen text an overall style needs) into plan.json
+6. PY "SK/scripts/init_project.py" "<project>" [--my-style "<name>"]   fonts, project files, starter plan.json
+       (leave --my-style out for the default style). Write the pinned title, any on-screen text an overall style
+       needs, and the reel's own parts of the style ("Graphic elements" in style.md, from THIS reel's words) into plan.json
 7. effects picked?  PY "SK/scripts/footage_check.py" "<project>"   then, for each one that passes AND fits a line:
        it says "ready":   PY "SK/scripts/fx_new.py" <key> --project "<project>" --from <sec> --to <sec>
                           fill the CLIP block in the slot, run the commands it prints, then
                           PY "SK/scripts/fx_add.py" "<project>" "<slot>"      (writes the slot into plan.json)
        step by step: effects/INDEX.md
-8. PY "SK/scripts/build_reel.py" "<project>" --safe     reads the saved picks -> index.html, unsafe area in red
+8. PY "SK/scripts/build_reel.py" "<project>" --safe     reads the reel's style -> index.html, unsafe area in red
+                                                        (its "style" line says which style: check it)
    PY "SK/scripts/hf.py" "<project>" lint               0 errors
    PY "SK/scripts/hf.py" "<project>" snapshot --at <5 to 10 moments> --no-end --describe false
                                                         read <project>/snapshots/contact-sheet.jpg, fix
@@ -253,7 +282,12 @@ Look at one reel snapshot inside every slot: one caption look, nothing doubled, 
 caption unless the effect's own words carry it.
 
 Notes round: change `edl.json` / `words.json` / `plan.json`, rebuild from the step that changed, render `-v2`. Keep
-every version in `renders/`.
+every version in `renders/`. A note meant for every reel ("always", "from now on") goes into the style too: after
+they approve, `my_styles.py save "<style>" --from-project "<project>"`, plus a line in its style.md.
+
+Styles on request: "save this as a new style called X" (`my_styles.py save "X" --from-project`), "what styles do I
+have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Cozy with yellow captions"
+(`duplicate`, then change the copy), "get rid of X" (`retire`: kept, never deleted). `references/my-styles.md`.
 
 ## What the buyer hears
 
@@ -262,12 +296,16 @@ every version in `renders/`.
 - A fallback: "Your face fills the frame in this clip, so I kept the captions to one line under your chin."
 - A slow step: "This look needs a clean cutout of you. That takes about 12 minutes for this reel. I'll keep going
   and tell you when it's done."
-- Delivery: "Here's your reel. Captions: Keyword. Effects: Digital Zoom on the hook. Tell me what to change."
+- Delivery: "Here's your reel in Cozy Talk. Effects: Digital Zoom on the hook. Tell me what to change."
+- The first reel in a new style: "This is the first one in this style, so tell me everything you'd change. Once
+  it's dialed in I'll save it and the next ones come out like this from the start."
 - An effect made of words: "I matched the Checklist to your Karaoke captions: same typeface, same caps, same
   yellow."
 - An example they showed you, before you start: "On it. I'm studying your example from start to finish, then I'll
   rebuild that look on your clip."
-- After replicating it: "Here is what I matched, and what I could not. Every reel uses this style from now on."
+- After replicating it: "Here is what I matched, and what I could not. Tell me what to change, then I'll save it
+  as <name>."
+- Saved: "Saved as <name>. Next time, drop your clips in and say: edit them in <name>."
 - A quiet recording: "Your voice is recorded a little quiet in this clip. Want a louder copy?"
 
 The styles for her (Soft Hours, Glam Cam, Color Block, Camera Shy) work faceless or on camera. Say it that way.

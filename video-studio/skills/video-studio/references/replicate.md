@@ -1,8 +1,14 @@
 # Replicating an example: study it, rebuild it, make it theirs
 
-When the buyer shows an example (a reel they like, a pin, a screenshot) or describes a look, that IS the brief.
-The built-in caption styles and effects step aside. You study the example from top to bottom and rebuild its look
-on the buyer's own clips, so it fits THEIR words and footage. Then you save it, and every later "edit it" uses it.
+When the buyer shows an example (a link to a reel they like, a file, a pin, a screenshot) or describes a look, that
+IS the brief. The built-in caption styles and effects step aside. You study the example from top to bottom and
+rebuild its look on the buyer's own clips, so it fits THEIR words and footage. Then you save it as one of their named
+styles (`references/my-styles.md`), and every later "edit it in <name>" uses it.
+
+You can rebuild almost any talking-head or voice-over edit: type, colour, plates, layout, caption rhythm, every kind
+of caption and graphic animation (`references/motion.md`), pace, punch-ins, overlays, the grade, sound cues, and
+the Studio's effects where the example has something like them. Work it out like an editor would. Do not settle for
+the nearest built-in look.
 
 ## What is copied and what never is
 
@@ -21,21 +27,39 @@ The skill's own text never names or imitates a specific creator. A buyer's refer
 ## 1. Study it (the whole thing, not three stills)
 
 ```
-PY "SK/scripts/study.py" "<example file>"            a video or a picture the buyer dropped in
+PY "SK/scripts/get_example.py" "<link or file>" ["<another link>" ...]     links to posts, or files they dropped in
+PY "SK/scripts/study.py" "<the file it printed>"                            once per example
 ```
-A link to a post (a reel, a short, a pin) goes through Apify: use your Apify tool to get the direct address of
-the video for that link, then `PY "SK/scripts/get_example.py" --direct "<address>"` right away (such addresses
-expire within minutes) and run `study.py` on the file it prints. It lands in `ST/examples/downloads/`. If you
-have no Apify tool, tell the buyer in one sentence that links need Apify connected (the walkthrough in their
-portal shows how), or they can drop the video file in instead.
+`get_example.py` takes Instagram, TikTok, YouTube, Pinterest, X and most other post links, and files. Each lands in
+`ST/examples/downloads/` with a `STATUS example READY <file>` line. The first link installs the downloader into the
+Studio's own Python (about 3 MB), once.
+- `STATUS example FAILED LOGIN`: the post only shows to a logged-in visitor (Instagram does this sometimes). Ask
+  the buyer, in these words or close: "Instagram wants a login for that one. Can I use your browser's login to fetch
+  it? Nothing is saved." Only on a yes: run it again with `--browser chrome` (or safari, firefox, edge: the browser
+  they are logged in with). On a no: they download the video themselves and drop the file in.
+- Any other `FAILED`: ask for another link or the file. With an Apify tool connected you may also get the video's
+  direct address with it and run `get_example.py --direct "<address>"` right away (those addresses expire in minutes).
 
-It writes `ST/examples/<name>/`: every sampled frame on contact sheets (`sheet_01.jpg` ...), `cuts.jpg` (the frame
-before and after each cut), full-size frames in `frames/`, and `study.json` (cut times, shot lengths, loudness over
-time, where the sound jumps, the words with their times). It prints the measured half: length, cuts, pace, speech
-rate, sound jumps.
+`study.py` writes `ST/examples/<name>/`: every sampled frame on contact sheets (`sheet_01.jpg` ...), `cuts.jpg`
+(the frame before and after each cut), `motion_01.jpg ...` (frame-by-frame strips around every moment something
+appears or moves: how captions and graphics ANIMATE), full-size frames in `frames/`, and `study.json` (cut times,
+shot lengths, loudness over time, where the sound jumps, the words with their times). It prints the measured half:
+length, cuts, pace, speech rate, motion moments, sound jumps.
 
-Then LOOK at every sheet, in order, and at two or three full-size frames for type and colour. Captions, graphics
-and framing change from beat to beat: a look read off three stills is a guess.
+Then LOOK at every sheet, in order, every motion strip, and two or three full-size frames for type and colour.
+Captions, graphics and framing change from beat to beat: a look read off three stills is a guess. The sheets show
+WHAT is on screen; the motion strips show HOW it moves. You cannot hear the example: the loudness line and the sound
+jumps are your ears, so check each jump against the frame at that time (a pop on a word, a whoosh on a cut, music).
+
+## Several examples: mix and match
+
+Buyers often like the captions of one reel, the motion of another and the overlays of a third. Study each one.
+Then ask ONE message of questions, only what decides the look:
+"I studied all three. Here is what stands out in each: (one line per example). What do you want from each one?
+For example: captions from the first, the way things pop in from the second, the grade from the third."
+Write the answer into `style.md` "Made from" and `style.json` "sources" (`references/my-styles.md`), then rebuild:
+each area from its example. When two areas fight (a busy caption style and busy overlays), say so in one line and
+pick the calmer one unless they asked for both.
 
 A still (a pin, a screenshot) shows type, colour, plate, placement and graphics. It cannot show rhythm, animation,
 pace or sound: ask the buyer in one question, or choose calm defaults and say so.
@@ -45,14 +69,16 @@ the same notes from their words, and ask one question about whatever decides the
 
 ## 2. Write it down
 
-Write these into `ST/my-style.md`, in plain words, one short line each. Leave nothing as "like the example".
+Make the style first (`PY "SK/scripts/my_styles.py" new "<name>"`: the buyer's name for it, or one you propose,
+short and plain, such as "Cozy Talk"), then write these into its `style.md`, in plain words, one short line each.
+Leave nothing as "like the example".
 
 | Area | What to note |
 |---|---|
 | Type | feel (serif, clean sans, condensed, wide capitals, mono, handwriting), weight, case, size against the frame width, tracking, the face you will use and why |
 | Colour | text, the accent, plate, outline or shadow, background or page colour, the grade (warm, cool, flat, contrasty, faded) |
 | Captions | where they sit (chest, lower third, above the head, top, centre), how many words and lines at once, plate or none, what the word being said does, what a key word does |
-| Caption motion | how a line arrives (cut, pop, fade, slide up, typed, word by word) and leaves |
+| Caption motion | how a line arrives and leaves, what each word does as it is said, what a key word does: read it off the motion strips (from where, how many frames, overshoot or not) |
 | Pace | cuts per 10 seconds, typical shot length, punch-ins (how often, how hard), pauses kept or cut |
 | Framing | how big the speaker is, where in the frame, anything behind or around them (a page, a border, a card) |
 | Graphic elements | titles, bars, borders, lower thirds, stickers, cards, inserts: what, where, when they come and go |
@@ -63,9 +89,11 @@ Write these into `ST/my-style.md`, in plain words, one short line each. Leave no
 Edit the buyer's clips as always (`references/cutting.md`): their best takes, their words. The example's timing
 is not copied. Its RHYTHM is: if it cuts every 2 seconds and marks one word per line, do that on their words.
 
-Everything below goes into `ST/my-style.json` (the style, used by every reel) or `<project>/plan.json` (this reel
-only, wins over my-style). `build_reel.py` reads both. No built-in caption style or effect is used unless the
-buyer asks for one.
+Build the first reel with everything in its `<project>/plan.json` (start the project with `init_project.py
+"<project>" --my-style "<name>"`). When the buyer approves it, `my_styles.py save "<name>" --from-project
+"<project>"` moves the parts that belong to every reel into the style (`references/my-styles.md`). `build_reel.py`
+reads the style, then the reel's plan.json on top. No built-in caption style or effect is used unless the buyer asks
+for one (then it goes in the style's `picks`).
 
 ### The custom caption style: `"caption": { ... }`
 
@@ -88,7 +116,8 @@ logic, and effect slots (`--caption-y`, hide windows) work with it. Every field 
 | `words`, `chars`, `lines` | most words and characters per line; 1 or 2 lines | 3, 18, 1 |
 | `position`, `dy` | `chest`, `lower`, `above-head`, `top`, `center`, or a y in px; a nudge in px | chest |
 | `align`, `margin` | `center`, `left`, `right`; side margin px | center, 70 |
-| `entrance`, `exit` | `none`, `pop`, `fade`, `slide-up`, `type-on`, `word-by-word`; `none` or `fade` | none |
+| `entrance`, `exit` | `none`, `pop`, `fade`, `slide-up`, `type-on`, `word-by-word`; `none` or `fade` (shortcuts: anything else is `motion`) | none |
+| `motion`, `word_motion`, `mark_motion` | your own animation for each line, each word as it is said, each marked word: `references/motion.md` | |
 | `css` | extra css for this style. Classes: `.cu` the block, `.cu .ln` a line, `.cu .pl` the plate, `.cu .w` a word, `.cu .w.m` a marked word | |
 
 The engine keeps the block inside the safe zone, breaks lines where the width runs out, and moves a block that
@@ -108,11 +137,14 @@ corner tag, a sticker, a page behind the speaker. Plain html and css that you wr
 - `anchor`: a band the engine places for this clip, `top` (y 236), `above-head`, `center`, `chest`, `lower-third`
   (a 1080 wide centred box whose top sits on the band; `dx` / `dy` nudge it). Or `full`: the whole frame, your css
   places everything. Or `behind`: the whole frame, BEHIND the speaker, which needs a person cutout (`rvm_cut.py`).
-- `from` / `to` in reel seconds. Leave both out for a layer that stays the whole reel. In `my-style.json` only
+- `from` / `to` in reel seconds. Leave both out for a layer that stays the whole reel. In a saved style only
   those always-on layers are used; timed layers belong in a reel's `plan.json`, written from that reel's words.
-- `in` / `out`: `none`, `fade`, `pop`, `slide-up`. That is all the motion a layer has: css `@keyframes` in a
-  layer's css will NOT play in the renderer. When the example moves a graphic in another way, use the nearest of
-  these four and say so.
+- `in` / `out`: `none`, `fade`, `pop`, `slide-up` as shortcuts. Any other movement (a spring, a wiggle, letters
+  one by one, a slide from the side, a blur-in, a progress bar filling) is the layer's `"motion"`
+  (`references/motion.md`). css `@keyframes` will NOT play in the renderer.
+- `from` / `to` work for reel-specific layers in plan.json; a style keeps only always-on layers. For a graphic
+  that every reel in the style has at its own moments (a title on the hook, a lower third on the name), write it
+  down in `style.md` "Graphic elements" and add it to each reel's plan.json from that reel's words.
 - A GIF or a short clip as a layer: `gif_add.py` makes it and writes the layer for you (`references/gifs.md`).
 - Text in a layer is the buyer's own words or a generic placeholder. Never a logo, a handle or a claim.
 - Layers go through the same checks as everything else: `HF lint`, snapshots with the red safe guide, and
@@ -129,13 +161,12 @@ corner tag, a sticker, a page behind the speaker. Plain html and css that you wr
 | Punch-in rhythm | `edl.json`: split a take into segments and alternate `zoom` (1.0, 1.25, 1.0 ...) with `cx` / `cy` on the face, as often as the example punches in | hard cuts between zoom levels; a smooth zoom is the Digital Zoom effect; soft above about 1.4 on a 1080 source |
 | Cut pace | `edl.json`: tighter or looser out points, pauses kept or cut, to the example's typical shot length | the buyer's takes decide what can be cut |
 | Sound | `"sounds": [{"src": "assets/sfx/pop.mp3", "at": 1.2, "vol": 0.2}]` in `plan.json` (the stock names are in `<project>/assets/sfx`); none for a quiet example. Effects: `SFX=0`, `--no-sfx`, `SFX_GAIN` | the stock cue set only; no music is added |
-| Anything else | `"css": "..."` plain css appended last, in `plan.json` or `my-style.json` | it can restyle what is on the page; it cannot add motion |
+| Reel motion | `"motion"`: punch-ins on key words, a flash, shake or zoom on every cut, a slow push over the hook (`references/motion.md`, `"on": "marks"` / `"cuts"`) | GSAP tweens only, no random values |
+| Anything else | `"css": "..."` plain css appended last, in `plan.json` or the style | it restyles; movement is `motion` |
 
-What cannot be matched today, so say it plainly when the example has it: music, a layout that moves the speaker
-into a panel or onto a page (use the Show and Tell or Chalk Talk overall style when that is the look, or Green
-Screen for a background), speed ramps, transitions between shots other than a cut or the Zoom-Through Cut effect,
-animated graphics beyond the four entrances, caption motion beyond the six entrances, 3D, and b-roll the buyer
-did not supply.
+What cannot be matched today, so say it plainly when the example has it: music (none is added), a layout that
+moves the speaker into a panel or onto a page (use the Show and Tell or Chalk Talk overall style when that is the
+look, or Green Screen for a background), speed ramps, 3D, and b-roll the buyer did not supply.
 
 ## 4. Check it side by side
 
@@ -149,15 +180,14 @@ colour, position, weight. One polish pass.
 Then tell the buyer, in plain words: "I studied your example. Here is what I matched: ... And the two things I
 could not: ..." One line each. Send the sheet with the reel.
 
-## 5. It becomes theirs
+## 5. It becomes theirs, under a name
 
-- `ST/my-style.md`: the notes from step 2, the face that stands in for theirs, what could not be matched, their
-  standing notes ("always", "never"), and where the example's study is.
-- `ST/my-style.json`: `{"name": "...", "caption": {...}, "layers": [always-on ones], "grade": "...", "css": "...",
-  "pace": "...", "sound": "..."}`. `build_reel.py` reads `caption`, always-on `layers`, `grade` and `css` on every
-  build; `pace` and `sound` are notes for you when you write `edl.json` and `plan.json`.
-- From then on "edit it" uses their style without asking. It sits above the saved picks. A built-in caption style
-  or an effect is only used when the buyer asks for it, and an effect is then restyled to their style
-  (`effects/INDEX.md`, "Restyling an effect's own words").
-- "Go back to my picks": `build_reel.py --no-my-style` for one reel, or put `my-style.json` aside (rename it,
-  never delete it) for good.
+- After their notes are in and they are happy: `PY "SK/scripts/my_styles.py" save "<name>" --from-project
+  "<project>"` (add `--with-picks` when the style uses the Studio's effects or a built-in caption style).
+- `style.md`: the notes from step 2, where each part came from, the face that stands in for theirs, what could
+  not be matched, their standing notes ("always", "never").
+- Tell them: "Saved as <name>. Next time, drop your clips in and say: edit them in <name>." The first style they
+  save becomes the default, so plain "edit it" uses it too. They can make as many styles as they like, change the
+  default (`my_styles.py default`), rename, copy or retire them (`references/my-styles.md`).
+- An effect added to a reel in their style is restyled to it (`effects/INDEX.md`, "Restyling an effect's own words").
+- "Go back to the Picker picks": `build_reel.py --no-my-style` for one reel, or `my_styles.py default none`.
