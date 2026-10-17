@@ -15,6 +15,8 @@ What it writes into the folder:
   sheet_01.jpg ...   EVERY sampled frame with its time, 12 to a sheet, in order. Read all of them, not three stills:
                      captions, graphics and framing change from beat to beat.
   cuts.jpg           the frame before and after each cut, side by side, with the cut time
+  motion_01.jpg ...  frame-by-frame strips around each moment something appears or moves (a caption coming in, a
+                     graphic popping, a zoom), the hook first: how things ANIMATE, which the sheets are too far apart for
   study.json         size, length, the cut times and shot lengths, pace, loudness over time and where sound cues
                      hit, the words with their times (speech rate, pauses), and the sampled frame times
   frames/            the sampled frames at full size, for a closer look at type and colour
@@ -92,6 +94,49 @@ def loudness(path, win=.1):
     return out, win
 
 
+def frame_changes(path, fps, w=72, h=128):
+    """-> [how much the picture changed from the frame before, per frame], from a tiny grey copy of every frame"""
+    p = subprocess.run([FF, '-v', 'error', '-i', path, '-an', '-vf', f'scale={w}:{h},format=gray', '-f', 'rawvideo', '-'],
+                       capture_output=True)
+    n = w * h
+    data = p.stdout
+    count = len(data) // n
+    try:
+        import numpy as np
+        a = np.frombuffer(data[:count * n], np.uint8).reshape(count, n).astype(np.int16)
+        return [0.0] + [float(x) for x in np.abs(np.diff(a, axis=0)).mean(axis=1)]
+    except ImportError:
+        out, prev = [0.0], None
+        for i in range(count):
+            cur = data[i * n:(i + 1) * n]
+            if prev is not None:
+                out.append(sum(abs(x - y) for x, y in zip(cur[::4], prev[::4])) / (n / 4))
+            prev = cur
+        return out
+
+
+def motion_moments(changes, fps, cuts, dur, most=8):
+    """Moments where something APPEARS or MOVES on screen that is not a cut: a caption coming in, a graphic popping,
+    a zoom. A frame-to-frame change well above the usual for its neighbourhood, away from every cut. The hook (first
+    1.5 s) always counts: that is where most of the animation is."""
+    found = []
+    for i in range(3, len(changes) - 1):
+        t = i / fps
+        if any(abs(t - c) < 2.5 / fps for c in cuts) or t > dur - .5:
+            continue
+        near = sorted(changes[max(0, i - 15):i + 15])
+        base = near[len(near) // 2] or .01
+        if changes[i] >= max(2.2 * base, base + 2.5) and changes[i] >= changes[i - 1] and changes[i] >= changes[i + 1]:
+            found.append((changes[i] / base, t))
+    picked = [0.0]
+    for _, t in sorted(found, reverse=True):
+        if all(abs(t - p) > .8 for p in picked):
+            picked.append(t)
+        if len(picked) >= most:
+            break
+    return sorted(picked)
+
+
 def main():
     skillenv.utf8_stdio()
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
@@ -163,6 +208,28 @@ def main():
     edges = [0.0] + cuts + [dur]
     shots = [round(b - a, 2) for a, b in zip(edges, edges[1:])]
 
+    # motion: the sheets above are half a second apart, and an entrance is over in a quarter of a second. So around
+    # every moment something appears or moves (not a cut), lay out the frames one after another: motion_01.jpg ...
+    # Read each strip left to right: how it comes in (pop, slide, fade, letter by letter, word by word), how far, how
+    # fast, whether it overshoots, what else moves with it.
+    bursts = []
+    span = max(1, int(round(fps / 15)))          # every other frame at 30 fps: 10 frames cover about 0.65 s
+    for k, t in enumerate(motion_moments(frame_changes(src, fps), fps, cuts, dur)):
+        start = max(0.0, t - 2 / fps)
+        strip = []
+        for j in range(10):
+            ft = start + j * span / fps
+            if ft >= dur - .05:
+                break
+            f = os.path.join(frames_dir, f'motion_{k:02d}_{j:02d}.jpg')
+            subprocess.run(quiet + ['-ss', f'{ft:.3f}', '-i', src] + still + [f], stderr=subprocess.DEVNULL)
+            if os.path.isfile(f):
+                strip.append((f'{ft:.2f}s', f))
+        if len(strip) >= 3:
+            sheet(strip, os.path.join(out, f'motion_{k + 1:02d}.jpg'), cols=5, tw=270, th=480)
+            bursts.append({'sheet': f'motion_{k + 1:02d}.jpg', 'at': round(t, 2), 'from': round(start, 3),
+                           'step': round(span / fps, 3), 'frames': len(strip)})
+
     # sound: level over time, and the moments it jumps (a cue, a hit, a music entry)
     db, win = loudness(src)
     hits = []
@@ -190,7 +257,7 @@ def main():
     study = {'kind': 'video', 'file': src, 'width': w, 'height': h, 'fps': round(fps, 2), 'duration': round(dur, 2),
              'aspect': round(w / max(h, 1), 3), 'frame_times': times, 'cuts': cuts, 'shots': shots,
              'shot_median': sorted(shots)[len(shots) // 2] if shots else None, 'sound': sound, 'loudness_db': db, 'loudness_step': win,
-             'words': words, 'words_per_second': round(len(words) / dur, 2) if dur else None,
+             'motion_bursts': bursts, 'words': words, 'words_per_second': round(len(words) / dur, 2) if dur else None,
              'speech_share': round(spoken / dur, 2) if dur else None, 'pauses_over_0.35s': len(pauses)}
     with open(os.path.join(out, 'study.json'), 'w', encoding='utf-8') as fh:
         json.dump(study, fh, indent=1)
@@ -200,6 +267,10 @@ def main():
     print(f'frames {len(tiles)} sampled every {step:.2f}s on {n_sheets} sheet(s): sheet_01.jpg to sheet_{n_sheets:02d}.jpg. LOOK at every one')
     print(f'cuts   {len(cuts)}' + (f' at {", ".join(f"{c:.2f}" for c in cuts[:30])}' if cuts else ' (one continuous shot)')
           + (f'   shots {min(shots):.2f} to {max(shots):.2f}s, typical {study["shot_median"]:.2f}s   cuts.jpg shows each one' if cuts else ''))
+    if bursts:
+        print(f'motion {len(bursts)} strip(s), frame by frame around what appears or moves: '
+              + ', '.join(f'{b["sheet"]} ({b["at"]:.2f}s)' for b in bursts)
+              + '. LOOK at each: this is where entrances, pops and zooms show (references/motion.md)')
     if db:
         print(f'sound  typical level {sound["median_db"]} dB, peak {sound["peak_db"]} dB, {sound["quiet_share"] * 100:.0f}% near silent; '
               f'{len(hits)} sudden jump(s)' + (f' at {", ".join(f"{t:.2f}" for t in hits[:20])}' if hits else '')
