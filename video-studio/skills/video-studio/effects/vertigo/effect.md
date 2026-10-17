@@ -41,6 +41,7 @@ cutout `assets/subject.webm`: yes. aroll_hi: no. `words.json`: timing and the ef
 ```
 PY "SK/scripts/fx_run.py" "<slot>" onsets.py      # 0. optional: frame-exact word onsets, if you time by hand
 PY "SK/scripts/fx_run.py" "<slot>" more.py      # 1. optional, more plate
+PY "SK/scripts/rvm_cut.py" "<slot>" --src work/more.mp4 --out work/more.webm      # 1b. only after more.py: its clean cutout
 PY "SK/scripts/fx_run.py" "<slot>" prep.py      # 2. track, measure, clean plate. LOOK at work/plate_check.jpg
 PY "SK/scripts/fx_run.py" "<slot>" build.py CAPTIONS=0      # 3. variant, timing, index.html. Read the printout (or the DECLINE line)
 PY "SK/scripts/fx_run.py" "<slot>" bake.py      # 4. assets/fx.mp4 (PY bake.py --frames 40-48 previews a few frames)

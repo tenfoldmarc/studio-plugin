@@ -13,7 +13,7 @@
  "sounds": {},
  "steps": [
   "run onsets.py      # 0. optional: frame-exact word onsets, if you time by hand",
-  "run more.py      # 1. optional, more plate",
+  "run more.py      # 1. optional, more plate; then its clean cutout: PY scripts/rvm_cut.py <slot> --src work/more.mp4 --out work/more.webm",
   "run prep.py      # 2. track, measure, clean plate. LOOK at work/plate_check.jpg",
   "run build.py CAPTIONS=0      # 3. variant, timing, index.html. Read the printout (or the DECLINE line)",
   "run bake.py      # 4. assets/fx.mp4 (PY bake.py --frames 40-48 previews a few frames)",
