@@ -1,0 +1,4 @@
+opencv-python-headless>=4.8
+numpy
+scipy
+Pillow

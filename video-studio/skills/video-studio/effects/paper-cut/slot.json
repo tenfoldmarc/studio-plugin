@@ -1,0 +1,20 @@
+{
+ "key": "paper-cut",
+ "pack": "paper-cut",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the cut-out letters are the caption: hide the reel's captions for this span, or build with CAPTIONS=0",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, choose the layout, plan, sounds, index.html. READ the printout",
+  "run bake.py --frames 30,90,140 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 11 to 20 s per second of slot (6 cores)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

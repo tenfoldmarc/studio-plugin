@@ -1,0 +1,20 @@
+{
+ "key": "god-rays",
+ "pack": "god-rays",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the two lines are the caption for this beat: hide the reel's captions for the span, or build with CAPTIONS=0",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, choose, plan, index.html. READ the printout",
+  "run bake.py --frames 40,52,70 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 15 to 20 s per second of slot (6 cores)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

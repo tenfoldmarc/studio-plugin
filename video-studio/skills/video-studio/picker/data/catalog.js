@@ -174,54 +174,6 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/orbit.jpg"
   },
   {
-   "n": 5,
-   "key": "frame-break",
-   "name": "Frame Break",
-   "line": "The video shrinks into a card and you pop out of it.",
-   "preview": "previews/effects/frame-break.mp4",
-   "poster": "previews/posters/effects/frame-break.jpg"
-  },
-  {
-   "n": 6,
-   "key": "type-wall",
-   "name": "Type Wall",
-   "line": "Giant words march behind you and swap as you talk.",
-   "preview": "previews/effects/type-wall.mp4",
-   "poster": "previews/posters/effects/type-wall.jpg"
-  },
-  {
-   "n": 8,
-   "key": "digital-zoom",
-   "name": "Digital Zoom",
-   "line": "A slow creep onto your face, then a hard snap on the key word.",
-   "preview": "previews/effects/digital-zoom.mp4",
-   "poster": "previews/posters/effects/digital-zoom.jpg"
-  },
-  {
-   "n": 16,
-   "key": "headline-wall",
-   "name": "Headline Wall",
-   "line": "The wall behind you fills with headlines.",
-   "preview": "previews/effects/headline-wall.mp4",
-   "poster": "previews/posters/effects/headline-wall.jpg"
-  },
-  {
-   "n": 17,
-   "key": "zoom-through-cut",
-   "name": "Zoom-Through Cut",
-   "line": "The camera dives through you into the next shot.",
-   "preview": "previews/effects/zoom-through-cut.mp4",
-   "poster": "previews/posters/effects/zoom-through-cut.jpg"
-  },
-  {
-   "n": 18,
-   "key": "clone",
-   "name": "Clone",
-   "line": "More of you pop up beside you, right on your words.",
-   "preview": "previews/effects/clone.mp4",
-   "poster": "previews/posters/effects/clone.jpg"
-  },
-  {
    "n": 2,
    "key": "couch-wall",
    "name": "Couch Wall",
@@ -238,12 +190,44 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/ui-world.jpg"
   },
   {
+   "n": 4,
+   "key": "freeze-sticker",
+   "name": "Freeze Sticker",
+   "line": "Your freeze frame becomes a die-cut sticker with handwritten notes.",
+   "preview": "previews/effects/freeze-sticker.mp4",
+   "poster": "previews/posters/effects/freeze-sticker.jpg"
+  },
+  {
+   "n": 5,
+   "key": "frame-break",
+   "name": "Frame Break",
+   "line": "The video shrinks into a card and you pop out of it.",
+   "preview": "previews/effects/frame-break.mp4",
+   "poster": "previews/posters/effects/frame-break.jpg"
+  },
+  {
+   "n": 6,
+   "key": "type-wall",
+   "name": "Type Wall",
+   "line": "Giant words march behind you and swap as you talk.",
+   "preview": "previews/effects/type-wall.mp4",
+   "poster": "previews/posters/effects/type-wall.jpg"
+  },
+  {
    "n": 7,
    "key": "the-stack",
    "name": "The Stack",
    "line": "Data cards with racing bars stack above you.",
    "preview": "previews/effects/the-stack.mp4",
    "poster": "previews/posters/effects/the-stack.jpg"
+  },
+  {
+   "n": 8,
+   "key": "digital-zoom",
+   "name": "Digital Zoom",
+   "line": "A slow creep onto your face, then a hard snap on the key word.",
+   "preview": "previews/effects/digital-zoom.mp4",
+   "poster": "previews/posters/effects/digital-zoom.jpg"
   },
   {
    "n": 9,
@@ -254,12 +238,28 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/sticky-text.jpg"
   },
   {
+   "n": 10,
+   "key": "odometer",
+   "name": "Odometer",
+   "line": "Numbers roll up digit by digit, like a mileage counter.",
+   "preview": "previews/effects/odometer.mp4",
+   "poster": "previews/posters/effects/odometer.jpg"
+  },
+  {
    "n": 11,
    "key": "spotlight",
    "name": "Spotlight",
    "line": "The room goes dark, you stay lit, the key words land big.",
    "preview": "previews/effects/spotlight.mp4",
    "poster": "previews/posters/effects/spotlight.jpg"
+  },
+  {
+   "n": 12,
+   "key": "comment-bubble",
+   "name": "Comment Bubble",
+   "line": "The comment types itself, posts, and your reply with the link lands.",
+   "preview": "previews/effects/comment-bubble.mp4",
+   "poster": "previews/posters/effects/comment-bubble.jpg"
   },
   {
    "n": 13,
@@ -286,20 +286,28 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/checklist.jpg"
   },
   {
-   "n": 21,
-   "key": "pointer-callout",
-   "name": "Pointer Callout",
-   "line": "Cards tied to you by lines that follow you around.",
-   "preview": "previews/effects/pointer-callout.mp4",
-   "poster": "previews/posters/effects/pointer-callout.jpg"
+   "n": 16,
+   "key": "headline-wall",
+   "name": "Headline Wall",
+   "line": "The wall behind you fills with headlines.",
+   "preview": "previews/effects/headline-wall.mp4",
+   "poster": "previews/posters/effects/headline-wall.jpg"
   },
   {
-   "n": 10,
-   "key": "odometer",
-   "name": "Odometer",
-   "line": "Numbers roll up digit by digit, like a mileage counter.",
-   "preview": "previews/effects/odometer.mp4",
-   "poster": "previews/posters/effects/odometer.jpg"
+   "n": 17,
+   "key": "zoom-through-cut",
+   "name": "Zoom-Through Cut",
+   "line": "The camera dives through you into the next shot.",
+   "preview": "previews/effects/zoom-through-cut.mp4",
+   "poster": "previews/posters/effects/zoom-through-cut.jpg"
+  },
+  {
+   "n": 18,
+   "key": "clone",
+   "name": "Clone",
+   "line": "More of you pop up beside you, right on your words.",
+   "preview": "previews/effects/clone.mp4",
+   "poster": "previews/posters/effects/clone.jpg"
   },
   {
    "n": 19,
@@ -318,44 +326,12 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/chart-grow.jpg"
   },
   {
-   "n": 4,
-   "key": "freeze-sticker",
-   "name": "Freeze Sticker",
-   "line": "Your freeze frame becomes a die-cut sticker with handwritten notes.",
-   "preview": "previews/effects/freeze-sticker.mp4",
-   "poster": "previews/posters/effects/freeze-sticker.jpg"
-  },
-  {
-   "n": 12,
-   "key": "comment-bubble",
-   "name": "Comment Bubble",
-   "line": "The comment types itself, posts, and your reply with the link lands.",
-   "preview": "previews/effects/comment-bubble.mp4",
-   "poster": "previews/posters/effects/comment-bubble.jpg"
-  },
-  {
-   "n": 26,
-   "key": "green-screen",
-   "name": "Green Screen",
-   "line": "You shrink to the bottom and the whole screen becomes what you're talking about.",
-   "preview": "previews/effects/green-screen.mp4",
-   "poster": "previews/posters/effects/green-screen.jpg"
-  },
-  {
-   "n": 25,
-   "key": "knockout-tiles",
-   "name": "Knockout Tiles",
-   "line": "Name tiles slam onto the wall behind you and get knocked out one by one.",
-   "preview": "previews/effects/knockout-tiles.mp4",
-   "poster": "previews/posters/effects/knockout-tiles.jpg"
-  },
-  {
-   "n": 23,
-   "key": "timeline-burn",
-   "name": "Timeline Burn",
-   "line": "An editing timeline builds in front of you, then catches fire on your word.",
-   "preview": "previews/effects/timeline-burn.mp4",
-   "poster": "previews/posters/effects/timeline-burn.jpg"
+   "n": 21,
+   "key": "pointer-callout",
+   "name": "Pointer Callout",
+   "line": "Cards tied to you by lines that follow you around.",
+   "preview": "previews/effects/pointer-callout.mp4",
+   "poster": "previews/posters/effects/pointer-callout.jpg"
   },
   {
    "n": 22,
@@ -366,12 +342,100 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/blackout.jpg"
   },
   {
+   "n": 23,
+   "key": "timeline-burn",
+   "name": "Timeline Burn",
+   "line": "An editing timeline builds in front of you, then catches fire on your word.",
+   "preview": "previews/effects/timeline-burn.mp4",
+   "poster": "previews/posters/effects/timeline-burn.jpg"
+  },
+  {
    "n": 24,
    "key": "pull-back-reveal",
    "name": "Pull-Back Reveal",
    "line": "The video shrinks into a card in an app window and you watch it get edited.",
    "preview": "previews/effects/pull-back-reveal.mp4",
    "poster": "previews/posters/effects/pull-back-reveal.jpg"
+  },
+  {
+   "n": 25,
+   "key": "knockout-tiles",
+   "name": "Knockout Tiles",
+   "line": "Name tiles slam onto the wall behind you and get knocked out one by one.",
+   "preview": "previews/effects/knockout-tiles.mp4",
+   "poster": "previews/posters/effects/knockout-tiles.jpg"
+  },
+  {
+   "n": 26,
+   "key": "green-screen",
+   "name": "Green Screen",
+   "line": "You shrink to the bottom and the whole screen becomes what you're talking about.",
+   "preview": "previews/effects/green-screen.mp4",
+   "poster": "previews/posters/effects/green-screen.jpg"
+  },
+  {
+   "n": 28,
+   "key": "paper-cut",
+   "name": "Paper Cut",
+   "line": "The room tears away into a paper collage with ransom-note letters.",
+   "preview": "previews/effects/paper-cut.mp4",
+   "poster": "previews/posters/effects/paper-cut.jpg"
+  },
+  {
+   "n": 29,
+   "key": "doodle-boil",
+   "name": "Doodle Boil",
+   "line": "A chalk line traces you and doodles draw themselves on your words.",
+   "preview": "previews/effects/doodle-boil.mp4",
+   "poster": "previews/posters/effects/doodle-boil.jpg"
+  },
+  {
+   "n": 31,
+   "key": "word-pile",
+   "name": "Word Pile",
+   "line": "The things you name drop as solid blocks and pile up on a line.",
+   "preview": "previews/effects/word-pile.mp4",
+   "poster": "previews/posters/effects/word-pile.jpg"
+  },
+  {
+   "n": 32,
+   "key": "vertigo",
+   "name": "Vertigo",
+   "line": "You stay still while the room stretches away behind you.",
+   "preview": "previews/effects/vertigo.mp4",
+   "poster": "previews/posters/effects/vertigo.jpg"
+  },
+  {
+   "n": 34,
+   "key": "scene-text",
+   "name": "Scene Text",
+   "line": "A word prints across your real wall, then two big words land on it.",
+   "preview": "previews/effects/scene-text.mp4",
+   "poster": "previews/posters/effects/scene-text.jpg"
+  },
+  {
+   "n": 35,
+   "key": "cover-story",
+   "name": "Cover Story",
+   "line": "Your shot becomes a magazine cover while you keep talking.",
+   "preview": "previews/effects/cover-story.mp4",
+   "poster": "previews/posters/effects/cover-story.jpg"
+  },
+  {
+   "n": 38,
+   "key": "rack-focus",
+   "name": "Rack Focus",
+   "line": "Focus pulls from you to a title, like a real lens.",
+   "preview": "previews/effects/rack-focus.mp4",
+   "poster": "previews/posters/effects/rack-focus.jpg"
+  },
+  {
+   "n": 39,
+   "key": "god-rays",
+   "name": "God Rays",
+   "line": "The room dims and light breaks out from behind your head.",
+   "preview": "previews/effects/god-rays.mp4",
+   "poster": "previews/posters/effects/god-rays.jpg"
   }
  ],
  "styles": [

@@ -1,0 +1,27 @@
+{
+ "key": "vertigo",
+ "pack": "vertigo",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "optional",
+ "reel_captions": "keep",
+ "captions_note": "built with CAPTIONS=0 so the reel's own captions carry the words",
+ "reel_env": [
+  "CAPTIONS=0"
+ ],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # 0. optional: frame-exact word onsets, if you time by hand",
+  "run more.py      # 1. optional, more plate",
+  "run prep.py      # 2. track, measure, clean plate. LOOK at work/plate_check.jpg",
+  "run build.py CAPTIONS=0      # 3. variant, timing, index.html. Read the printout (or the DECLINE line)",
+  "run bake.py      # 4. assets/fx.mp4 (PY bake.py --frames 40-48 previews a few frames)",
+  "hf lint",
+  "run build.py SAFE=1 CAPTIONS=0",
+  "hf snapshot --at <mid push>",
+  "run build.py CAPTIONS=0      # 5. guide off again (with the switches you want, e.g. CAPTIONS=0 SFX=0)",
+  "hf render --video-frame-format png",
+  "run post.py      # 6. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

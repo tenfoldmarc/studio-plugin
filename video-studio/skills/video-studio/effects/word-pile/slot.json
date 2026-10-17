@@ -1,0 +1,20 @@
+{
+ "key": "word-pile",
+ "pack": "word-pile",
+ "imported": "2026-10-17",
+ "cutout": "measure",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the slabs land in the low band where captions sit: hide the reel's captions for this span",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, adapt, search the drops, physics, sounds, index.html. READ the printout",
+  "run bake.py --frames 60,140,175 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4 (4 workers)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

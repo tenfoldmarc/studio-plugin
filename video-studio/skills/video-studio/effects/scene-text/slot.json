@@ -1,0 +1,23 @@
+{
+ "key": "scene-text",
+ "pack": "scene-text",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "optional",
+ "reel_captions": "hide",
+ "captions_note": "the big words are the caption for those words: hide the reel's captions for this span",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run onsets.py      # 2. word frames from the audio (check words.json: Whisper can mishear or invent a line)",
+  "run scene.py measure      # 3. camera, wall map, head, perspective, variant. LOOK at work/measure.jpg",
+  "edit the CLIP block (PRINT_TEXT/FRAME, HERO always); re-run measure to see the block",
+  "run scene.py still SAFE=1      # 5. six key frames -> work/stills/sheet1.jpg",
+  "run scene.py bake      # 6. assets/fx.mp4 (all cores; about 6 to 8 s per slot second on an M-series Mac, 6 workers)",
+  "run build.py      # 7. index.html (same switches you want in the render, e.g. SFX=0)",
+  "hf lint",
+  "hf render",
+  "run post.py      # 8. frame count, phone copy, work/qa/sheet.jpg from the final mp4"
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "key": "cover-story",
+ "pack": "cover-story",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "optional",
+ "reel_captions": "hide",
+ "captions_note": "the cover line is the caption: the reel's own captions are hidden for this span",
+ "reel_env": [],
+ "in_a_reel": [
+  "leave OUT at its default so the cover is gone 0.5 s before the slot ends (plain footage at both edges)"
+ ],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, choose the framing, plan, index.html. READ the printout",
+  "run bake.py --frames 75,142,168 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 10 to 15 s per second of slot (6 cores)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

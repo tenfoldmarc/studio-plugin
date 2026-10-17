@@ -1,0 +1,20 @@
+{
+ "key": "rack-focus",
+ "pack": "rack-focus",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the title is the caption for its span: hide the reel's captions there, or build with CAPTIONS=0",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, place, time, plan, sounds, index.html. READ the printout",
+  "run bake.py --frames 40,62,95 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 9 to 15 s per second of slot (6 cores)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, edge colour, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

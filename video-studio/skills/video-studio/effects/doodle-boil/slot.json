@@ -1,0 +1,23 @@
+{
+ "key": "doodle-boil",
+ "pack": "doodle-boil",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "doodles carry no words: the reel's own captions stay on",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. plan + index.html + chalk sound. READ the printout",
+  "run bake.py --frames 40,80,120,160 --guide      # 2. quick look: work/test/sheet.jpg (yellow = doodle boxes, red = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 3 to 7 s per second of slot on 4 cores",
+  "hf lint      # 4. 0 errors",
+  "run build.py SAFE=1",
+  "hf snapshot --at 1.0,2.5,4.0",
+  "run build.py",
+  "hf render      # 5. guide off first (the && above rebuilds without it)",
+  "run post.py      # 6. frame count, edges plain, phone copy, work/qa/sheet_*.jpg"
+ ]
+}
