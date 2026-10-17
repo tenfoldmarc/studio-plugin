@@ -422,6 +422,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/cover-story.jpg"
   },
   {
+   "n": 36,
+   "key": "neon-sign",
+   "name": "Neon Sign",
+   "line": "Your phrase lights up as a neon sign on your wall.",
+   "preview": "previews/effects/neon-sign.mp4",
+   "poster": "previews/posters/effects/neon-sign.jpg"
+  },
+  {
    "n": 38,
    "key": "rack-focus",
    "name": "Rack Focus",

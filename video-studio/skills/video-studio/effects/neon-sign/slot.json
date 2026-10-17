@@ -1,0 +1,20 @@
+{
+ "key": "neon-sign",
+ "pack": "neon-sign",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the sign repeats a short phrase on the wall: keep the reel's captions on, or hide them for the span if the sign says the same words",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, place, trace, light maps, index.html (20 to 40 s). READ the printout",
+  "run bake.py --frames 14,79,115 -g      # 2. preview the frames it suggests -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4 (4 workers)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

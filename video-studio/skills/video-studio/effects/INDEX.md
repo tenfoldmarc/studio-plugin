@@ -188,7 +188,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 ## The list
 
 <!-- LIST:START (generated from index.json, do not edit by hand) -->
-34 ready, 0 recipe.
+35 ready, 0 recipe.
 
 | # | Effect | Key | Kind | What it does | The buyer says | Framing | Camera | Wall | Cutout | Tracking | Extra packages |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -224,6 +224,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 | 32 | Vertigo | `vertigo` | ready | A dolly zoom from one locked-off shot: you stay still while the room stretches away behind you, then it snaps back. | "do a vertigo zoom on this line" | any | any | open wall beside the speaker | clean | drift is tracked; a moving camera gets a gentler stretch | opencv-python-headless |
 | 34 | Scene Text | `scene-text` | ready | A word prints across your real wall like wallpaper, behind you and the things on the wall, then two big words land on it. | "print X all over my wall and paint Y on it" | any | still or drifting | open wall beside the speaker | clean | camera track pins the print to the wall | opencv-python-headless |
 | 35 | Cover Story | `cover-story` | ready | The live shot becomes a magazine cover: a serif masthead behind your head, a hairline border, small labels and one italic cover line. | "make this line a magazine cover" | any | still or drifting | clear wall above the head | clean | none (the page is fixed to the screen; the cutout follows the speaker) | opencv-python-headless |
+| 36 | Neon Sign | `neon-sign` | ready | Your phrase as a neon tube on your wall: it flickers on, the room dims and the sign lights the wall. | "hang a neon sign that says X on my wall" | wide or medium | still or drifting | open wall beside the speaker | clean | camera track (shift, roll, scale) pins the sign to the wall | opencv-python-headless |
 | 38 | Rack Focus | `rack-focus` | ready | A title starts as soft lens bokeh, focus pulls to it while you and the room go into real lens blur, then racks back. | "rack focus to a title when I say X" | any | still or drifting | no need | clean | the title is glued to the lens | opencv-python-headless |
 | 39 | God Rays | `god-rays` | ready | The room drops a stop and beams of light fan out from behind your head, with two small lines of type. For one reveal line. | "backlight me with light rays when I say X" | any | still or drifting | clear wall above the head | clean | the light is locked to the head every frame | opencv-python-headless |
 
@@ -261,6 +262,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 - **Vertigo** (READY, `effects/vertigo/`: bake.py, build.py, effect.md, example, more.py, onsets.py, post.py, prep.py, requirements.txt, slot.json, vcore.py). Needs nothing from the buyer. Needs a room with lines or things in it beside or above the head (a plain wall declines). Best on a still camera.
 - **Scene Text** (READY, `effects/scene-text/`: build.py, effect.md, example, onsets.py, post.py, requirements.txt, scene.py, slot.json). Needs nothing from the buyer. Needs some plain wall behind or beside the speaker. Goes behind things on the wall by itself. Declines on a camera that travels.
 - **Cover Story** (READY, `effects/cover-story/`: bake.py, build.py, cover.py, effect.md, example, fxio.py, onsets.py, post.py, requirements.txt, slot.json). Needs nothing from the buyer. Hook line said to camera. Picks the layout from the head: behind the head (medium), above it (selfie), clear above (wide). Declines when the head reaches the very top of the frame.
+- **Neon Sign** (READY, `effects/neon-sign/`: bake.py, build.py, effect.md, example, fxio.py, neon.py, onsets.py, post.py, requirements.txt, scene.py, slot.json). Needs nothing from the buyer. Needs plain wall beside or above the speaker that stays clear. Tries beside, above, a corner, one line, then declines. A punch-in zoom inside the slot breaks the tracking.
 - **Rack Focus** (READY, `effects/rack-focus/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rack.py, requirements.txt, slot.json). Needs nothing from the buyer. The title goes to the darkest calm spot off the face. Declines when the face fills every spot or the title would be sharp for under 0.55 s.
 - **God Rays** (READY, `effects/god-rays/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rays.py, requirements.txt, slot.json). Needs nothing from the buyer. Once per reel, on a reveal or turning-point line. Declines with nobody in shot or the speaker filling the frame.
 <!-- LIST:END -->

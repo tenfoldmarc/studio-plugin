@@ -264,6 +264,14 @@
    "preview": "previews/effects/cover-story.mp4"
   },
   {
+   "n": 36,
+   "key": "neon-sign",
+   "name": "Neon Sign",
+   "job": "Hook",
+   "line": "Your phrase lights up as a neon sign on your wall.",
+   "preview": "previews/effects/neon-sign.mp4"
+  },
+  {
    "n": 38,
    "key": "rack-focus",
    "name": "Rack Focus",
