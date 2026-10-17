@@ -14,9 +14,9 @@
 # It prints the same STATUS lines as setup.py. When no Python can be had it prints STATUS python MISSING with the
 # steps for this computer and exits 1.
 #
-# NOT YET RUN ON A WINDOWS PC. The download address, the checksum and the folder layout of the archive were
-# checked from a Mac. Until it has been run on Windows, SKILL.md treats a failure here as "Python is missing" and
-# gives the install steps, which is what happened before this file existed.
+# Run end to end on Windows Server 2025 (GitHub's windows-latest, Python and Node hidden from the PATH, started from
+# PowerShell 7) on 2026-10-17 by ci/e2e.py: own Python fetched and checked, setup, one full edit. Not yet run on a
+# home Windows 10 or 11 PC. SKILL.md treats a failure here as "Python is missing" and gives the install steps.
 
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'      # a download is many times slower with the progress bar on
