@@ -39,6 +39,13 @@ if opt('--state'):
 ENV['PYTHONIOENCODING'] = 'utf-8'
 
 
+for _s in (sys.stdout, sys.stderr):                  # a Windows console is cp1252: the renderer prints symbols
+    try:
+        _s.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, ValueError):
+        pass
+
+
 def log(msg):
     print(msg, flush=True)
 
