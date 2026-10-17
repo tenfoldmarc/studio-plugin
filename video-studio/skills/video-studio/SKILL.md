@@ -109,15 +109,18 @@ Read the STATUS lines:
 - The other opt-in extra, only when a script asks for it: `setup.py --fx <effect key>` (extra Python packages
   for that effect, into the skill's own Python).
 
-What a new buyer downloads, and when (one time each; how long depends on their connection, so say the size, not
-a time):
-- at setup: the skill's Python environment, about 0.25 GB. On a computer that has none of its own, also Python
-  (about 25 MB on a Mac, 46 MB on Windows), Node (about 50 MB) and ffmpeg (about 45 to 75 MB).
-- at the first edit: the speech model, about 0.5 GB at step 1 and 1.4 GB more at step 4. HyperFrames (the
-  renderer), about 0.4 GB, the first time `HF` or `layout.py` runs, then its browser (about 0.2 GB) at the first
-  snapshot or render and its quick-cutout model (about 0.2 GB) at step 5.
-- with the first effect: the clean cutout, about 105 MB.
-Say it once before the first edit: "The first edit downloads about 3 GB of tools, one time. After that it is quick."
+What a new buyer downloads, all of it at setup, one time (how long depends on their connection, so say the size,
+not a time):
+- the setup check: the skill's Python environment, about 0.25 GB. On a computer that has none of its own, also
+  Python (about 25 MB on a Mac, 46 MB on Windows), Node (about 50 MB) and ffmpeg (about 45 to 75 MB).
+- then `PY "SK/scripts/prefetch.py"`, started IN THE BACKGROUND right after the first setup check, so it downloads
+  while they answer the questions and build their style: the two speech models (about 0.5 and 1.4 GB), HyperFrames
+  (the renderer, about 0.4 GB) and its browser, the quick cutout model (about 170 MB) and the clean cutout (about
+  105 MB). Say it once: "I'm downloading the editing tools in the background now (about 3 GB, one time), so your
+  first edit is quick. We can keep going while it runs."
+- Before step 1 of an edit, while `prefetch.py` has not reported `STATUS prefetch DONE`: `PY "SK/scripts/prefetch.py"
+  --status`. RUNNING: tell them it is still finishing the download and wait for it. INCOMPLETE or STOPPED: carry on,
+  the edit downloads what is missing by itself (and `prefetch.py` can be run again).
 
 Then read `ST/.platform.json` (rewritten on every run). It holds the commands for this computer:
 - `PY` = its `python` value. Run EVERY script of this skill with it, never a bare `python3`.
@@ -141,6 +144,7 @@ folder, their saved styles and which is the default) and ask what they want to c
 or their default. Change only that. Never wipe their styles, picks or folders.
 
 `STATUS config MISSING`:
+0. Start `PY "SK/scripts/prefetch.py"` in the background now (see Step 0: the downloads), then go on.
 1. Say: "Welcome to Claude Creator Studio. Two quick questions, then we build your editing style. This only
    happens once."
 2. Ask in one message: where their raw clips usually land (default `~/Downloads`; you check there for new clips

@@ -110,6 +110,8 @@ def main():
         RESULTS.append({'step': 'setup prints a STATUS styles line', 'ok': False, 'code': 0, 'optional': False})
         finish(1)
     S = lambda n: os.path.join(SK, 'scripts', n)      # noqa: E731
+    run('prefetch every download at setup', [py, S('prefetch.py')], must=r'STATUS prefetch DONE in')
+    run('prefetch status', [py, S('prefetch.py'), '--status'], must=r'DONE: the first edit downloads nothing')
 
     # 2. the buyer's answers to the two setup questions
     projects = os.path.join(OUT, 'reel-edits') if opt('--state') else os.path.join(home, 'reel-edits-e2e')
