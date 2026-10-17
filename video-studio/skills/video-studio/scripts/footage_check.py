@@ -71,14 +71,14 @@ def main():
         sys.exit(__doc__)
     proj = skillenv.path_arg(sys.argv[1])
     args = sys.argv[2:]
-    picks_path = skillenv.picks_file()
+    picks_path = None
     if '--picks' in args:
         i = args.index('--picks')
         picks_path = skillenv.path_arg(args[i + 1])
         args = args[:i] + args[i + 2:]
     index = read(os.path.join(skillenv.SKILL_DIR, 'effects', 'index.json'), {}).get('effects', [])
     by_key = {e['key']: e for e in index}
-    picks = read(picks_path, {}) or {}
+    picks, _ = skillenv.effective_picks(proj, picks_path)    # a saved style's own effect picks count first
     layout = read(os.path.join(proj, 'layout.json'), None)
     if layout is None:
         sys.exit('layout.json is missing: run layout.py first.')

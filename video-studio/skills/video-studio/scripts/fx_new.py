@@ -161,7 +161,7 @@ def main():
                          f'{n - k} after. Widen --from / --to (the cut is at {(frame0 + k) / 30:.2f}s).')
             print(f'two shots: cut on slot frame {k} (reel {(frame0 + k) / 30:.3f}s), {k} frames before, {n - k} after. '
                   'clip.json carries the cut, so the effect\'s own two-shot step is not needed.')
-        picks = fxlib.read(skillenv.path_arg(a.picks) if a.picks else skillenv.picks_file(), {}) or {}
+        picks, _ = skillenv.effective_picks(proj, skillenv.path_arg(a.picks) if a.picks else None)
         where, _ = fxlib.reel_parts(proj)
         ok, why = fxlib.part_verdict(picks, key, where, frame0 / 30, (frame0 + n) / 30)
         if not ok:

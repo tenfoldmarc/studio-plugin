@@ -837,6 +837,118 @@ def _num(v, default):
         return float(default)
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# MOTION: animation the editing Claude writes itself, as GSAP tweens on the reel's one timeline (references/motion.md).
+# The renderer seeks that timeline frame by frame, so a tween here always renders exactly; css @keyframes and
+# transitions never do. Each entry is plain JSON:
+#   {"target": ".w", "tween": "from" | "to" | "fromTo" | "set", "vars": {...gsap vars...}, "from": {...},  (fromTo only)
+#    "at": 0.0  (seconds after the element comes in) | "at_end": 0.3  (seconds before it goes),
+#    "on": "marks" | "words" | "cuts" | "start", "kinds": ["key", "num"], "every": 1, "offset": 0.0}  (reel motion only)
+# ----------------------------------------------------------------------------------------------------------------------
+TWEENS = ('from', 'to', 'fromTo', 'set')
+TARGETS = {'self': '', 'footage': '#plate,#cutw', 'speaker': '#cutw', 'captions': '#caps', 'layers': '#layers'}
+MOTION_MAX = 400          # tweens from one "on" entry: more than this is a mistake (a word tween on every word of a long reel is fine)
+
+
+def _unsafe(v):
+    """Anything that would make two renders of the same frame differ (random values: the renderer may load the page
+    more than once), or that is not plain data."""
+    s = json.dumps(v)
+    return any(x in s for x in ('random(', '"random"', '=>', 'function', 'Math.', '<script'))
+
+
+def _jsjson(v):
+    return json.dumps(v).replace('</', '<\\/')
+
+
+def motion(entries, scope='', base=0.0, end=None, where='Motion'):
+    """GSAP lines for a list of motion entries. scope = the element they belong to (a layer, a caption line, a word):
+    "target" is a selector INSIDE it, "self" (or nothing) is the element itself. Without a scope "target" is a
+    selector on the page, or one of TARGETS ("footage" moves the picture and the cutout together)."""
+    if isinstance(entries, dict):
+        entries = [entries]
+    out = []
+    for k, m in enumerate(entries if isinstance(entries, list) else []):
+        if not isinstance(m, dict):
+            continue
+        tw = m.get('tween', 'from')
+        name = f'{where} {m.get("id", k + 1)}'
+        if tw not in TWEENS:
+            NOTES.append(f'{name}: tween "{tw}" is not one of {", ".join(TWEENS)}; left out.')
+            continue
+        vars_ = m.get('vars') if isinstance(m.get('vars'), dict) else {}
+        if _unsafe(m):
+            NOTES.append(f'{name}: random values or code are not allowed (two renders of one frame must match); left out. '
+                         'Write the numbers out.')
+            continue
+        tgt = str(m.get('target', 'self') or 'self').strip()
+        tgt = TARGETS.get(tgt, tgt)
+        if scope:
+            sel = scope if not tgt else ','.join(f'{scope} {t.strip()}' for t in tgt.split(',') if t.strip())
+        elif tgt:
+            sel = tgt
+        else:
+            NOTES.append(f'{name}: no target; left out.')
+            continue
+        t = (end - _num(m.get('at_end'), 0)) if m.get('at_end') is not None and end is not None else base + _num(m.get('at'), 0)
+        t = T(max(0.0, min(t, DUR)))
+        v = dict(vars_)
+        if tw == 'set':
+            v.pop('duration', None)
+            args = _jsjson(v)
+        elif tw == 'fromTo':
+            v.setdefault('immediateRender', False)
+            args = _jsjson(m.get('from') if isinstance(m.get('from'), dict) else {}) + ',' + _jsjson(v)
+        else:
+            v.setdefault('duration', .3)
+            args = _jsjson(v)
+        out.append(f'tl.{tw}({_jsjson(sel)},{args},{t:.3f});')
+    return out
+
+
+def reel_motion(entries):
+    """Reel-wide motion (plan.json / a saved style "motion"): at fixed reel seconds ("at"), or on a pattern ("on"):
+    every marked word ("marks", optionally only some "kinds"), every word, every cut, or the start. A saved style
+    only keeps the "on" kind: its times come from each new reel's own words."""
+    if isinstance(entries, dict):
+        entries = [entries]
+    out = []
+    for k, m in enumerate(entries if isinstance(entries, list) else []):
+        if not isinstance(m, dict):
+            continue
+        on = m.get('on')
+        if not on:
+            out += motion([m], '', 0.0, None, 'Reel motion')
+            continue
+        if on == 'marks':
+            kinds = m.get('kinds')
+            times = [w['start'] for w in W if w.get('e') and (not kinds or w.get('e') in kinds)]
+        elif on == 'words':
+            times = [w['start'] for w in W]
+        elif on == 'cuts':
+            times = [s0 for s0, _ in SEGS[1:]]
+        elif on == 'start':
+            times = [0.0]
+        else:
+            NOTES.append(f'Reel motion {m.get("id", k + 1)}: "on": "{on}" is not marks, words, cuts or start; left out.')
+            continue
+        every = max(1, int(_num(m.get('every'), 1)))
+        times = [t + _num(m.get('offset'), 0) for t in times[::every]][:MOTION_MAX]
+        one = {x: y for x, y in m.items() if x not in ('on', 'every', 'offset', 'kinds')}
+        for t in times:
+            out += motion([{**one, 'at': t}], '', 0.0, None, 'Reel motion')
+    return out
+
+
+def css_motion_note(css, where):
+    """css animation never plays in the renderer: say so once, so the look is rebuilt with motion entries"""
+    if css and ('@keyframes' in str(css) or 'animation:' in str(css) or 'transition:' in str(css)):
+        note = (f'{where}: css @keyframes / animation / transition do not play in the renderer (it seeks frame by frame). '
+                'Rewrite that movement as "motion" entries (references/motion.md).')
+        if note not in NOTES:
+            NOTES.append(note)
+
+
 def custom_top(s=None):
     """screen y of the top of the custom caption block, from its "position" (a band name or a y), kept inside the
     safe zone and off the face"""
@@ -893,8 +1005,11 @@ def custom(b):
                                       'left' | 'right'; side margin px
       entrance, exit                  'none' | 'pop' | 'fade' | 'slide-up' | 'type-on' | 'word-by-word'; 'none' | 'fade'
       css                             extra css for this style (classes: .cu block, .cu .ln line, .cu .w word, .cu .w.m
-                                      marked word, .cu .pl plate)"""
+                                      marked word, .cu .pl plate)
+      motion, word_motion, mark_motion   the buyer's own animation (see MOTION above): for each line, for each word as
+                                      it is said, for each marked word. Any of them can replace or add to "entrance"."""
     s = CUSTOM
+    css_motion_note(s.get('css'), 'Custom captions')
     fam, weight = str(s.get('font') or 'Inter Tight'), int(_num(s.get('weight'), 800))
     size, lh = _num(s.get('size'), 64), _num(s.get('line_height'), 1.12)
     case = s.get('case', 'as-typed')
@@ -979,6 +1094,11 @@ def custom(b):
                     inner = esc(txt)
                 ws.append(f'<span id="{wid}" class="{cls}">{inner}</span>')
                 ts = T(w['start'])
+                # the buyer's own motion for each word as it is said, and for each marked word (references/motion.md)
+                if s.get('word_motion'):
+                    b.js += motion(s['word_motion'], f'#{wid}', w['start'], None, 'Caption word motion')
+                if w.get('e') and s.get('mark_motion'):
+                    b.js += motion(s['mark_motion'], f'#{wid}', w['start'], None, 'Caption mark motion')
                 if entrance == 'word-by-word' and w is not g[0]:
                     b.js.append(f"gsap.set('#{wid}',{{opacity:0}});")
                     b.js.append(f"tl.fromTo('#{wid}',{{opacity:0,scale:1.18}},{{opacity:1,scale:1,duration:.16,ease:'back.out(2)',immediateRender:false}},{ts:.3f});")
@@ -1009,6 +1129,8 @@ def custom(b):
         else:
             b.cut(sel, t0)
         b.out(sel, t1, fade=.12 if s.get('exit') == 'fade' else 0)
+        if s.get('motion'):              # the buyer's own motion for each caption line: "at" after it comes in, "at_end" before it goes
+            b.js += motion(s['motion'], sel, t0, t1 if t1 < DUR - .02 else None, 'Caption motion')
 
 
 STYLES = {
@@ -1233,6 +1355,9 @@ def layers(b, behind=False):
             if how_out == 'fade':
                 b.js.append(f"tl.to('{sel}',{{autoAlpha:0,duration:.18}},{max(0, T(t1) - .18):.3f});")
             b.js.append(f"tl.set('{sel}',{{autoAlpha:0}},{T(t1):.3f});")
+        css_motion_note(l.get('css'), f'Layer {l.get("id", n)}')
+        if l.get('motion'):              # the layer's own animation: "at" after it comes in, "at_end" before it goes
+            b.js += motion(l['motion'], sel, t0, t1 if t1 < DUR - .02 else None, f'Layer {l.get("id", n)} motion')
     return out
 
 
@@ -1285,6 +1410,8 @@ def document(b, footage, safe=False, audio_track=9):
     fx_audio = fx_audio + sounds()
     if EXTRA.get('css'):                  # the escape hatch: plain css from plan.json / my-style.json, last so it wins
         b.css.append('\n' + str(EXTRA['css']))
+        css_motion_note(EXTRA['css'], 'The style css')
+    b.js += reel_motion(EXTRA.get('motion'))   # reel-wide motion: punch-ins on key words, a flash on every cut, ...
     return f'''<!doctype html>
 <html lang="en" data-resolution="portrait">
 <head>

@@ -2,7 +2,10 @@
 """Put what a reel project needs to render into it: hyperframes.json, package.json, assets/fonts, the sound effects
 (assets/sfx) and a starter plan.json. One command for every OS and shell, instead of cp / Copy-Item.
 
-Usage:  PY init_project.py <project_dir>
+Usage:  PY init_project.py <project_dir> [--my-style "<saved style name>" | --my-style none]
+
+  --my-style   build this reel in one of the buyer's saved styles (the one they named: "edit it in Cozy Talk").
+               Left out: the default style (my_styles.py default), or the Studio Picker picks when none is saved.
 
 Files that already exist in the project are KEPT, never overwritten, so running this twice is harmless.
 plan.json is the per-reel plan the editing Claude fills in (see references/styles.md): the pinned title from the
@@ -62,9 +65,19 @@ def main():
         print('no sound effects found (setup.py reported them MISSING): the reel renders without them until they are added')
 
     plan = os.path.join(proj, 'plan.json')
+    asked = sys.argv[sys.argv.index('--my-style') + 1] if '--my-style' in sys.argv[:-1] else None
+    kept = {}
     if os.path.exists(plan):
-        print('plan.json was already in the project and was left as it is')
-        return
+        try:
+            with open(plan, encoding='utf-8') as fh:
+                kept = json.load(fh)
+        except (OSError, ValueError):
+            kept = None
+        # a plan.json that only says which saved style to use (my_styles.py use) still gets its starter fields
+        if not isinstance(kept, dict) or set(kept) - {'myStyle'}:
+            print('plan.json was already in the project and was left as it is')
+            report_style(proj)
+            return
     title = ['', '']
     try:
         with open(os.path.join(proj, 'words.json'), encoding='utf-8') as fh:
@@ -77,11 +90,28 @@ def main():
         'style': {},                          # words an overall style shows on screen: {"<style key>": {...}}
         'slots': [],                          # finished effect renders laid over the reel
     }
+    if asked:
+        found, many = skillenv.find_style(asked)
+        if not found and asked != 'none':
+            sys.exit(f'No saved style called "{asked}".' + (' It could be: ' + ', '.join(m['name'] for m in many) + '.'
+                     if many else ' Saved styles: ' + (', '.join(s['name'] for s in skillenv.saved_styles()) or 'none yet')))
+        starter['myStyle'] = found['slug'] if found else 'none'   # the saved style this reel is built in
+    elif kept.get('myStyle'):
+        starter['myStyle'] = kept['myStyle']
     with open(plan, 'w', encoding='utf-8') as fh:
         json.dump(starter, fh, indent=1)
         fh.write('\n')
     print(f'plan.json started with a first-guess title {title}: rewrite it from the hook '
           '(references/captions.md, "Titles come from the hook"; words for an overall style: references/styles.md)')
+    report_style(proj)
+
+
+def report_style(proj):
+    s, why = skillenv.project_style(proj)
+    if s:
+        print(f'style: this reel is built in the saved style "{s["name"]}" ({why})')
+    else:
+        print(f'style: no saved style for this reel ({why}): it is built from the Studio Picker picks')
 
 
 if __name__ == '__main__':

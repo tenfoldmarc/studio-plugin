@@ -126,7 +126,7 @@ def main():
     if os.path.getmtime(index) > os.path.getmtime(render) + 1:
         sys.exit('index.html changed after the render (build.py ran again). Render the slot again, then add.')
     t0, t1 = f0 / 30, (f0 + frames) / 30
-    picks = fxlib.read(skillenv.path_arg(opt('--picks')) if opt('--picks') else skillenv.picks_file(), {}) or {}
+    picks, _ = skillenv.effective_picks(proj, skillenv.path_arg(opt('--picks')) if opt('--picks') else None)
     where, dur = fxlib.reel_parts(proj)
     ok, why = fxlib.part_verdict(picks, key, where, t0, t1)
     if not ok:

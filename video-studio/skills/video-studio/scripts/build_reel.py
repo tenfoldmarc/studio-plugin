@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Turn the buyer's saved picks into the reel's composition: <project>/index.html.
 
-Usage:  PY build_reel.py <project_dir> [--safe] [--picks <file>] [--caption <key>] [--style <key>] [--no-my-style]
+Usage:  PY build_reel.py <project_dir> [--safe] [--picks <file>] [--caption <key>] [--style <key>]
+                                       [--my-style "<saved style>"] [--no-my-style]
 
   --safe            draw the Reels unsafe area in red (for snapshots only; never render with it)
   --picks <file>    read this picks file instead of the saved one (studio-picks.json in the state folder)
   --caption <key>   one-off: use this caption style for this build without changing the saved picks
-  --style <key>     one-off: use this overall style for this build ("none" = no overall style)
-  --no-my-style     one-off: ignore the buyer's own style (my-style.json) and build from the saved picks
+  --style <key>     one-off: use this BUILT-IN overall style for this build ("none" = no overall style)
+  --my-style <name> one-off: build in this one of the buyer's saved styles
+  --no-my-style     one-off: ignore the buyer's saved styles and build from the Studio Picker picks
 
-The buyer's own style wins over the saved picks: my-style.json in the state folder (a custom caption spec, always-on
-layers, a grade, css), then this reel's plan.json on top of it ("caption", "layers", "grade", "css", "sounds").
-Every field is in references/replicate.md.
+The buyer's own style wins over the Picker picks: one of their saved styles (styles/<slug>/style.json in the state
+folder; plan.json "myStyle" names it, else the default style), then this reel's plan.json on top of it ("caption",
+"layers", "grade", "css", "sounds", "motion"). A saved style that carries "picks" (a caption key, an overall style,
+effects) uses those instead of studio-picks.json. Every field: references/replicate.md and references/my-styles.md.
 
 What it reads:
   the picks        {"mode": "preset"|"custom", "style": key|null, "captionStyle": key|"none", "effects": [...],
@@ -63,10 +66,40 @@ def main():
         sys.exit(__doc__)
     proj = skillenv.path_arg(sys.argv[1])
     safe = '--safe' in sys.argv
-    picks_path = skillenv.path_arg(opt('--picks')) if opt('--picks') else skillenv.picks_file()
-    picks = read(picks_path)
+
+    # Which of the buyer's saved styles this reel is built in (references/my-styles.md): --my-style for a one-off,
+    # else plan.json "myStyle", else their default style. --no-my-style builds from the Studio Picker picks alone.
+    saved, saved_why = None, 'no saved style'
+    if '--no-my-style' in sys.argv:
+        saved_why = '--no-my-style'
+    elif opt('--my-style'):
+        saved, many = skillenv.find_style(opt('--my-style'))
+        if not saved:
+            sys.exit(f'No saved style called "{opt("--my-style")}".' + (
+                ' It could be: ' + ', '.join(m['name'] for m in many) if many else
+                ' Saved styles: ' + (', '.join(s['name'] for s in skillenv.saved_styles()) or 'none yet')))
+        saved_why = '--my-style'
+    else:
+        saved, saved_why = skillenv.project_style(proj)
+    if saved:
+        mine = read(saved['path'], {}) or {}
+    elif '--no-my-style' not in sys.argv and os.path.isfile(skillenv.my_style_file()):
+        mine = read(skillenv.my_style_file(), {}) or {}          # an old single my-style.json nobody migrated yet
+    else:
+        mine = {}
+
+    if opt('--picks'):
+        picks, picks_path = read(skillenv.path_arg(opt('--picks'))), opt('--picks')
+    elif isinstance(mine.get('picks'), dict):
+        picks, picks_path = mine['picks'], f'the style "{mine.get("name") or saved["name"]}"'
+    else:
+        picks_path = skillenv.picks_file()
+        picks = read(picks_path)
     if not isinstance(picks, dict):
-        sys.exit(f'No picks saved yet ({picks_path}). Open the Studio Picker first: PY scripts/picker.py')
+        if not mine:
+            sys.exit(f'No picks saved yet ({picks_path}) and no saved style. Open the Studio Picker '
+                     '(PY scripts/picker.py) or build a style from an example (references/replicate.md).')
+        picks = {'mode': 'custom', 'style': None, 'captionStyle': 'none', 'effects': []}
     style = picks.get('style') if picks.get('mode') == 'preset' else None
     caption = picks.get('captionStyle') or 'none'
 
@@ -76,10 +109,9 @@ def main():
     cap.load(proj)
     del cap.NOTES[:]
 
-    # The buyer's own style beats the saved picks (SKILL.md, "The buyer's style wins"). It lives in my-style.json in
-    # the state folder (written once from an example or a description, references/replicate.md); this reel's
-    # plan.json can override any part of it. A one-off --caption / --style on the command line beats both.
-    mine = {} if '--no-my-style' in sys.argv else (read(skillenv.my_style_file(), {}) or {})
+    # The buyer's own style beats the saved picks (SKILL.md, "The buyer's style wins"). It is one of their saved
+    # styles (picked above); this reel's plan.json can override any part of it. A one-off --caption / --style on the
+    # command line beats both.
     plan = cap.PLAN
     own_look = None
     spec = plan.get('caption', mine.get('caption'))
@@ -93,7 +125,10 @@ def main():
     cap.EXTRA = {'layers': always + [l for l in (plan.get('layers') or []) if isinstance(l, dict)],
                  'grade': plan.get('grade', mine.get('grade')),
                  'css': '\n'.join(str(c) for c in (mine.get('css'), plan.get('css')) if c),
-                 'sounds': plan.get('sounds') or []}
+                 'sounds': plan.get('sounds') or [],
+                 # reel-wide motion: the style's patterns ("on": marks / words / cuts) plus this reel's own entries
+                 'motion': [m for m in (mine.get('motion') or []) if isinstance(m, dict) and m.get('on')]
+                           + [m for m in (plan.get('motion') or []) if isinstance(m, dict)]}
     fonts_src = skillenv.my_fonts_dir()
     if os.path.isdir(fonts_src):                 # fonts fetched for the buyer's style (get_font.py) go with every reel
         os.makedirs(os.path.join(proj, 'assets', 'fonts'), exist_ok=True)
@@ -165,11 +200,12 @@ def main():
         what = f'style=none captions={caption}'
     notes += cap.NOTES
     n_layers = len(cap.EXTRA.get('layers') or [])
-    if own_look or n_layers or cap.EXTRA.get('grade') or cap.EXTRA.get('css') or cap.EXTRA.get('sounds'):
+    if own_look or n_layers or cap.EXTRA.get('grade') or cap.EXTRA.get('css') or cap.EXTRA.get('sounds') or cap.EXTRA.get('motion'):
         what += ('  [the buyer\'s own style: ' + ', '.join(x for x in (
             own_look if caption == 'custom' or own_look and not opt('--caption') else None,
             f'{n_layers} layer(s)' if n_layers else None, 'grade' if cap.EXTRA.get('grade') and not style else None,
             'css' if cap.EXTRA.get('css') else None,
+            f"{len(cap.EXTRA['motion'])} motion entr(ies)" if cap.EXTRA.get('motion') else None,
             f"{len(cap.EXTRA['sounds'])} sound cue(s)" if cap.EXTRA.get('sounds') else None) if x) + ']')
     with open(os.path.join(proj, 'index.html'), 'w', encoding='utf-8', newline='\n') as fh:
         fh.write(html)
@@ -182,6 +218,8 @@ def main():
     marks = sum(1 for w in cap.W if w.get('e'))
     print(f'built index.html  {what}  words={len(cap.W)} marked={marks}  dur={cap.DUR:.3f}s  '
           f'slots={len(live)}  safe guide={"ON (snapshots only)" if safe else "off"}')
+    print(f'style  ' + (f'saved style "{saved["name"]}" ({saved_why})' if saved else f'none ({saved_why})')
+          + f'   picks from {picks_path}')
     for s in live:
         hid = s.get('hide_captions')
         caps = ('captions hidden ' + ', '.join(f'{h[0]:.2f}-{h[1]:.2f}s' for h in hid) if hid

@@ -12,6 +12,7 @@ What lives here:
                       matting model): always a per-user data folder OUTSIDE the skill, so an update of the skill
                       never wipes the buyer's picks
   load()              reads <state>/.platform.json, written by setup.py, so nothing is detected twice
+  saved_styles(), find_style(), project_style(), effective_picks()   the buyer's named editing styles
   path_arg(), utf8_stdio(), concat_entry(), safe_name()   small things every script needs on Windows
 """
 import glob
@@ -230,6 +231,129 @@ def my_style_file(state=None):
     """The buyer's own style as a spec the build reads (custom captions, always-on layers, grade, css). Written once
     from an example or a description (references/replicate.md); my-style.md beside it says the same in plain words."""
     return os.path.join(state or state_dir(), 'my-style.json')
+
+
+def styles_dir(state=None):
+    """The buyer's saved editing styles, one folder each: styles/<slug>/style.json (what the build reads) and
+    style.md (the same in plain words, plus their standing notes). references/my-styles.md has the whole format."""
+    return os.path.join(state or state_dir(), 'styles')
+
+
+def style_slug(name):
+    """'Cozy Talk!' -> 'cozy-talk'. The folder name of a saved style."""
+    s = re.sub(r'[^a-z0-9]+', '-', str(name).strip().lower()).strip('-')
+    return s or 'style'
+
+
+def _read_json(path, fallback=None):
+    try:
+        with open(path, encoding='utf-8') as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return fallback
+
+
+def migrate_my_style(state=None):
+    """The one-style days: a my-style.json in the state folder becomes the saved style "My style" (and the default),
+    once. The old file is renamed to my-style.json.migrated, never deleted."""
+    state = state or state_dir()
+    old = my_style_file(state)
+    if not os.path.isfile(old):
+        return None
+    spec = _read_json(old, None)
+    if not isinstance(spec, dict):
+        return None
+    name = str(spec.get('name') or 'My style')
+    slug = style_slug(name)
+    folder = os.path.join(styles_dir(state), slug)
+    if not os.path.isdir(folder):
+        os.makedirs(folder, exist_ok=True)
+        spec['name'], spec['slug'] = name, slug
+        with open(os.path.join(folder, 'style.json'), 'w', encoding='utf-8', newline='\n') as fh:
+            json.dump(spec, fh, indent=1)
+            fh.write('\n')
+        md = os.path.join(state, 'my-style.md')
+        if os.path.isfile(md):
+            shutil.copyfile(md, os.path.join(folder, 'style.md'))
+    cfg_path = config_file(state)
+    cfg = _read_json(cfg_path, {}) or {}
+    if not cfg.get('defaultStyle'):
+        cfg['defaultStyle'] = slug
+        with open(cfg_path, 'w', encoding='utf-8', newline='\n') as fh:
+            json.dump(cfg, fh, indent=1)
+            fh.write('\n')
+    os.replace(old, old + '.migrated')
+    return slug
+
+
+def saved_styles(state=None):
+    """-> [{'slug', 'name', 'path', 'default'}] for every saved style, default first, then by name."""
+    state = state or state_dir()
+    migrate_my_style(state)
+    root = styles_dir(state)
+    default = (_read_json(config_file(state), {}) or {}).get('defaultStyle')
+    out = []
+    if os.path.isdir(root):
+        for slug in sorted(os.listdir(root)):
+            path = os.path.join(root, slug, 'style.json')
+            if slug.startswith(('_', '.')) or not os.path.isfile(path):
+                continue
+            spec = _read_json(path, {}) or {}
+            out.append({'slug': slug, 'name': str(spec.get('name') or slug), 'path': path, 'default': slug == default})
+    out.sort(key=lambda s: (not s['default'], s['name'].lower()))
+    return out
+
+
+def find_style(name, state=None):
+    """A saved style by what the buyer calls it: its folder name, its name in any case, or one unique partial
+    match ("cozy" finds "Cozy Talk"). -> (style or None, [candidates when the name matched more than one])."""
+    if not name:
+        return None, []
+    have = saved_styles(state)
+    want, slug = str(name).strip().lower(), style_slug(name)
+    for s in have:
+        if s['slug'] == slug or s['name'].lower() == want:
+            return s, []
+    part = [s for s in have if want in s['name'].lower() or slug in s['slug']]
+    return (part[0], []) if len(part) == 1 else (None, part)
+
+
+def default_style(state=None):
+    """The style "edit it" uses when the buyer names none (config.json "defaultStyle"), or None."""
+    have = saved_styles(state)
+    return next((s for s in have if s['default']), None)
+
+
+def project_style(project, state=None):
+    """The saved style a reel is built in: <project>/plan.json "myStyle" (a style's name, or "none" for the plain
+    picks), else the default style. -> (style or None, why)."""
+    plan = _read_json(os.path.join(project, 'plan.json'), {}) or {}
+    asked = plan.get('myStyle')
+    if asked == 'none':
+        return None, 'plan.json says "myStyle": "none"'
+    if asked:
+        s, many = find_style(asked, state)
+        if s:
+            return s, f'plan.json "myStyle": "{asked}"'
+        return None, (f'plan.json asks for the style "{asked}", which is not saved'
+                      + (' (it could be: ' + ', '.join(m['name'] for m in many) + ')' if many else ''))
+    s = default_style(state)
+    return (s, 'the default style') if s else (None, 'no saved style')
+
+
+def effective_picks(project=None, picks_path=None, state=None):
+    """The picks that count for this reel: an explicit --picks file, else the "picks" a saved style carries (a
+    style made from presets and effects), else what the Studio Picker saved. -> (picks dict, where from)."""
+    if picks_path:
+        return _read_json(picks_path, {}) or {}, picks_path
+    if project:
+        s, _ = project_style(project, state)
+        if s:
+            spec = _read_json(s['path'], {}) or {}
+            if isinstance(spec.get('picks'), dict):
+                return spec['picks'], f'the style "{s["name"]}"'
+    path = picks_file(state)
+    return _read_json(path, {}) or {}, path
 
 
 def my_fonts_dir(state=None):
