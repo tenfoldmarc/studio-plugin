@@ -31,13 +31,29 @@ buyer the one line it prints.
 |---|---|---|
 | Time | about 7s per second of footage on Apple Silicon, a few times that on other machines | about 1.2s per FRAME: a 20s reel is about 12 minutes |
 | Good for | measuring (layout.py does its own small one), Sticky Text | anything BEHIND the speaker or popping out of a card: Bold, Chalk Talk (`--hard`), Show and Tell, most effects. Every ready effect uses this one |
-| Weak spot | can take a face in a painting or poster for the speaker; rough hands | slow; needs `setup.py --matting` once (about 105 MB) |
+| Weak spot | can take a face in a painting or poster for the speaker; rough hands | slow; needs `setup.py --matting` once (about 105 MB). It can keep a face or skull picture behind the head too: its head check takes that off (below) |
 
 Prefer the clean one whenever an edge will be seen. Tell the buyer the time BEFORE starting, run it in the
 background, keep working. One cutout at a time. Only an effect's own frames need matting: `fx_new.py` does that
 for a ready effect (a 3 second slot is about 2 minutes), `rvm_cut.py --src` for a recipe.
 Both write `assets/subject.webm` and stop with FRAME MISMATCH if it is not frame-for-frame with the cut: then
 re-run `assemble.py` and cut again.
+
+**Head check (runs inside `rvm_cut.py`, every time).** A painting, poster or framed photo with a face or a skull
+right behind the speaker's head can be kept by the cutout as a grey see-through "ghost" above the head, and it
+then shows over anything behind them. `head_clean.py` looks for it and takes it off; a clean cutout is not touched.
+Its last line starts `head check:`:
+- `clean`: nothing to say to the buyer.
+- `CLEANED`: tell the buyer, in plain words, something like "The picture on the wall behind your head was
+  sneaking into the cutout, so I took it off." Look at the head in the snapshots of every look that goes behind them.
+- `PARTLY CLEANED`: the full clean needs Apple's face finder. On a Mac, ask the buyer to install Apple's free
+  developer tools (the line says how; about 10 minutes, one time), then run the `--redo` command it names. On
+  Windows or Linux, look at the head in the snapshots; if a shape still shows above it, pick a look that keeps
+  nothing behind the head for those moments, and tip the buyer: hang nothing with a face right behind your head
+  next time, or shoot a little to the side of it.
+The first clean cutout on a Mac builds the face finder once (about a minute); after that the check adds well under
+a minute to a reel. `PY head_clean.py <project> --look 120 300` shows what it would do on those frames without
+changing anything (`work/head_clean_<frame>.jpg`).
 
 ## 3. Self-check (after building anything)
 Before the render, from snapshots with the red guide (`build_reel.py --safe`, `HF snapshot --at ...`): layout,

@@ -14,6 +14,9 @@ run it in the background and keep working.
 First use needs the model and scipy, one time:   <any python> scripts/setup.py --matting   (about 105 MB download)
 
 --hard   push soft, half-transparent edges solid (for a speaker placed on a new backdrop, as Chalk Talk does)
+--no-head-clean   skip the head check. By default, head_clean.py takes a picture behind the head (a face or skull
+         the cutout kept as a grey ghost above the speaker) off the finished cutout; a clean cutout is not touched.
+         Its "head check:" line says what it did (references/checks.md says what to tell the buyer).
 The recurrent state is warmed on the first frame and reset at every cut in <project>/segments.json (in an effect
 slot: at the "cut_frames" of its clip.json). fx_new.py runs this on a slot's own frames when the reel has no cutout.
 """
@@ -54,6 +57,16 @@ elif os.path.exists('clip.json') and '--src' not in sys.argv:      # an effect s
     with open('clip.json', encoding='utf-8') as fh:
         cuts = set(json.load(fh).get('cut_frames') or [])
 WARM = 12
+# The head check (head_clean.py) finds the face and hands while the matting runs, then takes off a picture behind the
+# head if the cutout kept one. --no-head-clean skips it.
+HEAD_CLEAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'head_clean.py')
+head_prep = None
+if '--no-head-clean' not in sys.argv:
+    try:
+        head_prep = subprocess.Popen([sys.executable, HEAD_CLEAN, '.', '--prepare', '--src', src],
+                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8', errors='replace')
+    except OSError:
+        head_prep = None
 
 so = ort.SessionOptions()
 so.intra_op_num_threads = int(os.environ.get('RVM_THREADS', str(max(2, (os.cpu_count() or 4) - 2))))
@@ -118,3 +131,13 @@ aroll = subprocess.run([skillenv.tool('ffprobe'), '-v', 'error', '-count_frames'
                         'stream=nb_read_frames', '-of', 'csv=p=0', src], **skillenv.TEXT).stdout.strip().split(',')[0]
 if aroll and aroll != str(n):
     sys.exit(f'FRAME MISMATCH: {src} has {aroll} frames, the cutout has {n}. Re-run assemble.py, then this script.')
+if head_prep is not None:
+    prep_out = head_prep.communicate()[0] or ''
+    if 'building the face finder' in prep_out:
+        print('head check: built the face finder (one time)', flush=True)
+    r = subprocess.run([sys.executable, HEAD_CLEAN, '.', '--src', src, '--cut', out], **skillenv.TEXT)
+    lines = [ln for ln in (r.stdout or '').splitlines() if ln.startswith('head check:')]
+    if lines:
+        print('\n'.join(lines), flush=True)
+    if r.returncode != 0 or not lines:
+        print('head check: did not finish, the cutout is as matted. ' + (r.stderr or '').strip()[-400:], flush=True)

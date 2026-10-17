@@ -246,7 +246,8 @@ A look that goes behind the speaker or lifts them out of the room (Bold captions
 a person cutout of the whole reel first. Use the clean one, `rvm_cut.py`, and tell the buyer how long it takes
 before you start (`references/checks.md`). Almost every effect needs the clean cutout too (`effects/INDEX.md` says which do not), but only of its own frames:
 `fx_new.py` does that (about 1.2 to 1.8 seconds per frame on an Apple Silicon Mac, so about 2 minutes for a 3
-second effect). Both need `setup.py --matting` once.
+second effect). Both need `setup.py --matting` once. Every clean cutout ends with a `head check:` line (a picture
+behind the head taken off the cutout, or not): pass it on as `references/checks.md` says.
 
 Look at one reel snapshot inside every slot: one caption look, nothing doubled, no spoken word without a
 caption unless the effect's own words carry it.
