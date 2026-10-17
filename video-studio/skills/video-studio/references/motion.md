@@ -86,3 +86,9 @@ build, take snapshots at the same moments, and compare (`side_by_side.py`). One 
 Motion goes through the same checks as everything else: `hf lint` 0 errors, snapshots in the middle of a movement
 (not only after it settles), and the final render's frames. Something that moves must not cross the face or leave
 the safe zone at any frame of the movement, only at rest is not enough.
+
+Motion on the picture itself (`footage`, `speaker`, `#root`): the captions and the face box are placed for the
+unmoved picture. Bring a punch-in back (`"yoyo": true, "repeat": 1`, or a later `to` with `scale: 1`) unless the
+example really holds the zoom, keep it small (1.03 to 1.08), and grow it from the face (`transformOrigin` at the
+head). The automatic self-check cannot compare a moved picture with the footage, so `build_reel.py` says so and
+`frames_check.py` stops flagging those frames: look at its sheet yourself.

@@ -60,6 +60,19 @@ def read(path, fallback=None):
         return fallback
 
 
+def motion_entries(mine, plan):
+    """Reel-wide motion: the style's patterns ("on": marks / words / cuts), then this reel's own entries. An entry in
+    both (the reel the style was saved from) counts once."""
+    out, seen = [], set()
+    for m in [m for m in (mine.get('motion') or []) if isinstance(m, dict) and m.get('on')] + \
+             [m for m in (plan.get('motion') or []) if isinstance(m, dict)]:
+        key = json.dumps(m, sort_keys=True)
+        if key not in seen:
+            seen.add(key)
+            out.append(m)
+    return out
+
+
 def main():
     skillenv.utf8_stdio()
     if len(sys.argv) < 2 or sys.argv[1].startswith('--'):
@@ -127,8 +140,7 @@ def main():
                  'css': '\n'.join(str(c) for c in (mine.get('css'), plan.get('css')) if c),
                  'sounds': plan.get('sounds') or [],
                  # reel-wide motion: the style's patterns ("on": marks / words / cuts) plus this reel's own entries
-                 'motion': [m for m in (mine.get('motion') or []) if isinstance(m, dict) and m.get('on')]
-                           + [m for m in (plan.get('motion') or []) if isinstance(m, dict)]}
+                 'motion': motion_entries(mine, plan)}
     fonts_src = skillenv.my_fonts_dir()
     if os.path.isdir(fonts_src):                 # fonts fetched for the buyer's style (get_font.py) go with every reel
         os.makedirs(os.path.join(proj, 'assets', 'fonts'), exist_ok=True)
@@ -211,10 +223,18 @@ def main():
         fh.write(html)
     # what was built, for frames_check.py: the automatic checks only make sense when the picture was not regraded or moved
     os.makedirs(os.path.join(proj, 'work'), exist_ok=True)
+    # reel motion that moves or filters the picture itself (a punch-in on key words, a flash on cuts) means the
+    # frames no longer match the footage, so the automatic before / after comparison would flag every such frame
+    moved = any(str(m.get('target', '')).strip() in ('footage', 'speaker', '#plate', '#cutw', '#bgv', '#footage', '#root')
+                or any(t in str(m.get('target', '')) for t in ('#plate', '#cutw', '#bgv', '#footage', '#root'))
+                for m in (cap.EXTRA.get('motion') or []) if isinstance(m, dict))
+    if moved:
+        notes.append('Reel motion moves the picture (footage, speaker or #root), so the self-check cannot compare '
+                     'frames with the footage: LOOK at its sheet yourself, and at a frame where the picture is moved most.')
     with open(os.path.join(proj, 'work', 'build.json'), 'w', encoding='utf-8') as fh:
         json.dump({'style': style, 'caption': caption, 'safe': safe,
-                   'untouched_footage': not style and not cap.LIFT and not cap.EXTRA.get('grade'),
-                   'face_in_place': (not style) or style == 'fireside'}, fh, indent=1)
+                   'untouched_footage': not style and not cap.LIFT and not cap.EXTRA.get('grade') and not moved,
+                   'face_in_place': ((not style) or style == 'fireside') and not moved}, fh, indent=1)
     marks = sum(1 for w in cap.W if w.get('e'))
     print(f'built index.html  {what}  words={len(cap.W)} marked={marks}  dur={cap.DUR:.3f}s  '
           f'slots={len(live)}  safe guide={"ON (snapshots only)" if safe else "off"}')
