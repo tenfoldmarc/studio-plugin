@@ -1,0 +1,25 @@
+{
+ "key": "inside-out",
+ "pack": "inside-out",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "no words of its own: the reel's captions stay on",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, choose, prep the fill, plan, sounds, index.html. READ the printout",
+  "run bake.py --frames 40,80,110 -g      # 2. preview the frames it suggests -> work/t/ ; look at work/qa/fill.jpg",
+  "run bake.py      # 3. assets/fx.mp4 (4 workers)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ],
+ "buyer_folder": {
+  "name": "fill",
+  "min": 1,
+  "what": "one short b-roll clip or picture (a place, a product, a screen; never a person)"
+ }
+}

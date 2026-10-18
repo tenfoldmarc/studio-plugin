@@ -406,6 +406,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/vertigo.jpg"
   },
   {
+   "n": 33,
+   "key": "inside-out",
+   "name": "Inside Out",
+   "line": "Your body becomes a window into another clip, then the room becomes it.",
+   "preview": "previews/effects/inside-out.mp4",
+   "poster": "previews/posters/effects/inside-out.jpg"
+  },
+  {
    "n": 34,
    "key": "scene-text",
    "name": "Scene Text",

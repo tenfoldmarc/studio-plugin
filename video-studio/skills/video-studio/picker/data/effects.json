@@ -248,6 +248,14 @@
    "preview": "previews/effects/vertigo.mp4"
   },
   {
+   "n": 33,
+   "key": "inside-out",
+   "name": "Inside Out",
+   "job": "Hook",
+   "line": "Your body becomes a window into another clip, then the room becomes it.",
+   "preview": "previews/effects/inside-out.mp4"
+  },
+  {
    "n": 34,
    "key": "scene-text",
    "name": "Scene Text",
