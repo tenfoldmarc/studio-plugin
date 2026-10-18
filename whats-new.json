@@ -8,5 +8,6 @@
   "1.23.0": "Fixes a crash on the first transcription on Windows PCs with an NVIDIA graphics card.",
   "1.24.0": "Setup no longer gets stuck when your computer has a very new Python. It uses its own Python instead.",
   "1.25.0": "Clean cutouts now remove a painting or poster behind your head that used to show as a grey shape above it.",
-  "2.0.0": "Big one. Send me links to reels whose editing you love and I'll rebuild that style on your clips, animations included. Save as many styles as you want by name and say: edit these in [name]. Plus 14 new effects (40 in total), and setup now downloads everything up front so your first edit is quick."
+  "2.0.0": "Big one. Send me links to reels whose editing you love and I'll rebuild that style on your clips, animations included. Save as many styles as you want by name and say: edit these in [name]. Plus 14 new effects (40 in total), and setup now downloads everything up front so your first edit is quick.",
+  "2.1.0": "Trial reels. After an edit, say: make 8 variations for my trial reels. You get 8 finished versions of the same reel, each with one thing changed (the hook, the captions, the effects or your style), rendered one at a time so your computer keeps up, with a short list of what's different in each."
 }

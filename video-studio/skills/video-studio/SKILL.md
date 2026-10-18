@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
@@ -18,7 +18,8 @@ Read `references/replicate.md` and `references/motion.md` the moment the buyer s
 of their own: you can rebuild nearly any talking-head or voice-over edit, animation included. Read
 `references/styles.md` when the picks hold an overall style, `effects/INDEX.md` when they hold effects,
 `references/gotchas.md` when a build or render misbehaves, `references/gifs.md` when the buyer asks for GIFs (you
-can find them yourself and place them on the right lines).
+can find them yourself and place them on the right lines), `references/variations.md` when they ask for variations
+or trial reel versions of a reel.
 
 ## The buyer's style wins. Read this first.
 
@@ -302,6 +303,23 @@ Notes round: change `edl.json` / `words.json` / `plan.json`, rebuild from the st
 every version in `renders/`. A note meant for every reel ("always", "from now on") goes into the style too: after
 they approve, `my_styles.py save "<style>" --from-project "<project>"`, plus a line in its style.md.
 
+## Trial reel variations ("make 8 variations for my trial reels")
+
+After a reel is edited, the buyer can ask for N versions of it to post as Instagram trial reels. Each version is a
+finished reel from the same raw clips that differs in ONE thing: the hook (another take, another line first,
+another opening cut), the caption style, the effect set, or the saved style. `references/variations.md` has every
+detail. No reel edited yet: edit it first, then make the variations.
+
+```
+1. PY "SK/scripts/variations.py" plan "<project>" --count <N> [--change hook,captions,effects,style]
+       they said what each should change ("all different hooks"): pass --change or edit <project>/variations.json.
+       They did not: show the proposed mix as a short list and ask in ONE message before building. Wait.
+2. PY "SK/scripts/variations.py" make "<project>"     do every CHECK line in that trial's own folder
+3. PY "SK/scripts/variations.py" render "<project>"   IN THE BACKGROUND. One render after another, never in
+       parallel (two at once can run the computer out of memory). LOOK at each self-check sheet as it lands.
+4. deliver <project>/trial-reels/ and the list (PY "SK/scripts/variations.py" list "<project>")
+```
+
 Styles on request: "save this as a new style called X" (`my_styles.py save "X" --from-project`), "what styles do I
 have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Cozy with yellow captions"
 (`duplicate`, then change the copy), "get rid of X" (`retire`: kept, never deleted). `references/my-styles.md`.
@@ -324,5 +342,12 @@ have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Co
   as <name>."
 - Saved: "Saved as <name>. Next time, drop your clips in and say: edit them in <name>."
 - A quiet recording: "Your voice is recorded a little quiet in this clip. Want a louder copy?"
+- Variations, before building: "Here's the mix I'd test: 3 different hooks, 3 caption styles, one with no effects,
+  one in your Hype style. Want that, or should they all test the hook?"
+- Variations, while rendering: "On it. I'm rendering them one at a time so your computer doesn't choke. That takes
+  about 20 minutes. I'll tell you when they're ready."
+- Variations, delivered: "Your 8 trial reels are in the trial-reels folder. Same clips, one thing different in
+  each:" then one line per file ("trial-01-hook-take-2.mp4: opens on your other take of the first line"). "Post
+  them as trial reels and keep the one that wins."
 
 The styles for her (Soft Hours, Glam Cam, Color Block, Camera Shy) work faceless or on camera. Say it that way.

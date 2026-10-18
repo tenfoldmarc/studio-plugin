@@ -213,6 +213,38 @@ def main():
     run('reel with the effect: lint', [py, S('hf.py'), proj, 'lint'], must=r'0 errors')
     run('reel with the effect: render', [py, S('hf.py'), proj, 'render', '-o', 'renders/e2e-reel-v2.mp4', '--quality', 'high'])
 
+    # 7c. trial reel variations: a mix proposed for 8, then 3 made (a new opening cut, other captions, no effects)
+    # and rendered one after another into one folder with what-changed.txt
+    V = S('variations.py')
+    run('variations: propose 8', [py, V, 'plan', proj, '--count', '8', '--fresh'], must=r'PLAN 8 variations of 8')
+    out = run('variations: propose 3', [py, V, 'plan', proj, '--count', '3', '--change', 'hook,captions,effects',
+                                        '--fresh'], must=r'PLAN 3 variations of 3')
+    for kind in ('hook', 'captions', 'effects'):
+        if not re.search(rf'trial-0\d-\S+\.mp4\s+{kind}\s', out):
+            RESULTS.append({'step': f'variations: the mix has a {kind} trial', 'ok': False, 'code': 0, 'optional': False})
+            finish(1)
+    run('variations: make', [py, V, 'make', proj], must=r'MADE 3 of 3')
+    run('variations: render one after another', [py, V, 'render', proj], must=r'STATUS variations DONE 3 of 3',
+        timeout=5400)
+    trials = os.path.join(proj, 'trial-reels')
+    made = sorted(n for n in os.listdir(trials) if n.endswith('.mp4'))
+    sizes = {}
+    for n in made:
+        d = float(subprocess.run([rec['ffprobe'], '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0',
+                                  os.path.join(trials, n)], capture_output=True, text=True).stdout.strip() or 0)
+        with open(os.path.join(trials, n), 'rb') as fh:
+            sizes[n] = (round(d, 2), hash(fh.read()))
+        log(f'{n}  {d:.2f}s')
+    listed = open(os.path.join(trials, 'what-changed.txt'), encoding='utf-8').read()
+    ok = (len(made) == 3 and [n[:9] for n in made] == ['trial-01-', 'trial-02-', 'trial-03-']
+          and all(d > 3 for d, _ in sizes.values()) and len({h for _, h in sizes.values()}) == 3
+          and all(n in listed for n in made) and chr(0x2014) not in listed)
+    RESULTS.append({'step': 'variations: 3 distinct reels and the list', 'ok': ok, 'code': 0, 'optional': False})
+    log(f'----- {"PASS" if ok else "FAIL"}: 3 distinct trial reels in one folder\n{listed}')
+    if not ok:
+        finish(1)
+    run('variations: list', [py, V, 'list', proj], must=r'trial-03-\S+\.mp4 .*\[ready\]')
+
     # 8. the rest of the style commands
     run('styles: duplicate', [py, S('my_styles.py'), 'duplicate', 'ci soft', 'CI Copy'], must=r'COPIED')
     run('styles: default', [py, S('my_styles.py'), 'default', 'CI Copy'], must=r'DEFAULT')
@@ -229,6 +261,14 @@ def main():
     # keep what a person should look at
     keep = os.path.join(OUT, 'look')
     os.makedirs(keep, exist_ok=True)
+    trials = os.path.join(proj, 'trial-reels')
+    for n in (os.listdir(trials) if os.path.isdir(trials) else []):
+        shutil.copyfile(os.path.join(trials, n), os.path.join(keep, n))
+    vdir = os.path.join(proj, 'work', 'variations')
+    for n in (os.listdir(vdir) if os.path.isdir(vdir) else []):
+        sheet = os.path.join(vdir, n, 'work', 'check', n + '.jpg')
+        if os.path.isfile(sheet):
+            shutil.copyfile(sheet, os.path.join(keep, 'check-' + n + '.jpg'))
     for src in (os.path.join(proj, 'renders', 'e2e-reel-v1-phone.mp4'), os.path.join(proj, 'renders', 'e2e-reel-v2.mp4'), os.path.join(proj, 'snapshots', 'contact-sheet.jpg'),
                 os.path.join(proj, 'work', 'check', 'e2e-reel-v1.jpg'), os.path.join(proj, 'work', 'layout', 'check.jpg')):
         if os.path.isfile(src):
