@@ -444,6 +444,14 @@ window.STUDIO_CATALOG = {
    "line": "The room dims and light breaks out from behind your head.",
    "preview": "previews/effects/god-rays.mp4",
    "poster": "previews/posters/effects/god-rays.jpg"
+  },
+  {
+   "n": 40,
+   "key": "glass-type",
+   "name": "Glass Type",
+   "line": "One word in thick clear glass on your wall.",
+   "preview": "previews/effects/glass-type.mp4",
+   "poster": "previews/posters/effects/glass-type.jpg"
   }
  ],
  "styles": [

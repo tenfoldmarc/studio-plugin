@@ -286,6 +286,14 @@
    "job": "Proof",
    "line": "The room dims and light breaks out from behind your head.",
    "preview": "previews/effects/god-rays.mp4"
+  },
+  {
+   "n": 40,
+   "key": "glass-type",
+   "name": "Glass Type",
+   "job": "Hook",
+   "line": "One word in thick clear glass on your wall.",
+   "preview": "previews/effects/glass-type.mp4"
   }
  ]
 }

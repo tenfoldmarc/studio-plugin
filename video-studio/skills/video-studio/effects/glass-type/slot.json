@@ -1,0 +1,23 @@
+{
+ "key": "glass-type",
+ "pack": "glass-type",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "optional",
+ "reel_captions": "keep",
+ "captions_note": "the glass word is the caption for that word: keep the reel's captions, and hide them just for that word (--hide-captions a-b)",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "edit the CLIP block: TEXT always; the rest only if a printout says so",
+  "run glass.py measure      # 4. camera, zoom, plate, head, the word's box, level, light. LOOK at work/measure.jpg",
+  "run onsets.py      # optional: if the glass lands visibly early or late, give T_IN in seconds",
+  "run glass.py still SAFE=1      # 5. six key frames -> work/stills/sheet.jpg",
+  "run glass.py bake      # 6. assets/fx.mp4 (up to 4 workers; WORKERS=n)",
+  "run build.py      # 7. sounds + index.html (same switches you want in the render, e.g. SFX=0)",
+  "hf lint",
+  "hf render",
+  "run post.py      # 8. frame count, phone copy, stills, work/qa/sheet_*.jpg from the final mp4"
+ ]
+}

@@ -188,7 +188,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 ## The list
 
 <!-- LIST:START (generated from index.json, do not edit by hand) -->
-35 ready, 0 recipe.
+36 ready, 0 recipe.
 
 | # | Effect | Key | Kind | What it does | The buyer says | Framing | Camera | Wall | Cutout | Tracking | Extra packages |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -227,6 +227,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 | 36 | Neon Sign | `neon-sign` | ready | Your phrase as a neon tube on your wall: it flickers on, the room dims and the sign lights the wall. | "hang a neon sign that says X on my wall" | wide or medium | still or drifting | open wall beside the speaker | clean | camera track (shift, roll, scale) pins the sign to the wall | opencv-python-headless |
 | 38 | Rack Focus | `rack-focus` | ready | A title starts as soft lens bokeh, focus pulls to it while you and the room go into real lens blur, then racks back. | "rack focus to a title when I say X" | any | still or drifting | no need | clean | the title is glued to the lens | opencv-python-headless |
 | 39 | God Rays | `god-rays` | ready | The room drops a stop and beams of light fan out from behind your head, with two small lines of type. For one reveal line. | "backlight me with light rays when I say X" | any | still or drifting | clear wall above the head | clean | the light is locked to the head every frame | opencv-python-headless |
+| 40 | Glass Type | `glass-type` | ready | One word as thick clear glass letters on your wall, bending the light behind them. | "put the word X in glass on my wall" | any | still or drifting | clear wall above the head | clean | camera track pins the glass to the wall | opencv-python-headless |
 
 ## Per effect: what the buyer has to give you, and what to watch
 
@@ -265,4 +266,5 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 - **Neon Sign** (READY, `effects/neon-sign/`: bake.py, build.py, effect.md, example, fxio.py, neon.py, onsets.py, post.py, requirements.txt, scene.py, slot.json). Needs nothing from the buyer. Needs plain wall beside or above the speaker that stays clear. Tries beside, above, a corner, one line, then declines. A punch-in zoom inside the slot breaks the tracking.
 - **Rack Focus** (READY, `effects/rack-focus/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rack.py, requirements.txt, slot.json). Needs nothing from the buyer. The title goes to the darkest calm spot off the face. Declines when the face fills every spot or the title would be sharp for under 0.55 s.
 - **God Rays** (READY, `effects/god-rays/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rays.py, requirements.txt, slot.json). Needs nothing from the buyer. Once per reel, on a reveal or turning-point line. Declines with nobody in shot or the speaker filling the frame.
+- **Glass Type** (READY, `effects/glass-type/`: build.py, effect.md, example, glass.py, onsets.py, post.py, requirements.txt, slot.json). Needs nothing from the buyer. Needs some open wall above or beside the head. Best with something behind to bend (window, lamp, panels); a plain wall still reads. Declines on a zoom inside the slot or a camera that travels.
 <!-- LIST:END -->
