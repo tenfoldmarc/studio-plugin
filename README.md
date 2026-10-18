@@ -22,7 +22,7 @@ https://github.com/tenfoldmarc/studio-plugin
 /video-studio setup
 ```
 
-Setup asks two quick questions and downloads what it needs. Give it a few minutes. Then the Studio Picker opens so you can pick your look.
+Setup asks where your clips land, then builds your editing style with you: send links to reels whose editing you love (or describe it, or pick from the Studio's built-in looks), and name it. It downloads its tools in the background while you do that. Your first edit dials the style in, and after that you just drop clips in and say: edit these in [your style].
 
 ## Install from a terminal instead
 

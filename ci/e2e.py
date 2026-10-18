@@ -196,6 +196,23 @@ def main():
         finish(1)
     run('second reel: lint', [py, S('hf.py'), proj2, 'lint'], must=r'0 errors')
 
+    # 7b. one of the new effects, inside the reel: OpenCV installed per effect, a process-pool bake, render, added to
+    # the reel (Code Scan runs without a person in shot, so the test picture is enough)
+    run('effect: install its packages (OpenCV)', [py, S('setup.py'), '--fx', 'code-scan'], must=r'effect packages OK')
+    run('effect: make the slot', [py, S('fx_new.py'), 'code-scan', '--project', proj, '--from', '1.0', '--to', '5.0',
+                                  '--no-cutout'], must=r'slot ready')
+    slot = os.path.join(proj, 'fx', 'code-scan')
+    R = S('fx_run.py')
+    run('effect: build', [py, R, slot, 'build.py'])
+    run('effect: bake (process pool)', [py, R, slot, 'bake.py'])
+    run('effect: lint', [py, R, slot, 'hf', 'lint'], must=r'0 errors')
+    run('effect: render', [py, R, slot, 'hf', 'render', '--video-frame-format', 'png'])
+    run('effect: check', [py, R, slot, 'post.py'], must=r'frames: aroll (\d+), render \1\b')
+    run('effect: add to the reel', [py, S('fx_add.py'), proj, slot])
+    run('reel with the effect: build', [py, S('build_reel.py'), proj], must=r'slots=1')
+    run('reel with the effect: lint', [py, S('hf.py'), proj, 'lint'], must=r'0 errors')
+    run('reel with the effect: render', [py, S('hf.py'), proj, 'render', '-o', 'renders/e2e-reel-v2.mp4', '--quality', 'high'])
+
     # 8. the rest of the style commands
     run('styles: duplicate', [py, S('my_styles.py'), 'duplicate', 'ci soft', 'CI Copy'], must=r'COPIED')
     run('styles: default', [py, S('my_styles.py'), 'default', 'CI Copy'], must=r'DEFAULT')
@@ -212,7 +229,7 @@ def main():
     # keep what a person should look at
     keep = os.path.join(OUT, 'look')
     os.makedirs(keep, exist_ok=True)
-    for src in (os.path.join(proj, 'renders', 'e2e-reel-v1-phone.mp4'), os.path.join(proj, 'snapshots', 'contact-sheet.jpg'),
+    for src in (os.path.join(proj, 'renders', 'e2e-reel-v1-phone.mp4'), os.path.join(proj, 'renders', 'e2e-reel-v2.mp4'), os.path.join(proj, 'snapshots', 'contact-sheet.jpg'),
                 os.path.join(proj, 'work', 'check', 'e2e-reel-v1.jpg'), os.path.join(proj, 'work', 'layout', 'check.jpg')):
         if os.path.isfile(src):
             shutil.copyfile(src, os.path.join(keep, os.path.basename(src)))

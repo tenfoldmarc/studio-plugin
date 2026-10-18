@@ -1,8 +1,8 @@
 {
   "name": "video-studio",
   "displayName": "Claude Creator Studio",
-  "version": "1.25.0",
-  "description": "Turns raw 9:16 talking-head clips into a finished Instagram reel in the look you saved in the Studio Picker: best takes, cuts, captions, effects and sound.",
+  "version": "2.0.0",
+  "description": "Turns raw 9:16 talking-head clips into a finished Instagram reel in your own named editing style, rebuilt from reels you love or picked in the Studio Picker: best takes, cuts, captions, animation, 40 effects and sound.",
   "author": {
     "name": "Marc Cleroux",
     "url": "https://github.com/tenfoldmarc"
