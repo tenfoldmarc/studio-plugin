@@ -454,6 +454,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/neon-sign.jpg"
   },
   {
+   "n": 37,
+   "key": "spatial-glass",
+   "name": "Spatial Glass",
+   "line": "Three frosted glass panels float around you for three steps.",
+   "preview": "previews/effects/spatial-glass.mp4",
+   "poster": "previews/posters/effects/spatial-glass.jpg"
+  },
+  {
    "n": 38,
    "key": "rack-focus",
    "name": "Rack Focus",

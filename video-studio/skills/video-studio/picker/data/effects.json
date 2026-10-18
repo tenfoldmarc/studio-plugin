@@ -296,6 +296,14 @@
    "preview": "previews/effects/neon-sign.mp4"
   },
   {
+   "n": 37,
+   "key": "spatial-glass",
+   "name": "Spatial Glass",
+   "job": "Explain",
+   "line": "Three frosted glass panels float around you for three steps.",
+   "preview": "previews/effects/spatial-glass.mp4"
+  },
+  {
    "n": 38,
    "key": "rack-focus",
    "name": "Rack Focus",

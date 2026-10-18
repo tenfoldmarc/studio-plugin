@@ -1,0 +1,20 @@
+{
+ "key": "spatial-glass",
+ "pack": "spatial-glass",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the pane words are not captions: keep the reel's captions on; build with CAPTIONS=0 if they say the same thing twice",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. track, measure, choose the layout, plan, index.html. READ the printout",
+  "run bake.py --frames <the 4 it suggests> -g      # 2. preview -> work/t/ (red lines = safe zone)",
+  "run bake.py      # 3. assets/fx.mp4, 7 to 13 s per second of slot (4 workers; WORKERS=n)",
+  "hf lint      # 4. 0 errors",
+  "hf render",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}
