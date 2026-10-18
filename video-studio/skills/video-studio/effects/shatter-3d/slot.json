@@ -1,0 +1,20 @@
+{
+ "key": "shatter-3d",
+ "pack": "shatter-3d",
+ "imported": "2026-10-17",
+ "cutout": "measure",
+ "hi": "optional",
+ "reel_captions": "keep",
+ "captions_note": "no words of its own: the reel's captions stay on (they sit on top of the tiles)",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, choose, plan, sounds, index.html. READ the printout",
+  "run bake.py --frames <the 4 it prints> -g      # 2. preview -> work/t/ (red = safe zone, green = face, blue = eyes)",
+  "run bake.py      # 3. assets/fx.mp4, 16 to 27 s per second of slot (4 workers)",
+  "hf lint      # 4. 0 errors",
+  "hf render",
+  "run post.py      # 5. frame count, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

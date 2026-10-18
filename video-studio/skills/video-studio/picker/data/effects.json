@@ -216,6 +216,14 @@
    "preview": "previews/effects/green-screen.mp4"
   },
   {
+   "n": 27,
+   "key": "shatter-3d",
+   "name": "Shatter 3D",
+   "job": "Hook",
+   "line": "The frame breaks into floating glass, then shatters to reveal you.",
+   "preview": "previews/effects/shatter-3d.mp4"
+  },
+  {
    "n": 28,
    "key": "paper-cut",
    "name": "Paper Cut",

@@ -374,6 +374,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/green-screen.jpg"
   },
   {
+   "n": 27,
+   "key": "shatter-3d",
+   "name": "Shatter 3D",
+   "line": "The frame breaks into floating glass, then shatters to reveal you.",
+   "preview": "previews/effects/shatter-3d.mp4",
+   "poster": "previews/posters/effects/shatter-3d.jpg"
+  },
+  {
    "n": 28,
    "key": "paper-cut",
    "name": "Paper Cut",
