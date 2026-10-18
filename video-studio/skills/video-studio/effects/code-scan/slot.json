@@ -1,0 +1,20 @@
+{
+ "key": "code-scan",
+ "pack": "code-scan",
+ "imported": "2026-10-17",
+ "cutout": "layer",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the terminal card is the only on-screen text of this beat: hide the reel's captions for the span, or build with CAPTIONS=0 and keep them",
+ "reel_env": [],
+ "in_a_reel": [],
+ "sounds": {},
+ "steps": [
+  "run build.py      # 1. measure, time, place the card, sounds, index.html. READ the printout",
+  "run bake.py --sheet <frames it prints>      # 2. quick look -> work/t/sheet.jpg (--frames ... -g for full size + safe lines)",
+  "run bake.py      # 3. assets/fx.mp4, 7 to 20 s per second of slot (4 workers)",
+  "hf lint      # 4. 0 errors",
+  "hf render --video-frame-format png",
+  "run post.py      # 5. frame count, edge colour, phone copy, stills, work/qa/sheet_*.jpg"
+ ]
+}

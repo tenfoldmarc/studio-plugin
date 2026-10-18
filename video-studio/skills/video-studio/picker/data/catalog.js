@@ -398,6 +398,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/effects/doodle-boil.jpg"
   },
   {
+   "n": 30,
+   "key": "code-scan",
+   "name": "Code Scan",
+   "line": "The picture resolves into code, then back.",
+   "preview": "previews/effects/code-scan.mp4",
+   "poster": "previews/posters/effects/code-scan.jpg"
+  },
+  {
    "n": 31,
    "key": "word-pile",
    "name": "Word Pile",

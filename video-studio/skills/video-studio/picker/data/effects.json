@@ -240,6 +240,14 @@
    "preview": "previews/effects/doodle-boil.mp4"
   },
   {
+   "n": 30,
+   "key": "code-scan",
+   "name": "Code Scan",
+   "job": "Hook",
+   "line": "The picture resolves into code, then back.",
+   "preview": "previews/effects/code-scan.mp4"
+  },
+  {
    "n": 31,
    "key": "word-pile",
    "name": "Word Pile",
