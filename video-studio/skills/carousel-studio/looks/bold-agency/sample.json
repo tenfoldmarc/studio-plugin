@@ -1,0 +1,16 @@
+[
+ {"layout": "hook", "class": "low",
+  "headline": "5 things I\nwish I knew\n[[sooner.]]",
+  "note": "The short list\nnobody gave me.",
+  "image": {"src": "{photo1}", "fit": "bleed", "face": "{face1}"}},
+ {"label": "Tip 01",
+  "headline": "start before\n[[you feel ready.]]",
+  "items": ["Pick the smallest version you can finish **this week.**", "Show it to **three real people.**", "Fix what they actually **tripped on.**"],
+  "image": {"src": "{photo2}", "fit": "half", "side": "top", "share": 0.4, "face": "{face2}"}},
+ {"layout": "cta", "class": "low",
+  "headline": "want the\n[[full list?]]",
+  "keyword": "LIST",
+  "keywordPost": "and I'll send you all 5.",
+  "follow": "Follow {handle} for more",
+  "image": {"src": "{photo3}", "fit": "bleed", "face": "{face3}"}}
+]

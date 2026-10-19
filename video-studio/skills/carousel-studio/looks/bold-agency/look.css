@@ -1,0 +1,231 @@
+/* Bold Agency: heavy lowercase grotesk packed tight, one word swapped to a serif italic (or circled by hand),
+   moody warm photos, blocks of cream / rust / oxblood / near-black, tiny caps label stacks in the corners.
+
+   Every colour runs through four slide-level tokens, so a ground can be swapped per slide with a class:
+   --g ground, --t type, --a accent, --m muted.  Slide classes: cream (default), rust, wine, ink, and
+   circle (the accent word gets a hand-drawn ellipse instead of the serif italic), blob (a middle photo
+   cropped in an organic blob). */
+.slide { --g: var(--bg); --t: var(--ink); --a: var(--accent); --m: color-mix(in srgb, var(--ink) 72%, transparent);
+  --line: color-mix(in srgb, var(--ink) 22%, transparent); --card: color-mix(in srgb, var(--ink) 5%, transparent);
+  --st-accent: var(--a); --st-mark: var(--a);
+  background: var(--g); color: var(--t); font-family: var(--font-body); }
+body { background: var(--g, var(--bg)); }
+
+/* grounds by layout (a class on the slide overrides them: it comes later with the same weight) */
+.slide.L-statement { --g: var(--wine); --t: var(--cream); --a: #EE8A63; --m: color-mix(in srgb, var(--cream) 72%, transparent);
+  --line: color-mix(in srgb, var(--cream) 26%, transparent); --card: color-mix(in srgb, var(--cream) 8%, transparent); }
+.slide.L-cta { --g: var(--rust); --t: var(--cream); --a: #FFD7BE; --m: color-mix(in srgb, var(--cream) 78%, transparent);
+  --line: color-mix(in srgb, var(--cream) 30%, transparent); --card: color-mix(in srgb, var(--cream) 10%, transparent); }
+.slide.cream { --g: var(--bg); --t: var(--ink); --a: var(--accent); --m: color-mix(in srgb, var(--ink) 72%, transparent);
+  --line: color-mix(in srgb, var(--ink) 22%, transparent); --card: color-mix(in srgb, var(--ink) 5%, transparent); }
+.slide.rust { --g: var(--rust); --t: var(--cream); --a: #FFD7BE; --m: color-mix(in srgb, var(--cream) 78%, transparent);
+  --line: color-mix(in srgb, var(--cream) 30%, transparent); --card: color-mix(in srgb, var(--cream) 10%, transparent); }
+.slide.wine { --g: var(--wine); --t: var(--cream); --a: #EE8A63; --m: color-mix(in srgb, var(--cream) 72%, transparent);
+  --line: color-mix(in srgb, var(--cream) 26%, transparent); --card: color-mix(in srgb, var(--cream) 8%, transparent); }
+.slide.ink { --g: var(--night); --t: var(--cream); --a: var(--accent-hi); --m: color-mix(in srgb, var(--cream) 70%, transparent);
+  --line: color-mix(in srgb, var(--cream) 22%, transparent); --card: color-mix(in srgb, var(--cream) 7%, transparent); }
+/* a full-slide photo: cream type, the hot rust accent */
+.slide.has-bleed:not(.has-half) { --t: var(--cream); --a: var(--accent-hi); --m: color-mix(in srgb, var(--cream) 82%, transparent);
+  --line: color-mix(in srgb, var(--cream) 30%, transparent); --card: rgba(23,17,15,0.42); }
+
+/* film grain over everything (photos and flat grounds alike) */
+.slide::after { content: ""; position: absolute; inset: 0; z-index: 9; pointer-events: none;
+  background: url(assets/grain.svg); background-size: 260px 260px; opacity: 0.32; mix-blend-mode: multiply; }
+.slide.has-bleed::after, .slide.rust::after, .slide.wine::after, .slide.ink::after, .slide.L-cta::after, .slide.L-statement::after { opacity: 0.5; mix-blend-mode: overlay; }
+
+/* ------------------------------------------------------------------ chrome: tiny caps stacks in the corners */
+.chrome { font: 700 19px/1.08 var(--font-body); letter-spacing: -0.005em; text-transform: uppercase; color: var(--t); }
+.chrome.top { align-items: flex-start; }
+.chrome .top-who { order: -1; }
+.chrome .top-who .av, .chrome .top-who .tick { display: none; }
+.chrome .tag { display: block; text-align: left; min-width: 0; max-width: 300px; }
+.chrome .tag i { display: none; }
+.chrome .count { display: none; }
+.chrome.bottom { align-items: flex-end; }
+.chrome.bottom .who { display: none; }
+.chrome .foot { display: block; max-width: 520px; font-weight: 600; }
+.has-zb .chrome .foot { display: none; }
+.chrome .swipe { margin-left: auto; }
+.chrome .swipe .st { display: none; }
+.chrome .swipe .sa { display: block; width: 64px; height: 28px; background: currentColor;
+  -webkit-mask: url(assets/arrow.svg) center / contain no-repeat; mask: url(assets/arrow.svg) center / contain no-repeat; }
+.chrome .swipe svg { display: none; }
+.is-last .chrome .swipe { visibility: hidden; }
+.half-top .chrome.top, .half-bottom .chrome.bottom, .half-left .chrome .top-who, .half-left .chrome .foot,
+.half-right .chrome .tag, .half-right .chrome .swipe { color: var(--cream); text-shadow: 0 1px 10px rgba(0,0,0,0.4); }
+
+/* ------------------------------------------------------------------ the headline */
+.zt .label { display: none; }   /* the label lives in the top-right stack */
+.rule { display: none; }
+.hl { font-family: var(--font-head); font-weight: 800; text-transform: lowercase; font-size: 124px; line-height: 0.86;
+  letter-spacing: -0.058em; color: var(--t); align-items: flex-start; }
+.hl .ln { white-space: normal; padding-bottom: 0.04em; }
+.hl .ac { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; color: var(--a);
+  font-size: 1.1em; line-height: 0.8; text-transform: lowercase; padding-right: 0.04em; }
+.hl .ln.ac { font-size: 1.1em; }
+.hl .ln.ac .ac { font-size: 1em; }
+.hl .ln.q { font-family: var(--font-serif); font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.01em;
+  font-size: 0.5em; line-height: 1.05; margin: 0.12em 0 0.18em; color: var(--t); }
+.hl .q { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; text-transform: none; }
+
+/* the hand-drawn ellipse (slide class "circle", and always on the CTA keyword) */
+/* the ellipse is drawn inside the word's own side padding, so it never pokes out of the box (the fit check
+   measures scroll width, and anything sticking out sideways would make it shrink the word) */
+.circle .hl .ac { font-family: var(--font-head); font-style: normal; font-weight: 800; letter-spacing: -0.058em; font-size: 1em;
+  color: var(--t); position: relative; display: inline-block; line-height: 0.86; padding: 0 0.26em 0 0.3em; text-transform: lowercase; }
+.circle .hl .ln.ac { display: block; align-self: flex-start; width: max-content; max-width: 100%; margin-top: 0.08em; }
+.circle .hl .ln.ac .ac { padding: 0; }
+.circle .hl .ac::after, .kw::after { content: ""; position: absolute; left: 0; right: 0; top: -0.18em; bottom: -0.3em;
+  background: var(--a); -webkit-mask: url(assets/ellipse.svg) center / 100% 100% no-repeat; mask: url(assets/ellipse.svg) center / 100% 100% no-repeat;
+  pointer-events: none; }
+.circle .hl .ln.ac .ac::after { display: none; }
+
+.sub { font: 500 36px/1.28 var(--font-body); letter-spacing: -0.012em; color: var(--m); max-width: 880px; }
+.sub .ac, .sub strong { color: var(--t); font-weight: 700; font-style: normal; }
+.kicker { font: 400 60px/1 var(--font-serif); font-style: italic; color: var(--a); align-self: flex-start; }
+
+/* the cover and the statement: the type IS the slide */
+.L-hook .hl { font-size: 200px; }
+.L-statement .hl { font-size: 168px; }
+.L-hook .body, .L-statement .body { justify-content: flex-start; }
+.L-hook .sub, .L-statement .sub { font-size: 38px; }
+/* a statement, or a cover with no photo and no middle: the headline floats to the middle, the small print stays
+   in the corner (the free room splits above and below the headline) */
+.L-statement .body { justify-content: center; padding-bottom: 60px; }
+.L-statement.has-zb .zt, .L-hook:not(.has-bleed):not(.has-zm):not(.has-stage).has-zb .zt { margin-top: auto; }
+.L-hook:not(.has-bleed):not(.has-zm):not(.has-stage):not(.has-zb) .body { justify-content: center; padding-bottom: 60px; }
+/* a text-only slide (headline and a line, nothing else): the headline grows and sits a little above the middle */
+.L-content:not(.has-zm):not(.has-zb):not(.has-bleed) .body { justify-content: center; padding-bottom: 90px; }
+.L-content:not(.has-zm):not(.has-zb):not(.has-bleed) .hl { font-size: 150px; }
+.L-content:not(.has-zm):not(.has-zb):not(.has-bleed) .sub { font-size: 38px; margin-top: 16px; }
+
+/* ------------------------------------------------------------------ middle */
+.zm { --zm-justify: center; }
+.items { font-family: var(--font-body); color: var(--t); }
+.items.bullets li, .items.check li { font: 600 38px/1.22 var(--font-body); letter-spacing: -0.015em; }
+.items .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--a); margin-top: 16px; }
+.items .dot.ck { width: auto; height: auto; background: none; margin-top: 0; color: var(--a); font-style: normal; font-weight: 800; }
+.items strong { font-weight: 800; }
+.items .ac { color: var(--a); font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 1.12em; letter-spacing: 0; }
+
+/* rows and steps: an editorial table, thin rules, serif italic numbers */
+.items.rows, .items.steps { --items-gap: 0px; border-top: 1.5px solid var(--line); }
+.items.rows li, .items.steps li { padding: 24px 0 26px; border-bottom: 1.5px solid var(--line); gap: 30px; align-items: baseline; }
+.items .n { font: 400 68px/0.8 var(--font-serif); font-style: italic; color: var(--a); min-width: 64px; }
+.items .t { font: 800 44px/1.02 var(--font-head); letter-spacing: -0.04em; text-transform: lowercase; }
+.items .d { font: 500 29px/1.3 var(--font-body); color: var(--m); margin-top: 8px; letter-spacing: -0.005em; }
+
+.items.chips { gap: 12px; }
+.items .chip { font: 700 28px/1 var(--font-body); text-transform: uppercase; letter-spacing: -0.005em; padding: 15px 22px 14px;
+  border: 1.5px solid var(--t); border-radius: 999px; }
+.items.compare { column-gap: 30px; row-gap: 0; border-top: 1.5px solid var(--line); }
+.items .pair { font: 700 38px/1.15 var(--font-body); letter-spacing: -0.02em; padding: 26px 0; border-bottom: 1.5px solid var(--line);
+  white-space: normal; display: grid; grid-template-columns: 1fr auto; gap: 8px 18px; }
+.items .old { grid-column: 1 / 3; color: var(--m); font-weight: 500; text-decoration-color: var(--a); text-decoration-thickness: 3px; }
+.items .ar { display: none; }
+.items .new { grid-column: 1 / 3; font-weight: 800; }
+.items .new::before { content: "\2192\00a0"; color: var(--a); font-weight: 500; }
+.items.grid { gap: 16px; }
+.items .card { padding: 30px 30px 32px; border: 1.5px solid var(--line); display: flex; flex-direction: column; gap: 10px; background: var(--card); }
+.items .card.hot { background: var(--rust); border-color: var(--rust); color: var(--cream); --m: color-mix(in srgb, var(--cream) 80%, transparent); }
+.slide.rust .items .card.hot, .slide.L-cta .items .card.hot { background: var(--wine); border-color: var(--wine); }
+.items .card .tag { font: 700 19px/1 var(--font-body); text-transform: uppercase; color: var(--a); }
+.items .card.hot .tag { color: #FFD7BE; }
+.items .card .t { font-size: 42px; }
+.items .card .d { font-size: 27px; margin-top: 0; }
+.items.versus { gap: 16px; }
+.items.versus .col { padding: 32px 30px; border: 1.5px solid var(--line); gap: 18px; }
+.items.versus .c2 { background: var(--rust); border-color: var(--rust); color: var(--cream); }
+.slide.rust .items.versus .c2, .slide.L-cta .items.versus .c2 { background: var(--wine); border-color: var(--wine); }
+.items.versus .t { font: 700 20px/1 var(--font-body); text-transform: uppercase; }
+.items.versus .c1 .t { color: var(--m); }
+.items.versus ul { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+.items.versus li { font: 700 32px/1.18 var(--font-body); letter-spacing: -0.02em; }
+.items.versus .c1 li { color: var(--m); font-weight: 500; }
+
+.big { gap: 26px; }
+.big .num { font: 800 330px/0.8 var(--font-head); letter-spacing: -0.07em; color: var(--t); }
+.big .bs { font: 400 66px/1.02 var(--font-serif); font-style: italic; color: var(--a); max-width: 900px; }
+.quote p { font: 400 70px/1.04 var(--font-serif); font-style: italic; letter-spacing: -0.01em; color: var(--t); }
+.quote p::before { content: "\201C"; color: var(--a); }
+.quote p::after { content: "\201D"; color: var(--a); }
+.quote cite { display: block; margin-top: 28px; font: 700 21px/1.1 var(--font-body); text-transform: uppercase; font-style: normal; color: var(--m); }
+
+/* pictures: square-cornered and editorial; "cover" (and the "blob" class) crops into an organic blob */
+.zm > .media.cover, .zm > .collage { flex: 1 1 520px; height: 520px; }   /* a size to measure with; it then grows into the room */
+.media img { border-radius: 0; box-shadow: 0 30px 70px rgba(30,10,8,0.28); }
+.media.cutout img { box-shadow: none; }
+.media.circle img { box-shadow: none; }
+.media.cover img, .blob .media img { box-shadow: none; -webkit-mask: url(assets/blob.svg) center / 100% 100% no-repeat; mask: url(assets/blob.svg) center / 100% 100% no-repeat; }
+.media figcaption { left: 0; right: 0; bottom: -46px; font: 700 19px/1 var(--font-body); text-transform: uppercase; color: var(--m); }
+.media-label { font: 700 19px/1 var(--font-body); text-transform: uppercase; color: var(--m); }
+
+/* a full-slide photo: warm grade, darkened where the type sits (top) and under the bottom stack */
+.bleed img { opacity: var(--dim, 1); filter: saturate(0.88) contrast(1.04); }
+.bleed:not(.half)::before { content: ""; position: absolute; inset: 0; z-index: 1; background: #5a2412; mix-blend-mode: soft-light; opacity: 0.55; }
+.bleed:not(.half)::after { content: ""; position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(180deg, rgba(23,13,10,0.78) 0%, rgba(23,13,10,0.52) 26%, rgba(23,13,10,0.12) 50%, rgba(23,13,10,0.14) 66%, rgba(23,13,10,0.72) 100%); }
+.collage-bleed::after { z-index: 3; }   /* the photos sit under the same shade as a single full-slide photo */
+/* a bleed slide whose text sits low (class "low"): the darkening moves down with it */
+.low .body { justify-content: flex-end; }
+.low .zt { margin-top: auto; }
+.low .zb { margin-top: 0; }
+.low .bleed:not(.half)::after { background: linear-gradient(180deg, rgba(23,13,10,0.5) 0%, rgba(23,13,10,0.08) 22%, rgba(23,13,10,0.2) 42%, rgba(23,13,10,0.8) 72%, rgba(23,13,10,0.92) 100%); }
+
+/* half photo: edge to edge, the type on the ground below (or beside) it */
+.bleed.half img { filter: saturate(0.88) contrast(1.03); }
+.has-half .hl { font-size: 126px; }
+.half-left .hl, .half-right .hl { font-size: 92px; }
+.half-left .sub, .half-right .sub { font-size: 32px; }
+.half-cap { left: 64px; bottom: 26px; font: 700 19px/1.1 var(--font-body); text-transform: uppercase; color: var(--cream); text-shadow: 0 1px 8px rgba(0,0,0,0.4); }
+
+/* collages: plain square crops with a hairline gap; polaroids and tape keep the engine's paper */
+.collage { --collage-gap: 14px; }
+.collage .f-plain { box-shadow: none; }
+.collage .f-card { border-radius: 0; box-shadow: 0 24px 50px rgba(30,10,8,0.3); }
+.collage .f-polaroid figcaption { font: 400 42px/1.1 var(--st-hand-font); text-transform: none; color: #3b1a12; }
+.collage figcaption { font: 400 36px/1 var(--font-serif); font-style: italic; text-transform: none; }
+.collage .f-polaroid figcaption { font: 400 42px/1.1 var(--st-hand-font); text-transform: none; }
+.collage .f-plain figcaption, .collage .f-card figcaption { left: 20px; bottom: 16px; color: var(--cream); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+
+/* ------------------------------------------------------------------ bottom */
+.zb { --zb-gap: 22px; }
+.callout { font: 800 46px/1.0 var(--font-head); letter-spacing: -0.045em; text-transform: lowercase; color: var(--t);
+  border-top: 1.5px solid var(--line); padding-top: 24px; }
+.callout .ac { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--a); font-size: 1.12em; letter-spacing: -0.01em; text-transform: none; }
+.payload { border: 1.5px solid var(--t); padding: 26px 30px 30px; background: var(--card); }
+.pl-label { display: flex; align-items: center; gap: 10px; font: 700 19px/1 var(--font-body); text-transform: uppercase; color: var(--a); margin-bottom: 14px; }
+.pl-label i { width: 10px; height: 10px; border-radius: 50%; background: var(--a); }
+.pl-text { font: 600 32px/1.32 var(--font-body); letter-spacing: -0.01em; color: var(--t); }
+.note { font: 700 21px/1.12 var(--font-body); text-transform: uppercase; letter-spacing: -0.005em; color: var(--t); max-width: 560px;
+  }
+/* the last small print drops onto the baseline of the arrow, like the corner stacks in the chrome */
+.zb > .note:last-child { margin-top: 18px; transform: translateY(var(--note-drop, 92px)); }
+
+/* ------------------------------------------------------------------ the CTA: a colour block, the keyword circled */
+.L-cta .body { justify-content: flex-start; align-items: stretch; text-align: left; }
+.L-cta .hl, .L-cta .zt, .L-cta .zb { align-items: flex-start; }
+.L-cta .hl { font-size: 196px; }
+.L-cta .zb { margin-top: auto; }
+.cta-word { display: flex; flex-direction: column; align-items: flex-start; }
+.cw-pre { font: 700 22px/1.1 var(--font-body); text-transform: uppercase; color: var(--t); }
+.kw { position: relative; margin: 44px 0 50px 0; padding: 0 0.34em 0 0.4em; font: 800 176px/0.86 var(--font-head); letter-spacing: -0.055em;
+  text-transform: lowercase; color: var(--t); }
+.kw::after { top: -0.22em; bottom: -0.3em; }
+.cw-post { font: 600 38px/1.2 var(--font-body); letter-spacing: -0.015em; color: var(--t); max-width: 820px; }
+.follow { margin-top: 28px; font: 700 21px/1.12 var(--font-body); text-transform: uppercase; color: var(--m); }
+
+/* type on a full-slide photo gets a soft shadow so it holds on busy spots */
+.has-bleed:not(.has-half) .hl, .has-bleed:not(.has-half) .sub, .has-bleed:not(.has-half) .note,
+.has-bleed:not(.has-half) .chrome { text-shadow: 0 2px 28px rgba(20,10,8,0.35); }
+.half-top .sub, .half-bottom .sub { font-size: 38px; }
+/* a half photo keeps a soft shade at its edges where the corner stacks sit on it */
+.half-top .bleed.half::after, .half-bottom .bleed.half::after, .half-left .bleed.half::after, .half-right .bleed.half::after {
+  display: block; content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(23,13,10,0.42) 0%, rgba(23,13,10,0) 16%, rgba(23,13,10,0) 84%, rgba(23,13,10,0.42) 100%); }
+/* "low" on a cover or CTA over a photo: everything sits at the bottom, the top of the photo (the face) stays clear */
+.low.L-hook .hl { font-size: 168px; }
+.low.L-cta .body { justify-content: flex-end; }
+.low.L-cta .zb { margin-top: 0; }
+.low.L-cta .hl { font-size: 150px; }
+.low.L-cta .kw { margin: 30px 0 34px; font-size: 150px; }

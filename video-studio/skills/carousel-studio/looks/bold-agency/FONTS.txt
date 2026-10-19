@@ -1,0 +1,8 @@
+Fonts used by the Bold Agency look. Both are already shipped in the skill's fonts/ folder (see fonts/OFL.txt for
+the full license text); no extra font files live in this look folder.
+
+Inter Tight (InterTight-var.woff2)            SIL Open Font License 1.1   Copyright 2022 The Inter Project Authors
+Instrument Serif (InstrumentSerif-italic.woff2)  SIL Open Font License 1.1   Copyright 2022 The Instrument Serif Project Authors
+
+The look's own pictures (assets/ellipse.svg, assets/blob.svg, assets/arrow.svg, assets/grain.svg) were drawn for
+this look.

@@ -1,0 +1,24 @@
+[
+ {
+  "layout": "hook",
+  "label": "A note to my younger self",
+  "headline": "((5 things I wish))\nI knew sooner",
+  "sub": "The lessons that would have saved me a year. Keep this one.",
+  "image": {"src": "{photo1}", "fit": "bleed", "face": "{face1}"}
+ },
+ {
+  "label": "Lesson one",
+  "headline": "((Start before))\nyou feel ready",
+  "image": {"src": "{photo2}", "fit": "half", "side": "top", "share": 0.46, "focus": "50% 16%", "face": "{face2}"},
+  "items": ["Ready is a feeling that never comes.", "The first version is meant to be rough.", "Momentum beats a perfect plan."]
+ },
+ {
+  "layout": "cta",
+  "class": "wine",
+  "headline": "((Want the))\nfull list?",
+  "photos": {"layout": "stack", "list": [{"src": "{photo3}", "focus": "50% 22%"}, {"src": "{photo1}", "focus": "50% 22%"}]},
+  "keyword": "LIST",
+  "keywordPost": "and I'll send you all 5 lessons.",
+  "follow": "Follow {handle} for more"
+ }
+]

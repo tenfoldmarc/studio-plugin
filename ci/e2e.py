@@ -294,6 +294,62 @@ def main():
     run('styles: list', [py, S('my_styles.py'), 'list'], must=r'CI Soft Lowercase')
     starter('setup, with a style saved')
 
+    # 8b. carousels: the setup a buyer meets on their first carousel, the 3 base looks, a look of their own, then a
+    # carousel from the reel above (transcript, stills, every kind of slide), rendered to PNGs and a PDF
+    CS = os.path.join(ROOT, 'video-studio', 'skills', 'carousel-studio', 'scripts', 'carousel.py')
+    carousels = os.path.join(OUT, 'carousels')
+    run('carousel: check before setup', [py, CS, 'check'], must=r'STATUS carousel profile MISSING[\s\S]*browser OK')
+    run('carousel: profile', [py, CS, 'profile', '--handle', 'e2e_test', '--name', 'E2E', '--dir', carousels],
+        must=r'STATUS profile SAVED handle @e2e_test')
+    run('carousel: the 3 base looks', [py, CS, 'looks'], must=r'Horizon[\s\S]*Paper[\s\S]*Poster')
+    run('carousel: preview the 3 looks', [py, CS, 'preview-looks', '--no-open'], must=r'STATUS looks PREVIEW')
+    run('carousel: a look of their own', [py, CS, 'look', 'new', 'CI Paper Blue', '--from', 'paper'], must=r'STATUS look NEW')
+    blue = os.path.join(state, 'carousels', 'looks', 'ci-paper-blue', 'look.json')
+    meta = json.load(open(blue, encoding='utf-8'))
+    meta['vars'] = {'--accent': '#2F6BFF'}
+    json.dump(meta, open(blue, 'w', encoding='utf-8'))
+    run('carousel: make it the default', [py, CS, 'look', 'default', 'CI Paper Blue'], must=r'DEFAULT "CI Paper Blue"')
+    out = run('carousel: new, from the reel', [py, CS, 'new', 'E2E from the reel', '--source', proj],
+              must=r'STATUS carousel NEW .* look "CI Paper Blue"')
+    cdir = re.search(r'STATUS carousel NEW (.+?) look ', out).group(1).strip()
+    run('carousel: transcript from the edit', [py, CS, 'transcript', proj, '--out', cdir], must=r'FROM the Studio edit')
+    run('carousel: still sheet', [py, CS, 'frames', proj, '--sheet', '6', '--out', cdir], must=r'STATUS frames SHEET')
+    run('carousel: one still', [py, CS, 'frames', proj, '--at', '1.0', '--out', cdir], must=r'STATUS frame .*frame-1.00s.jpg')
+    run('carousel: the buyer\'s photos in', [py, CS, 'photos', os.path.join(cdir, 'assets', 'frame-1.00s.jpg'), '--out', cdir],
+        must=r'STATUS photos 1 added')
+    run('carousel: find faces (the test picture has nobody in it)', [py, CS, 'faces', '--out', cdir],
+        must=r'STATUS faces DONE')
+    run('carousel: setup preview with their photos', [py, CS, 'preview-looks', '--photos',
+        os.path.join(cdir, 'assets', 'photos', 'p01.jpg'), '--no-open'], must=r'STATUS looks PREVIEW .*looks\.html')
+    cj = os.path.join(cdir, 'carousel.json')
+    data = json.load(open(cj, encoding='utf-8'))
+    data['slides'] = [
+        {'layout': 'hook', 'label': 'E2E', 'headline': 'Every kind\n[[of slide]]\n((in one carousel))', 'note': 'Swipe'},
+        {'label': 'List', 'headline': 'Rows and [[a callout]]', 'items': {'style': 'rows', 'list': [
+            {'title': 'One', 'text': 'First row.'}, {'title': 'Two', 'text': 'Second row.'}]}, 'callout': 'A punchline.'},
+        {'label': 'Picture', 'headline': 'A still from [[the reel]]', 'image': {'src': 'assets/frame-1.00s.jpg', 'height': 520}},
+        {'label': 'Keep', 'headline': 'Copy [[this]]', 'payload': {'label': 'Paste this', 'text': 'A short prompt to copy.'},
+         'items': {'style': 'compare', 'list': [{'before': 'Old', 'after': 'New'}]}},
+        {'headline': 'Want [[it?]]', 'keyword': 'E2E', 'keywordPost': 'and the test passes.'}]
+    json.dump(data, open(cj, 'w', encoding='utf-8'), indent=1)
+    out = run('carousel: render with the PDF', [py, CS, 'render', cdir, '--pdf', '--no-open'], must=r'STATUS render DONE 5 slides')
+    pngs = sorted(n for n in os.listdir(os.path.join(cdir, 'slides')) if n.endswith('.png'))
+    dims = [subprocess.run([rec['ffprobe'], '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+                            '-of', 'csv=p=0', os.path.join(cdir, 'slides', n)], capture_output=True, text=True).stdout.strip()
+            for n in pngs]
+    ok = (len(pngs) == 5 and set(dims) == {'1080,1440'} and 'with something to fix' not in out
+          and os.path.isfile(os.path.join(cdir, 'preview.html')) and os.path.isfile(os.path.join(cdir, 'work', 'sheet.jpg'))
+          and any(n.endswith('.pdf') for n in os.listdir(cdir)))
+    RESULTS.append({'step': 'carousel: 5 clean 1080x1440 slides, preview, sheet and PDF', 'ok': ok, 'code': 0, 'optional': False})
+    log(f'----- {"PASS" if ok else "FAIL"}: carousel files {pngs} {dims}')
+    if not ok:
+        finish(1)
+    run('carousel: one slide again in a base look', [py, CS, 'render', cdir, '--only', '2', '--look', 'horizon', '--no-open'],
+        must=r'CHECK slide 02 ')
+    run('carousel: cut out the person (allowed to fail: the test picture has nobody in it)',
+        [py, CS, 'cutout', os.path.join(cdir, 'assets', 'frame-1.00s.jpg')], must=r'STATUS cutout', allow_fail=True)
+    run('carousel: check after setup', [py, CS, 'check'], must=r'profile OK handle @e2e_test[\s\S]*default "CI Paper Blue"')
+
     # 9. a link to a public post (sites often refuse cloud machines, so this one may fail without failing the test)
     run('example from a link (allowed to fail on a cloud machine)',
         [py, S('get_example.py'), opt('--link') or 'https://www.youtube.com/watch?v=jNQXAC9IVRw'],   # "Me at the zoo"
@@ -315,6 +371,10 @@ def main():
                 os.path.join(proj, 'work', 'check', 'e2e-reel-v1.jpg'), os.path.join(proj, 'work', 'layout', 'check.jpg')):
         if os.path.isfile(src):
             shutil.copyfile(src, os.path.join(keep, os.path.basename(src)))
+    for src, name in ((os.path.join(cdir, 'work', 'sheet.jpg'), 'carousel-sheet.jpg'),
+                      (os.path.join(state, 'carousels', 'look-previews', 'the-3-looks.jpg'), 'carousel-3-looks.jpg')):
+        if os.path.isfile(src):
+            shutil.copyfile(src, os.path.join(keep, name))
     cmp_dir = os.path.join(proj, 'work', 'compare')
     for n in (os.listdir(cmp_dir) if os.path.isdir(cmp_dir) else []):
         if n.endswith('.jpg'):

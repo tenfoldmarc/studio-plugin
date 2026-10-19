@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carousel preview</title>
+<style>
+  :root { --bg: #f2f2f0; --card: #fff; --ink: #121212; --dim: #6b6b6b; --line: #e3e3e0; --dot: #c9c9c6; --blue: #0095f6; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0b0b0b; --card: #000; --ink: #f5f5f5; --dim: #a8a8a8; --line: #262626; --dot: #555; } }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 40px; padding: 40px 16px; }
+  .post { width: min(468px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7); padding: 2px; }
+  .av.none { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
+  .hn { font-weight: 600; }
+  .more { margin-left: auto; letter-spacing: 2px; color: var(--dim); }
+  .stage { position: relative; aspect-ratio: var(--ratio); background: #000; overflow: hidden; }
+  .track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .track::-webkit-scrollbar { display: none; }
+  .track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: center; user-select: none; -webkit-user-drag: none; }
+  .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 0;
+    background: rgba(255,255,255,0.85); color: #222; font-size: 18px; line-height: 30px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+  .nav[hidden] { display: none; }
+  .prev { left: 10px; } .next { right: 10px; }
+  .count { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.65); color: #fff; font-size: 12px; font-weight: 600;
+    padding: 3px 9px; border-radius: 12px; }
+  .bar { display: flex; align-items: center; gap: 16px; padding: 10px 14px 4px; position: relative; }
+  .bar svg { width: 24px; height: 24px; }
+  .bar .save { margin-left: auto; }
+  .dots { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot); }
+  .dots i.on { background: var(--blue); }
+  .cap { padding: 6px 14px 16px; white-space: pre-wrap; }
+  .cap b { font-weight: 600; margin-right: 6px; }
+  .side { width: min(468px, 100%); }
+  .side h2 { font-size: 15px; margin-bottom: 4px; }
+  .side p { color: var(--dim); margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .grid img { width: 100%; aspect-ratio: var(--ratio); object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
+  .grid img.on { border-color: var(--blue); }
+  code { font: 12px ui-monospace, Menlo, monospace; word-break: break-all; }
+</style>
+</head>
+<body>
+<article class="post">
+  <header class="head"><span id="av"></span><span class="hn" id="hn"></span><span class="more">&middot;&middot;&middot;</span></header>
+  <div class="stage" id="stage">
+    <div class="track" id="track"></div>
+    <button class="nav prev" id="prev" aria-label="Previous">&#8249;</button>
+    <button class="nav next" id="next" aria-label="Next">&#8250;</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.3 3.2 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.8 0 6 3.8 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.7 16.6A9 9 0 1 0 17 20.3L21 21z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3 9.2 10.1M22 3l-7 18-3.8-8.9L2 8.5z"/></svg>
+    <span class="dots" id="dots"></span>
+    <svg class="save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1z"/></svg>
+  </div>
+  <div class="cap" id="cap"></div>
+</article>
+<aside class="side">
+  <h2 id="title"></h2>
+  <p>Swipe, use the arrow keys, or click a slide. The files are in <code id="folder"></code></p>
+  <div class="grid" id="grid"></div>
+</aside>
+<script>
+const D = /*DATA*/null;
+document.documentElement.style.setProperty('--ratio', D.ratio);
+document.title = D.title + ' | preview';
+document.getElementById('title').textContent = D.title;
+document.getElementById('folder').textContent = D.folder;
+document.getElementById('hn').textContent = (D.handle || '').replace(/^@/, '');
+const av = document.getElementById('av');
+if (D.avatar) { const i = new Image(); i.src = D.avatar; i.className = 'av'; av.replaceWith(i); }
+else { av.className = 'av none'; av.textContent = ((D.name || D.handle || '?').replace(/^@/, '')[0] || '?').toUpperCase(); }
+if (D.caption) document.getElementById('cap').innerHTML = '<b></b>', document.querySelector('.cap b').textContent = (D.handle || '').replace(/^@/, ''), document.getElementById('cap').append(D.caption);
+const track = document.getElementById('track'), dots = document.getElementById('dots'), grid = document.getElementById('grid');
+const bust = '?v=' + Date.now();
+D.slides.forEach((src, k) => {
+  const im = new Image(); im.src = src + bust; im.alt = 'Slide ' + (k + 1); track.append(im);
+  dots.append(document.createElement('i'));
+  const g = new Image(); g.src = src + bust; g.onclick = () => go(k); grid.append(g);
+});
+let cur = 0;
+function go(k) { k = Math.max(0, Math.min(D.slides.length - 1, k)); track.scrollTo({ left: k * track.clientWidth, behavior: 'smooth' }); }
+function sync() {
+  cur = track.clientWidth ? Math.round(track.scrollLeft / track.clientWidth) : 0;
+  document.getElementById('count').textContent = (cur + 1) + '/' + D.slides.length;
+  [...dots.children].forEach((d, k) => d.classList.toggle('on', k === cur));
+  [...grid.children].forEach((d, k) => d.classList.toggle('on', k === cur));
+  document.getElementById('prev').hidden = cur === 0;
+  document.getElementById('next').hidden = cur === D.slides.length - 1;
+}
+track.addEventListener('scroll', () => requestAnimationFrame(sync));
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1); });
+sync();
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+ "name": "Horizon",
+ "about": "Dark ground, one giant warm sun rising from the bottom. Loud condensed headlines, a soft serif italic line under them, and the payoff (the prompt, the punchline, the keyword) sitting inside the sun in dark ink. Feels like a movie poster. Best for: tips, prompts, money and results, anything you want to feel big.",
+ "size": "3:4",
+ "kind": "type",
+ "for": ["everyone", "him"],
+ "niches": ["ai", "tech", "business", "money", "marketing", "prompts", "tips"],
+ "imageStyle": "dark, moody, warm orange light, cinematic, lots of black around the subject",
+ "fonts": [
+  {"family": "Archivo", "file": "Archivo-var.woff2", "weight": "100 900", "stretch": "62% 125%"},
+  {"family": "Instrument Serif", "file": "InstrumentSerif-italic.woff2", "style": "italic"},
+  {"family": "IBM Plex Mono", "file": "IBMPlexMono-600.woff2", "weight": "600"}
+ ],
+ "vars": {
+  "--bg": "#0a0503",
+  "--ink": "#ffffff",
+  "--ink-soft": "rgba(255,236,226,0.86)",
+  "--ink-dim": "rgba(255,255,255,0.55)",
+  "--accent": "#FF8E5C",
+  "--sun-hi": "#FFB48C",
+  "--sun-lo": "#F26F3B",
+  "--on-sun": "#160903",
+  "--font-head": "'Archivo', sans-serif",
+  "--font-body": "'Archivo', sans-serif",
+  "--font-serif": "'Instrument Serif', serif",
+  "--font-mono": "'IBM Plex Mono', monospace",
+  "--pad-x": "64px",
+  "--pad-top": "128px",
+  "--pad-bottom": "150px",
+  "--min-text": "26px",
+  "--zm-grow": "1.35"
+ }
+}

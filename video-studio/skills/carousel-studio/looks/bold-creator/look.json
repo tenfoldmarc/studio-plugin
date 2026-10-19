@@ -1,0 +1,41 @@
+{
+ "name": "Bold Creator",
+ "about": "Your face fills the slide and a huge white all-caps headline sits above your head, with your handle in small mono type over it. Simple, loud and face-first, like the covers of the big talking-head creators. Best for: creators who talk to camera about AI, tech, business, design, money or fitness.",
+ "size": "3:4",
+ "kind": "photo",
+ "for": ["him", "everyone"],
+ "niches": ["ai", "tech", "business", "design", "finance", "fitness", "creator", "coaching"],
+ "imageStyle": "real mid-shot photos of the creator talking to camera in a real place (studio desk, office, cafe, street), natural light, honest colour, the head in the lower half of the frame with clear room above it for the headline",
+ "fonts": [
+  {"family": "Archivo", "file": "Archivo-var.woff2", "weight": "100 900", "stretch": "62% 125%"},
+  {"family": "Inter", "file": "Inter-var.woff2", "weight": "300 900"},
+  {"family": "JetBrains Mono", "file": "JetBrainsMono-var.woff2", "weight": "400 800"},
+  {"family": "Instrument Serif", "file": "InstrumentSerif-regular.woff2"},
+  {"family": "Instrument Serif", "file": "InstrumentSerif-italic.woff2", "style": "italic"}
+ ],
+ "vars": {
+  "--bg": "#111112",
+  "--ground-hi": "#3a3b3e",
+  "--ground-lo": "#0c0c0d",
+  "--ink": "#ffffff",
+  "--ink-soft": "rgba(255,255,255,0.86)",
+  "--ink-dim": "rgba(255,255,255,0.62)",
+  "--accent": "#FF8A24",
+  "--paper": "#F8F7F3",
+  "--on-paper": "#141414",
+  "--glass": "rgba(18,18,20,0.58)",
+  "--line": "rgba(255,255,255,0.16)",
+  "--font-head": "'Archivo', sans-serif",
+  "--font-body": "'Inter', sans-serif",
+  "--font-serif": "'Instrument Serif', serif",
+  "--font-mono": "'JetBrains Mono', monospace",
+  "--pad-x": "84px",
+  "--pad-top": "196px",
+  "--pad-bottom": "150px",
+  "--chrome-top": "116px",
+  "--chrome-bottom": "62px",
+  "--min-text": "26px",
+  "--zm-grow": "1.3",
+  "--drop": "0px"
+ }
+}

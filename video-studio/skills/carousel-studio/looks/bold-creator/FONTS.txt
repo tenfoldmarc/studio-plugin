@@ -1,0 +1,7 @@
+Fonts used by the Bold Creator look. All of them come from Google Fonts and ship in the skill's fonts/ folder
+(../../fonts/, full licence text in ../../fonts/OFL.txt). No font file is copied into this folder.
+
+Archivo            SIL Open Font License 1.1   (Archivo-var.woff2, weight 100-900, width 62-125%)
+Inter              SIL Open Font License 1.1   (Inter-var.woff2)
+JetBrains Mono     SIL Open Font License 1.1   (JetBrainsMono-var.woff2)
+Instrument Serif   SIL Open Font License 1.1   (InstrumentSerif-regular.woff2, InstrumentSerif-italic.woff2)
