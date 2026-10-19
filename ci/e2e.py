@@ -270,7 +270,11 @@ def main():
     # the posted trial 2 and leaves every caption for Claude to write. Before the fresh plan below: that one moves
     # the finished trials into trial-reels/earlier-<date>/
     P = S('post.py')
-    run('posting: check without a key', [py, P, 'check'], must=r'STATUS posting NO KEY', allow_fail=True)
+    out = run('posting: check without a key (exits 1)', [py, P, 'check'], allow_fail=True)
+    ok = 'STATUS posting NO KEY' in out and 'Traceback' not in out
+    RESULTS.append({'step': 'posting: no key says so plainly', 'ok': ok, 'code': 0, 'optional': False})
+    if not ok:
+        finish(1)
     posting = os.path.join(proj, 'posting.json')
     run('posting: a plan for the trial reels', [py, P, 'new', posting, trials, '--platforms', 'instagram,tiktok',
                                                 '--trial', '--every', '5m', '--force'],
