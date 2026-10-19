@@ -147,7 +147,10 @@ trial-03-effects-none.mp4       Effects: no effects
 trial-04-style-hype.mp4         Style: in your Hype style
 ```
 
-  Then: "Post them as trial reels and keep the one that wins. Tell me which one did and I'll make it your default."
+  Then: "Post them as trial reels and keep the one that wins. Want me to post them for you? I can put them out a few
+  minutes apart, on TikTok too." Yes: references/posting.md (`post.py new "<project>/posting.json"
+  "<project>/trial-reels" --trial --every 5m`). Each one that goes to Instagram is marked posted by itself.
+  Later: "Tell me which one won and I'll make it your default."
 - They posted one: "Got it. Trial 3 stays exactly as you posted it, and anything new I make stays different from it."
   (`variations.py posted`).
 - Never: "these won't get flagged". Say what was done instead (above).

@@ -268,6 +268,23 @@ def main():
     run('variations: a fresh plan keeps the posted trial', [py, V, 'plan', proj, '--count', '2', '--change', 'captions',
                                                            '--fresh'], must=r'KEPT  1 posted trial')
 
+    # 7d. posting: no Zernio key on a CI machine, so only the parts that need none. A plan for the trial reels skips
+    # the posted trial 2 and leaves every caption for Claude to write; plan stops on a missing key, never crashes
+    P = S('post.py')
+    run('posting: check without a key', [py, P, 'check'], must=r'STATUS posting NO KEY', allow_fail=True)
+    posting = os.path.join(proj, 'posting.json')
+    run('posting: a plan for the trial reels', [py, P, 'new', posting, trials, '--platforms', 'instagram,tiktok',
+                                                '--trial', '--every', '5m', '--force'],
+        must=r'SKIPPED trial-02-.*\n(.*\n)*STATUS new WRITTEN .*: 2 post')
+    pj = json.load(open(posting, encoding='utf-8'))
+    ok = (pj['defaults'] == {'platforms': ['instagram', 'tiktok'], 'trial': True, 'graduation': 'manual'}
+          and [p['when'] for p in pj['posts']] == ['now', '5m'] and all(p['caption'] == 'WRITE ME' for p in pj['posts'])
+          and all(os.path.isfile(os.path.join(proj, p['file'])) for p in pj['posts']))
+    RESULTS.append({'step': 'posting: the plan file', 'ok': ok, 'code': 0, 'optional': False})
+    log(f'----- {"PASS" if ok else "FAIL"}: posting plan\n{json.dumps(pj, indent=1)}')
+    if not ok:
+        finish(1)
+
     # 8. the rest of the style commands
     run('styles: duplicate', [py, S('my_styles.py'), 'duplicate', 'ci soft', 'CI Copy'], must=r'COPIED')
     run('styles: default', [py, S('my_styles.py'), 'default', 'CI Copy'], must=r'DEFAULT')

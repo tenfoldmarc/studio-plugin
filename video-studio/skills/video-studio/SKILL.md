@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'post it', 'post this to Instagram / TikTok / YouTube', 'post these as trial reels', 'schedule this for tomorrow', 'set up posting', 'connect my Instagram', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
@@ -19,7 +19,7 @@ of their own: you can rebuild nearly any talking-head or voice-over edit, animat
 `references/styles.md` when the picks hold an overall style, `effects/INDEX.md` when they hold effects,
 `references/gotchas.md` when a build or render misbehaves, `references/gifs.md` when the buyer asks for GIFs (you
 can find them yourself and place them on the right lines), `references/variations.md` when they ask for variations
-or trial reel versions of a reel.
+or trial reel versions of a reel, `references/posting.md` when they ask you to post, schedule or connect an account.
 
 ## The buyer's style wins. Read this first.
 
@@ -329,6 +329,25 @@ posted is marked (`variations.py posted`) and never touched again. Never promise
 5. they posted one: PY "SK/scripts/variations.py" posted "<project>" <n>
 ```
 
+## Posting ("post it")
+
+The buyer can have you post a finished reel or their trial reels for them: Instagram (normal reels or trial reels),
+TikTok, YouTube Shorts, Facebook Reels and more, now, at a set time, or a few minutes apart. It goes through their own
+Zernio account (free for their first 2 connected accounts). `references/posting.md` has the setup, every step and
+the words.
+
+```
+PY "SK/scripts/post.py" check                      key saved? accounts connected? (setup steps when not)
+PY "SK/scripts/post.py" new "<project>/posting.json" "<file or folder>" --platforms instagram,tiktok [--trial] [--every 5m]
+   write every caption in posting.json, then:
+PY "SK/scripts/post.py" plan "<project>/posting.json"          show the buyer the plan, get a clear yes
+PY "SK/scripts/post.py" run "<project>/posting.json" --yes     only after that yes
+PY "SK/scripts/post.py" status "<project>/posting.json" --wait the links, or what failed and the fix
+```
+
+Never post, schedule or cancel without a clear yes to that exact plan, and only to the platforms they named. Trial
+reels are an Instagram thing: other platforms in the same post get a normal post.
+
 Styles on request: "save this as a new style called X" (`my_styles.py save "X" --from-project`), "what styles do I
 have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Cozy with yellow captions"
 (`duplicate`, then change the copy), "get rid of X" (`retire`: kept, never deleted). `references/my-styles.md`.
@@ -358,6 +377,6 @@ have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Co
 - Variations, delivered: "Your 8 trial reels are in the trial-reels folder. Same clips, one thing different in
   each, and each one has its own speed, framing and colour so none of them is a copy of another:" then one line per
   file ("trial-01-hook-take-2.mp4: opens on your other take of the first line"). "Post them as trial reels and keep
-  the one that wins."
+  the one that wins. Want me to post them for you?"
 
 The styles for her (Soft Hours, Glam Cam, Color Block, Camera Shy) work faceless or on camera. Say it that way.
