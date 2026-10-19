@@ -265,11 +265,10 @@ def main():
     run('variations: mark trial 2 posted', [py, V, 'posted', proj, '2'], must=r'POSTED trial-02-')
     run('variations: a posted trial is never rendered again', [py, V, 'render', proj, '--only', '2', '--redo'],
         must=r'POSTED: kept exactly as it is')
-    run('variations: a fresh plan keeps the posted trial', [py, V, 'plan', proj, '--count', '2', '--change', 'captions',
-                                                           '--fresh'], must=r'KEPT  1 posted trial')
 
     # 7d. posting: no Zernio key on a CI machine, so only the parts that need none. A plan for the trial reels skips
-    # the posted trial 2 and leaves every caption for Claude to write; plan stops on a missing key, never crashes
+    # the posted trial 2 and leaves every caption for Claude to write. Before the fresh plan below: that one moves
+    # the finished trials into trial-reels/earlier-<date>/
     P = S('post.py')
     run('posting: check without a key', [py, P, 'check'], must=r'STATUS posting NO KEY', allow_fail=True)
     posting = os.path.join(proj, 'posting.json')
@@ -284,6 +283,8 @@ def main():
     log(f'----- {"PASS" if ok else "FAIL"}: posting plan\n{json.dumps(pj, indent=1)}')
     if not ok:
         finish(1)
+    run('variations: a fresh plan keeps the posted trial', [py, V, 'plan', proj, '--count', '2', '--change', 'captions',
+                                                           '--fresh'], must=r'KEPT  1 posted trial')
 
     # 8. the rest of the style commands
     run('styles: duplicate', [py, S('my_styles.py'), 'duplicate', 'ci soft', 'CI Copy'], must=r'COPIED')
