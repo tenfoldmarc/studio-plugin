@@ -59,7 +59,7 @@ made it.
   .chrome.top       .tag (i dot + text)  .count (b = this slide)  .top-who (avatar + handle, hidden by most looks)
   main.body
     section.zt      .label (i + text)  .kicker  h1.hl > span.ln[.ac|.q]  .rule  p.sub
-    section.zm      .big (.num .bs)  blockquote.quote (p, cite)  .media-label  figure.media.<fit> (img, figcaption)
+    section.zm      .big (.num .bs)  blockquote.quote (p, cite)  .media-label  figure.media.<fit> (img, figcaption; fit "frame" is .framed)
                     .items.<style> (li > i.dot | span.n, .tx > b.t + span.d) | .chip | .card | .pair (s.old i.ar .new)
                     | .col (b.t, ul li)
     section.zb      .payload (.pl-label i, .pl-text)  .callout  .cta-word (.cw-pre .kw .cw-post .follow)  .note

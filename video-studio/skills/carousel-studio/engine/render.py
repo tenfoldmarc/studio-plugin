@@ -269,7 +269,8 @@ def media_html(m, project):
     style = ''
     if m.get('height'):
         style = f' style="height:{int(m["height"])}px;flex:0 0 auto"'
-    return f'{lab}<figure class="media {fit}"{style}><img src="{src}" alt=""{focus}>{cap}</figure>', ''
+    cls = 'framed' if fit == 'frame' else fit   # "frame" is a word looks use for their own decoration
+    return f'{lab}<figure class="media {cls}"{style}><img src="{src}" alt=""{focus}>{cap}</figure>', ''
 
 
 COLLAGES = ('pair', 'trio', 'grid', 'stack', 'strip', 'scatter', 'row')

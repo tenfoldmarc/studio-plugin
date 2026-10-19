@@ -2,7 +2,7 @@
 .grain { position: absolute; inset: 0; opacity: 0.6;
   background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--accent) 5%, transparent) 0%, transparent 40%),
               radial-gradient(circle at 80% 80%, rgba(42,31,20,0.05) 0%, transparent 45%); }
-.frame { position: absolute; inset: 40px; border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 8px; }
+.decor .frame { position: absolute; inset: 40px; border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 8px; }
 .corner { position: absolute; width: 22px; height: 22px; border: 0 solid var(--accent); }
 .corner.tl { top: 36px; left: 36px; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
 .corner.tr { top: 36px; right: 36px; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
