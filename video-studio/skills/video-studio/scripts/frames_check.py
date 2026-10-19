@@ -2,10 +2,12 @@
 """The self-check after a render: pull a few frames out of the FINAL mp4, draw the Reels safe zone and the face box
 on them, and measure what can be measured. One picture to look at instead of opening the video.
 
-Usage:  PY frames_check.py <project_dir> <render.mp4> [--at 1.2,3.4,5.6] [--n 6]
+Usage:  PY frames_check.py <project_dir> <render.mp4> [--at 1.2,3.4,5.6] [--n 6] [--punched]
 
-  --at   the moments to check (seconds). Default: the middle of --n words spread across the reel, so a caption is
-         on screen in every frame. Add the moments of every effect slot and every title yourself.
+  --at       the moments to check (seconds). Default: the middle of --n words spread across the reel, so a caption is
+             on screen in every frame. Add the moments of every effect slot and every title yourself.
+  --punched  also the middle of every punched-in part of the cut: the face sits lower and bigger there, so a caption
+             or card that clears it in the wide shots can cover the mouth
 
 <render.mp4> may be written the short way, "renders/<file>.mp4": it is looked up inside the project folder.
 
@@ -59,6 +61,18 @@ def changed(a, b, box):
     return sum(hist[60:]) / max(1, sum(hist))
 
 
+def reframed(box, r):
+    """the face box of a trial reel with its own framing (build.json "reframe", as applied by the engine): the picture
+    is scaled around (ox, oy) and shifted x pixels. A mirrored trial's layout.json is mirrored already
+    (variations.py), so only the scale and the shift are left to apply here."""
+    if not r:
+        return box
+    z, ox, oy, tx = float(r['zoom']), float(r['ox']), float(r['oy']), float(r['x'])
+    x0, y0, x1, y1 = box
+    xs = sorted((ox + tx + z * (x0 - ox), ox + tx + z * (x1 - ox)))
+    return (xs[0], oy + z * (y0 - oy), xs[1], oy + z * (y1 - oy))
+
+
 def main():
     skillenv.utf8_stdio()
     if len(sys.argv) < 3:
@@ -79,6 +93,12 @@ def main():
         times = [round((words[i]['start'] + words[i]['end']) / 2, 2) for i in idx]
     else:
         times = [1.0]
+    if '--punched' in sys.argv:
+        # the face sits lower and bigger in a punched-in part, so a caption or card that clears it in the wide shots
+        # can cover the mouth there: check the middle of every punched-in part too (at most 6)
+        cut = read(os.path.join(proj, 'segments.json'), []) or []
+        mids = [round((s['frame'] + s['frames'] / 2) / 30, 2) for s in cut if float(s.get('zoom', 1)) > 1.001]
+        times = sorted(set(times) | set(mids[:6]))
     out_dir = os.path.join(proj, 'work', 'check')
     os.makedirs(out_dir, exist_ok=True)
     head, lift = layout.get('head'), int(layout.get('lift') or 0)
@@ -100,6 +120,7 @@ def main():
             chin = (seg['chin'] if seg else head['chin']) - lift
             dx = (seg['cx'] - head['cx']) if seg and seg.get('cx') is not None else 0
             face = (head['left'] + dx, top + .22 * (chin - top), head['right'] + dx, chin)     # brow to chin: hair and caps may be overlapped
+            face = reframed(face, built.get('reframe'))
         line = f'{t:6.2f}s'
         in_slot = next((s for s in fx_slots if float(s['from']) - .001 <= t < float(s['to'])), None)
         if in_slot:

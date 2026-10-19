@@ -15,6 +15,8 @@ The buyer's own style wins over the Picker picks: one of their saved styles (sty
 folder; plan.json "myStyle" names it, else the default style), then this reel's plan.json on top of it ("caption",
 "layers", "grade", "css", "sounds", "motion"). A saved style that carries "picks" (a caption key, an overall style,
 effects) uses those instead of studio-picks.json. Every field: references/replicate.md and references/my-styles.md.
+A trial reel's plan.json may also hold "reframe" (variations.py writes it: its own zoom, sideways shift, mirror and
+light grade on the footage, the cutout and the effect slots; captions and layers stay as placed).
 
 What it reads:
   the picks        {"mode": "preset"|"custom", "style": key|null, "captionStyle": key|"none", "effects": [...],
@@ -141,6 +143,18 @@ def main():
                  'sounds': plan.get('sounds') or [],
                  # reel-wide motion: the style's patterns ("on": marks / words / cuts) plus this reel's own entries
                  'motion': motion_entries(mine, plan)}
+    # a trial reel's own framing and colour (variations.py): scaled around the face, so the captions placed under it
+    # still fit. The point is the face on screen (the layout's head, after any lift) unless the plan gives one.
+    reframe = plan.get('reframe')
+    if isinstance(reframe, dict) and reframe:
+        reframe = dict(reframe)
+        h = cap.HEAD or {}
+        reframe.setdefault('ox', round(float(h.get('cx', 540)), 1))
+        reframe.setdefault('oy', round((float(h.get('top', 700)) + float(h.get('chin', 900))) / 2 - (cap.LIFT or 0), 1))
+        cap.EXTRA['reframe'] = reframe
+        reframe = cap.reframe_values(reframe)                 # as applied: frames_check.py moves its face box the same way
+    else:
+        reframe = None
     fonts_src = skillenv.my_fonts_dir()
     if os.path.isdir(fonts_src):                 # fonts fetched for the buyer's style (get_font.py) go with every reel
         os.makedirs(os.path.join(proj, 'assets', 'fonts'), exist_ok=True)
@@ -211,7 +225,18 @@ def main():
         html = cap.page(caption, safe=safe)
         what = f'style=none captions={caption}'
     notes += cap.NOTES
+    if reframe and reframe['mirror']:
+        # a mirrored picture shows any text in it backwards: the words behind the head, an effect's own words, an
+        # overall style's on-screen text. Those reels never mirror (references/variations.md, "Mirror").
+        why = ('an overall style' if style else 'words or layers behind the head' if cap.BEHIND
+               else 'effect slots' if live else None)
+        if why:
+            sys.exit(f'This trial is mirrored, but the reel has {why}: their words would read backwards. Set "mirror": '
+                     f'false in its "unique" (variations.json) and make it again.')
     n_layers = len(cap.EXTRA.get('layers') or [])
+    if reframe:
+        what += (f"  [trial framing: {float(reframe.get('zoom', 1)):.3f}x" + (' mirrored' if reframe.get('mirror') else '')
+                 + (f", {float(reframe.get('x', 0)):+.0f}px" if reframe.get('x') else '') + (', own grade' if reframe.get('grade') else '') + ']')
     if own_look or n_layers or cap.EXTRA.get('grade') or cap.EXTRA.get('css') or cap.EXTRA.get('sounds') or cap.EXTRA.get('motion'):
         what += ('  [the buyer\'s own style: ' + ', '.join(x for x in (
             own_look if caption == 'custom' or own_look and not opt('--caption') else None,
@@ -232,9 +257,12 @@ def main():
         notes.append('Reel motion moves the picture (footage, speaker or #root), so the self-check cannot compare '
                      'frames with the footage: LOOK at its sheet yourself, and at a frame where the picture is moved most.')
     with open(os.path.join(proj, 'work', 'build.json'), 'w', encoding='utf-8') as fh:
+        # a reframed trial: the picture no longer matches the raw cut (no before / after numbers), and the face moved a
+        # little, so frames_check.py moves its face box the same way ("reframe")
         json.dump({'style': style, 'caption': caption, 'safe': safe,
-                   'untouched_footage': not style and not cap.LIFT and not cap.EXTRA.get('grade') and not moved,
-                   'face_in_place': ((not style) or style == 'fireside') and not moved}, fh, indent=1)
+                   'untouched_footage': not style and not cap.LIFT and not cap.EXTRA.get('grade') and not moved and not reframe,
+                   'face_in_place': ((not style) or style == 'fireside') and not moved,
+                   'reframe': reframe}, fh, indent=1)
     marks = sum(1 for w in cap.W if w.get('e'))
     print(f'built index.html  {what}  words={len(cap.W)} marked={marks}  dur={cap.DUR:.3f}s  '
           f'slots={len(live)}  safe guide={"ON (snapshots only)" if safe else "off"}')

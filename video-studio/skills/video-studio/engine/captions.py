@@ -823,7 +823,9 @@ def outline(b):
 # <project>/plan.json and the buyer's my-style.json.
 # ----------------------------------------------------------------------------------------------------------------------
 CUSTOM = {}               # the caption spec (see custom() for every field and its default)
-EXTRA = {}                # reel-wide extras: {'css': str, 'grade': css filter, 'layers': [...], 'sounds': [...], 'fonts': [...]}
+EXTRA = {}                # reel-wide extras: {'css': str, 'grade': css filter, 'layers': [...], 'sounds': [...], 'fonts': [...],
+                          #                 'reframe': a trial reel's own framing and colour (reframe_values)}
+BEHIND = False            # the last page() put words or layers behind the speaker (a mirrored trial must not)
 NOTES = []                # things the build could not do as asked; build_reel.py prints them as NOTE lines
 ENTRANCES = ('none', 'pop', 'fade', 'slide-up', 'type-on', 'word-by-word')
 LIT = ('none', 'color', 'stay', 'plate', 'pop')
@@ -1398,6 +1400,8 @@ def page(key, safe=False):
         STYLES[key][2](b)
         b.cap_top = cap_top(key)
     behind = layers(b, behind=True)       # the buyer's own layers that sit behind the speaker (they need the cutout)
+    global BEHIND
+    BEHIND = bool(b.back or behind)       # words or layers behind the head: a mirrored trial would show them backwards
     if EXTRA.get('grade'):                # one colour grade for the footage, the cutout and every effect slot (.gr)
         b.css.append(f"\n#plate,#cutw,.gr{{filter:{EXTRA['grade']}}}")
     nl = '\n'
@@ -1411,12 +1415,48 @@ def page(key, safe=False):
     return document(b, footage, safe=safe, audio_track=2)
 
 
+def reframe_values(r):
+    """A trial reel's own framing and colour (scripts/variations.py, references/variations.md), as it is applied:
+    -> {'zoom', 'mirror', 'ox', 'oy', 'x', 'grade'} or None. The footage, the cutout and the effect slots scale around
+    one point (the face, so captions placed under it still fit), shift sideways a little, may mirror, and get a light
+    grade on top. A mirrored trial turns around the middle of the frame, or the picture would not fill it; the shift
+    is kept small enough that no edge of the picture ever shows."""
+    if not isinstance(r, dict) or not r:
+        return None
+    z = max(1.0, _num(r.get('zoom'), 1.0))
+    mirror = bool(r.get('mirror'))
+    ox = 540.0 if mirror else min(max(_num(r.get('ox'), 540.0), 0.0), 1080.0)
+    oy = min(max(_num(r.get('oy'), 960.0), 0.0), 1920.0)
+    lo, hi = -(1080 - ox) * (z - 1), ox * (z - 1)          # the sideways room before an edge of the picture shows
+    if r.get('x') is None and r.get('shift') is not None:   # "shift": -1..1, the share of that room (variations.py)
+        sh = min(max(_num(r.get('shift'), 0.0), -1.0), 1.0)
+        r = {**r, 'x': sh * hi if sh >= 0 else -sh * lo}
+    tx = min(max(_num(r.get('x'), 0.0), lo), hi)
+    return {'zoom': round(z, 4), 'mirror': mirror, 'ox': round(ox, 1), 'oy': round(oy, 1), 'x': round(tx, 1),
+            'grade': str(r.get('grade') or '').strip()}
+
+
+def reframe_css(r):
+    """-> the css rule for #reframe (captions and layers are outside it: text stays sharp and where it was placed),
+    or '' when the reel has no reframe"""
+    v = reframe_values(r)
+    if not v:
+        return ''
+    z = v['zoom']
+    return (f"\n#reframe{{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:{v['ox']:.1f}px {v['oy']:.1f}px;"
+            f"transform:translate({v['x']:.1f}px,0) scale({-z if v['mirror'] else z:.4f},{z:.4f})"
+            + (f";filter:{v['grade']}" if v['grade'] else '') + '}')
+
+
 def document(b, footage, safe=False, audio_track=9):
     """The whole composition: footage layers, effect slots, captions, timeline. Used by page() and by styles.py."""
     nl = '\n'
     fx, fx_audio = slots(b)
     front = layers(b)                     # the buyer's own layers, over the slots and under the captions
     fx_audio = fx_audio + sounds()
+    rf = reframe_css(EXTRA.get('reframe'))
+    if rf:                                # a trial reel's own framing and colour, around the footage and the slots only
+        b.css.append(rf)
     if EXTRA.get('css'):                  # the escape hatch: plain css from plan.json / my-style.json, last so it wins
         b.css.append('\n' + str(EXTRA['css']))
         css_motion_note(EXTRA['css'], 'The style css')
@@ -1435,12 +1475,14 @@ def document(b, footage, safe=False, audio_track=9):
 <div id="root" data-composition-id="main" data-start="0" data-duration="{DUR:.3f}" data-width="1080" data-height="1920">
   <audio id="bga" src="{VIDEO}" data-start="0" data-media-start="0" data-duration="{DUR:.3f}" data-track-index="{audio_track}" data-volume="1"></audio>
 {nl.join('  ' + h for h in fx_audio)}
+{'  <div id="reframe">' if rf else ''}
   <div id="footage">
 {nl.join('    ' + h for h in footage)}
   </div>
   <div id="slots">
 {nl.join('    ' + h for h in fx)}
   </div>
+{'  </div><!--/reframe-->' if rf else ''}
   <div id="layers">
 {nl.join('    ' + h for h in front)}
   </div>

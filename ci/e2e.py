@@ -236,14 +236,22 @@ def main():
             sizes[n] = (round(d, 2), hash(fh.read()))
         log(f'{n}  {d:.2f}s')
     listed = open(os.path.join(trials, 'what-changed.txt'), encoding='utf-8').read()
+    # every trial is its own video (2.2.0): its own speed, so three different lengths, and the list says so
     ok = (len(made) == 3 and [n[:9] for n in made] == ['trial-01-', 'trial-02-', 'trial-03-']
           and all(d > 3 for d, _ in sizes.values()) and len({h for _, h in sizes.values()}) == 3
+          and len({d for d, _ in sizes.values()}) == 3 and 'its own speed, framing and colour' in listed
           and all(n in listed for n in made) and chr(0x2014) not in listed)
     RESULTS.append({'step': 'variations: 3 distinct reels and the list', 'ok': ok, 'code': 0, 'optional': False})
     log(f'----- {"PASS" if ok else "FAIL"}: 3 distinct trial reels in one folder\n{listed}')
     if not ok:
         finish(1)
-    run('variations: list', [py, V, 'list', proj], must=r'trial-03-\S+\.mp4 .*\[ready\]')
+    run('variations: list', [py, V, 'list', proj], must=r'trial-03-\S+\.mp4 .*x speed, framed .*\[ready\]')
+    # the buyer posted trial 2: it is never rendered again, and a fresh plan keeps it
+    run('variations: mark trial 2 posted', [py, V, 'posted', proj, '2'], must=r'POSTED trial-02-')
+    run('variations: a posted trial is never rendered again', [py, V, 'render', proj, '--only', '2', '--redo'],
+        must=r'POSTED: kept exactly as it is')
+    run('variations: a fresh plan keeps the posted trial', [py, V, 'plan', proj, '--count', '2', '--change', 'captions',
+                                                           '--fresh'], must=r'KEPT  1 posted trial')
 
     # 8. the rest of the style commands
     run('styles: duplicate', [py, S('my_styles.py'), 'duplicate', 'ci soft', 'CI Copy'], must=r'COPIED')
@@ -262,8 +270,9 @@ def main():
     keep = os.path.join(OUT, 'look')
     os.makedirs(keep, exist_ok=True)
     trials = os.path.join(proj, 'trial-reels')
-    for n in (os.listdir(trials) if os.path.isdir(trials) else []):
-        shutil.copyfile(os.path.join(trials, n), os.path.join(keep, n))
+    for root, _, files in (os.walk(trials) if os.path.isdir(trials) else []):    # earlier-<date>/ holds the last plan's reels
+        for n in files:
+            shutil.copyfile(os.path.join(root, n), os.path.join(keep, n))
     vdir = os.path.join(proj, 'work', 'variations')
     for n in (os.listdir(vdir) if os.path.isdir(vdir) else []):
         sheet = os.path.join(vdir, n, 'work', 'check', n + '.jpg')

@@ -14,6 +14,10 @@ People repeat a line until it lands. Rebuild what they meant to say from the tak
 - Use the LAST complete clean take of each line, unless the buyer says otherwise ("the good one starts at 0:47"
   means one continuous take from there).
 - In point: 0.05 to 0.07s before the first word. Out point: where the silence starts after the last word (speech map).
+- A word can go silent for a moment in the middle: the stop before a t, k, p, b, d or g ("fas" ... "ter"). A short
+  burst of sound 0.03 to 0.15s after such a dip is still the word, even when Whisper writes it as a word of its own
+  ("here", "Mr."). The out point goes after that burst, never in the dip. After assembling, read the cut's transcript
+  once: a last word that comes back short ("fast," where they said "faster") means the out point landed inside it.
 - Cut dead air between lines. Before trimming a short pause inside a line, confirm it with silencedetect
   (`ffmpeg -i <clip> -af silencedetect=n=-40dB:d=0.08 -f null -`): Whisper word times can be 0.1 to 0.3s off and it
   can invent a word at a cut.

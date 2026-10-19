@@ -11,13 +11,59 @@ each one different in ONE thing, so a winner tells them what worked.
 
 | change | what it means | how it is made |
 | --- | --- | --- |
-| hook | another opening: another take of the first line, another line first, a different opening cut | `edl` (any takes, any order), `punch` (the opening punched in close, cutting back to the usual framing in the first pause), `trim` (seconds cut off the start, e.g. a filler "So") |
+| hook | another opening: another take of the first line, another line first, a different opening cut, one more animation in the first seconds, a new opening headline | `edl` (any takes, any order), `punch` (the opening punched in close, cutting back to the usual framing in the first pause), `trim` (seconds cut off the start, e.g. a filler "So"), `opener` (an effect key for the first 3 seconds, or a short animation you write, references/motion.md), `plan` with a new `title` (a reel that opens on a pinned headline: write 2 or 3 options, the buyer picks) |
 | captions | another caption style | `caption`: any of the 19 keys, or a custom spec |
 | effects | another effect set | `effects`: the effect keys this trial keeps; `[]` = none |
 | style | another saved style, or one of the 8 built-in overall looks | `myStyle`: a saved style name; `style`: an overall style key |
 
 One change per variation is the clean test. Two in one ("new hook AND new captions") is allowed when the buyer asks
 for it, but then a winner does not say which of the two did it: tell them so once.
+
+## Every trial is its own video
+
+Trial reels are posted next to each other from one account. A trial that only swaps the caption style keeps the
+same voice track and the same frames as the reel and every other trial: as a file it is nearly a copy. So on top of
+the one thing it tests, every trial gets its own light pass, `"unique"` in variations.json (plan and make fill it in):
+
+| | what | how |
+| --- | --- | --- |
+| speed | 0.965 to 1.035, a different one per trial, never 1.0 | after the render, picture and voice together, voice pitch kept (`setpts` + `atempo`) |
+| framing | 3.5 to 7% tighter, around the face, shifted a little to one side | `plan.json "reframe"`: the footage, the cutout and the effect slots move together; captions and layers do not, so text stays sharp and where it was placed |
+| colour | a light grade on top of the reel's own | the same `"reframe"`, never black and white or a strong colour cast |
+| mirror | OFF unless you turn it on | see "Mirror" below |
+
+- The pass is small on purpose: a viewer only notices the one tested change, so a winner still says what worked.
+- No two trials share a speed or a framing, and none is the reel itself (1.0x, unframed). The render stops a trial
+  that would (`FAILED: it has the same speed as ...`): change its `"unique"`, make it again.
+- A strict test with nothing else changed: `"unique": false` on that trial.
+- Never tell the buyer the trials "won't get flagged": nobody outside Instagram knows how it compares videos. Say
+  what was done: each one has its own speed, framing and colour, so none of them is a copy of another.
+
+### Mirror
+
+A mirrored trial differs the most, but it shows every word in the picture backwards. The plan never turns it on.
+Turn it on for one trial (`"mirror": true` in its `"unique"`) only when ALL of these hold:
+- you LOOKED at the footage (work/sheets.jpg and the reel's own frames) and found no readable text at all: no logo
+  on clothes or a cap, no poster or framed print, no screen, sign or product label;
+- the reel has no effect slots, no words or layers behind the head, and no overall style (make and the build stop
+  a mirrored trial that has them: their words would read backwards);
+- the buyer did not say anything about which side they are on ("on my left").
+Then the layout is mirrored with the picture, so captions follow the face to the other side. Layers placed beside
+the speaker stay where they were: LOOK at the self-check.
+
+### Trials the buyer posted
+
+The buyer posted trial 3: `PY "SK/scripts/variations.py" posted "<project>" 3`. That trial keeps its file and name,
+is never made or rendered again (not even with `--redo`), and a fresh plan (`plan --fresh`) keeps it first, so every
+new trial stays different from it. `--undo` takes the mark off. The edited reel itself is never touched by any of
+this: it is the version most buyers post first.
+
+### The face on punched-in shots
+
+A punched-in part shows the face lower and bigger. A caption or card that clears the chin in the wide shots can
+cover the mouth there, and a trial's framing moves the face a little more. The render runs the self-check with
+`--punched` (the middle of every punched-in part is in the sheet): LOOK at those frames first. Something over the
+mouth or chin: move it lower or make it smaller in that trial's folder, then render it again (`--only <n> --redo`).
 
 ## The workflow
 
@@ -39,12 +85,14 @@ for it, but then a winner does not say which of the two did it: tell them so onc
 ```
 
 `plan` proposes, in this order of value: another take of the first line (found by reading every clip's transcript
-for the same words outside the take in the reel), the opening without a filler word, a punched-in opening, then
+for the same words outside the take in the reel), the opening without a filler word, a punched-in opening, one more
+animation in the opening (an effect the buyer picked that may play there and is not in it yet), then
 caption styles (the most different first; Bold only when the reel has a cutout), then no effects / one effect only
 / an effect the buyer picked that the reel does not have yet, then every other saved style. It takes one of each
 kind in turn until it has the count. When it cannot reach the count on its own it says `SHORT` and the rest needs
 your judgement, usually a hook: the strongest line of the reel as the opening (`edl` with that segment first, and
-a new `title` under `"plan"`), or a bolder first sentence from another take.
+a new `title` under `"plan"`), a bolder first sentence from another take, or a new opening headline when the reel
+opens on one (`IDEA` lines say which fit). It also prints each trial's own speed and framing (`UNIQUE`).
 
 Writing a hook by hand: copy the reel's `edl.json` into the variation's `"edl"` and change it, exactly as in
 `references/cutting.md`. Takes come from the raw clips (`transcript.txt`, `words_c1.json` ...), never invented.
@@ -71,8 +119,9 @@ Every trial folder is a normal project: rebuild, snapshot and lint it with the u
 
 ## Render: one after another
 
-`render` builds, lints (0 errors), renders at high quality, runs `frames_check.py` and copies the finished reel into
-`<project>/trial-reels/` as `trial-01-<id>.mp4`, `trial-02-<id>.mp4` ... with `what-changed.txt` beside them.
+`render` builds, lints (0 errors), renders at high quality, runs `frames_check.py --punched`, gives the reel its
+own speed and copies it into `<project>/trial-reels/` as `trial-01-<id>.mp4`, `trial-02-<id>.mp4` ... with
+`what-changed.txt` beside them.
 - Never two at once. A reel render takes the whole computer; two in parallel can run a Mac out of memory. Only one
   `make` or `render` runs per project (a second one says `STATUS variations BUSY` and stops).
 - A trial that would come out the same as another one, or as the reel itself, fails before it renders: change
@@ -87,8 +136,9 @@ Every trial folder is a normal project: rebuild, snapshot and lint it with the u
 - Asking: "Here's the mix I'd test: [the list]. Want that, or should they all test the hook?"
 - Starting: "On it. I'm making 8 versions, then rendering them one at a time so your computer doesn't choke. That
   takes about 20 minutes. I'll tell you when they're ready."
-- Delivery: "Your 8 trial reels are in the trial-reels folder. Same clips, one thing different in each:" then the
-  list, one line per file, for example:
+- Delivery: "Your 8 trial reels are in the trial-reels folder. Same clips, one thing different in each, and each one
+  has its own speed, framing and colour so none of them is a copy of another:" then the list, one line per file,
+  for example:
 
 ```
 trial-01-hook-take-2.mp4        Hook: opens on your other take of the first line
@@ -98,5 +148,8 @@ trial-04-style-hype.mp4         Style: in your Hype style
 ```
 
   Then: "Post them as trial reels and keep the one that wins. Tell me which one did and I'll make it your default."
+- They posted one: "Got it. Trial 3 stays exactly as you posted it, and anything new I make stays different from it."
+  (`variations.py posted`).
+- Never: "these won't get flagged". Say what was done instead (above).
 - The buyer says which won: a hook is a lesson for the next scripts and edits (say it in one line); captions, effects
   or a style can become their default (`my_styles.py save` / `default`, references/my-styles.md).

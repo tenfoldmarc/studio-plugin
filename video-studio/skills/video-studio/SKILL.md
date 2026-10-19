@@ -307,8 +307,15 @@ they approve, `my_styles.py save "<style>" --from-project "<project>"`, plus a l
 
 After a reel is edited, the buyer can ask for N versions of it to post as Instagram trial reels. Each version is a
 finished reel from the same raw clips that differs in ONE thing: the hook (another take, another line first,
-another opening cut), the caption style, the effect set, or the saved style. `references/variations.md` has every
-detail. No reel edited yet: edit it first, then make the variations.
+another opening cut, one more animation in the first seconds, a new opening headline), the caption style, the
+effect set, or the saved style. `references/variations.md` has every detail. No reel edited yet: edit it first, then
+make the variations.
+
+Every trial is also its own video, never a near copy: on top of the one thing it tests it gets its own speed (0.965
+to 1.035x, voice pitch kept), a reframe around the face (3.5 to 7% tighter) and a light grade, and no two trials
+share them. Mirror stays off unless you LOOKED at the footage and found no readable text (logos on clothes or caps,
+posters, screens, signs) and the reel has no effect slots, words behind the head or overall style. A trial the buyer
+posted is marked (`variations.py posted`) and never touched again. Never promise a trial "won't get flagged".
 
 ```
 1. PY "SK/scripts/variations.py" plan "<project>" --count <N> [--change hook,captions,effects,style]
@@ -316,8 +323,10 @@ detail. No reel edited yet: edit it first, then make the variations.
        They did not: show the proposed mix as a short list and ask in ONE message before building. Wait.
 2. PY "SK/scripts/variations.py" make "<project>"     do every CHECK line in that trial's own folder
 3. PY "SK/scripts/variations.py" render "<project>"   IN THE BACKGROUND. One render after another, never in
-       parallel (two at once can run the computer out of memory). LOOK at each self-check sheet as it lands.
+       parallel (two at once can run the computer out of memory). LOOK at each self-check sheet as it lands,
+       the punched-in frames first: nothing may cover the mouth or chin there.
 4. deliver <project>/trial-reels/ and the list (PY "SK/scripts/variations.py" list "<project>")
+5. they posted one: PY "SK/scripts/variations.py" posted "<project>" <n>
 ```
 
 Styles on request: "save this as a new style called X" (`my_styles.py save "X" --from-project`), "what styles do I
@@ -347,7 +356,8 @@ have" (`list`), "make Hype my default" (`default`), "rename", "make a copy of Co
 - Variations, while rendering: "On it. I'm rendering them one at a time so your computer doesn't choke. That takes
   about 20 minutes. I'll tell you when they're ready."
 - Variations, delivered: "Your 8 trial reels are in the trial-reels folder. Same clips, one thing different in
-  each:" then one line per file ("trial-01-hook-take-2.mp4: opens on your other take of the first line"). "Post
-  them as trial reels and keep the one that wins."
+  each, and each one has its own speed, framing and colour so none of them is a copy of another:" then one line per
+  file ("trial-01-hook-take-2.mp4: opens on your other take of the first line"). "Post them as trial reels and keep
+  the one that wins."
 
 The styles for her (Soft Hours, Glam Cam, Color Block, Camera Shy) work faceless or on camera. Say it that way.
