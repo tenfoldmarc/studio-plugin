@@ -1,0 +1,25 @@
+{
+ "key": "chip-row",
+ "pack": "chip-row",
+ "imported": "2026-10-19",
+ "cutout": "none",
+ "layer": "overlay",
+ "hi": "no",
+ "reel_captions": "keep",
+ "captions_note": "the reel's captions keep running above the row: look at one reel snapshot with a caption up, the caption must not touch the chips",
+ "reel_env": [],
+ "in_a_reel": [
+  "CHIPS are the speaker's own words for the things listed, each at the second it is said",
+  "the buyer's style wins: set the STYLE block at the top of build.py to the reel's caption style (font, weight, tracking, case, ink, accent) before the first build (effects/INDEX.md, Restyling an effect's own words)"
+ ],
+ "sounds": {},
+ "steps": [
+  "edit CHIPS in the CLIP block from the words build.py prints",
+  "run build.py SAFE=1      # prints each chip, the row place and the snapshot times",
+  "hf lint",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # guide off",
+  "hf render",
+  "run check.py      # frame count, work/check/sheet.jpg, phone copy"
+ ]
+}

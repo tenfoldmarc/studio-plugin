@@ -1,4 +1,4 @@
-# The 8 overall styles and the per-reel plan
+# The 9 overall styles and the per-reel plan
 
 An overall style = what happens to the footage (grade, layout, cuts, push-ins) + the captions it comes with.
 `build_reel.py` builds it when the picks say `"mode": "preset"`. Engine: `SK/engine/styles.py`. You never edit the
@@ -16,6 +16,7 @@ The four for her work faceless or on camera. Never call them faceless-only.
 | `chalk-talk` | Chalk Talk | The speaker cut out onto a dark teal studio backdrop, hand-drawn marker titles, an optional rounded b-roll card | None: the marker titles carry the words | a clean cutout made with `rvm_cut.py --hard` |
 | `fireside` | Fireside | One shot, warm lamp-light grade, vignette, one slow push-in on the face | Small gold serif, two words at a time | |
 | `raw-tape` | Raw Tape | A 4:3 picture inside the reel on black, faded green film grade, slow push-in | Small plain yellow subtitles inside the picture | |
+| `viral-guy` | Viral Guy | Slate-teal room grade, warm skin, a punch-in on every other shot (and one in the middle of any shot over 4.5 s), flat ink and paper word cards on the beats, a small step label over the words | Viral Guy (one quiet cream word at a time) | |
 | `show-and-tell` | Show and Tell | The speaker in a rounded card flush with the BOTTOM of the video, head popping out above it, a light canvas above | None: the canvas carries the words | a clean cutout (`rvm_cut.py`) |
 
 Caption swaps: when the picks' `captionStyle` is not the one the style comes with, the footage treatment stays and
@@ -93,6 +94,22 @@ marker label. The call to action ("COMMENT" + the keyword, underlined) is added 
 A beat is a label with one white card under it, or a label with up to four thumbnails (the buyer's own images,
 226x402) and an optional highlighted note. The big "Comment" + keyword is added by itself from the `cta` mark.
 The speaker card ignores the bottom safe zone on purpose. Everything else on the canvas stays inside it.
+
+### Viral Guy: word cards and step labels
+```json
+"viral-guy": {"cards": [{"from": 5.5, "to": 6.7, "kind": "ink"}, {"from": 13.8, "to": 14.3, "kind": "paper"}],
+              "steps": [{"from": 16.8, "to": 23.2, "label": "step one"}, {"from": 23.2, "to": 26.7, "label": "step two"}],
+              "zooms": [1.0, 1.12]}
+```
+All optional. A card replaces the picture with a flat ink (`#101B1B`) or paper (`#F4F6FA`) colour while the words keep
+running, centred on it: put cards on a punchline or a contrast ("campaigns" ink / "launches" paper), about 1 second,
+starting and ending on a word. Paper flips the Viral Guy captions to deep green; with a swapped caption style paper
+cards turn ink (a `NOTE` says so). Default with no `cards`: an ink or paper card on every other new sentence, at least 4 s
+apart. A step is the small label ("step one") over the captions for a whole section; a chapter card is a card plus a
+step that starts with it. Write the labels from the speaker's own structure ("step one", "number two"), never invented.
+`zooms` = the framings the shots take in turn. The effects that come from this look (Stat Stack, Dot Counter,
+Serif Flow, Chip Row, Prompt Box, Depth Scatter) are overlay effects: they lay over this style's own footage, so its
+grade and punch-ins stay under them.
 
 ## Push-ins and punch-ins already in the cut
 Styles add their own slow push-in on top of whatever `edl.json` did. Fireside and Raw Tape are meant for one

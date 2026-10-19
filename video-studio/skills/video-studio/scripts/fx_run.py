@@ -7,6 +7,7 @@ takes as environment variables are written as plain NAME=value words, so there i
   PY fx_run.py <slot_dir> hf lint
   PY fx_run.py <slot_dir> hf snapshot --at 0.2,1.0,2.0                 -> <slot>/work/snap/ (contact-sheet.jpg)
   PY fx_run.py <slot_dir> hf render                                    -> <slot>/renders/<slot folder>.mp4
+                                                                          (.webm with transparency for an overlay effect)
 
 Examples:
   PY fx_run.py "<project>/fx/odometer" measure.py
@@ -18,7 +19,9 @@ What it takes care of:
     found first on PATH (the effects look tools up on PATH)
   - `hf` is the pinned HyperFrames. snapshot gets `--no-end --describe false -o work/snap` unless you pass your own.
     render gets `-o renders/<slot folder>.mp4 --quality high`, REFUSES to run while the red safe-zone guide is still
-    in index.html, and afterwards checks that the render has exactly the slot's frame count.
+    in index.html, and afterwards checks that the render has exactly the slot's frame count. An overlay effect
+    (slot.json "layer": "overlay": graphics only, the reel's own footage stays under them) renders to
+    renders/<slot folder>.webm with transparency instead.
   - no sound effects on this machine: every script gets SFX=0 so the build does not point at missing files.
 """
 import os
@@ -71,8 +74,11 @@ def main():
             if fxlib.SAFE_MARK in page:
                 sys.exit('NOT RENDERED: the red safe-zone guide is still in index.html. Run build.py again WITHOUT SAFE=1 '
                          '(with the same other switches), then render.')
+            overlay = (fxlib.read(os.path.join(slot, 'slot.json'), {}) or {}).get('layer') == 'overlay'
+            if overlay and '--format' not in hf:
+                hf += ['--format', 'webm']
             if '-o' not in hf and '--output' not in hf:
-                hf += ['-o', f'renders/{name}.mp4']
+                hf += ['-o', f'renders/{name}.webm' if overlay else f'renders/{name}.mp4']
             if '--quality' not in hf:
                 hf += ['--quality', 'high']
         code = skillenv.run_hyperframes(hf, cwd=slot)

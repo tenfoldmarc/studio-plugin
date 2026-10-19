@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 19 caption styles or 8 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Claude Creator Studio (video-studio)
@@ -12,7 +12,7 @@ looks. You rebuild that look on their clips and save it under a name they choose
 default. They never open an editor: they watch a phone copy and give notes.
 
 Read before the first edit: `references/cutting.md` (takes, dead air, fixing the transcript),
-`references/captions.md` (the 19 caption styles, how to mark words, where captions go),
+`references/captions.md` (the 20 caption styles, how to mark words, where captions go),
 `references/checks.md` (footage check, self-check, safe zone), `references/my-styles.md` (the saved styles).
 Read `references/replicate.md` and `references/motion.md` the moment the buyer shows an example or describes a look
 of their own: you can rebuild nearly any talking-head or voice-over edit, animation included. Read

@@ -326,6 +326,54 @@
    "job": "Hook",
    "line": "One word in thick clear glass on your wall.",
    "preview": "previews/effects/glass-type.mp4"
+  },
+  {
+   "n": 41,
+   "key": "depth-scatter",
+   "name": "Depth Scatter",
+   "job": "Hook",
+   "line": "Your opening words land at different sizes and fall out of focus.",
+   "preview": "previews/effects/depth-scatter.mp4"
+  },
+  {
+   "n": 42,
+   "key": "stat-stack",
+   "name": "Stat Stack",
+   "job": "Proof",
+   "line": "The number you say lands huge, with a tiny line under it.",
+   "preview": "previews/effects/stat-stack.mp4"
+  },
+  {
+   "n": 43,
+   "key": "dot-counter",
+   "name": "Dot Counter",
+   "job": "Explain",
+   "line": "A dot pops in for each thing you are about to cover.",
+   "preview": "previews/effects/dot-counter.mp4"
+  },
+  {
+   "n": 44,
+   "key": "chip-row",
+   "name": "Chip Row",
+   "job": "Explain",
+   "line": "A pill pops in under your captions for each thing you list.",
+   "preview": "previews/effects/chip-row.mp4"
+  },
+  {
+   "n": 45,
+   "key": "prompt-box",
+   "name": "Prompt Box",
+   "job": "Explain",
+   "line": "What you tell the AI types itself into a glass box.",
+   "preview": "previews/effects/prompt-box.mp4"
+  },
+  {
+   "n": 46,
+   "key": "serif-flow",
+   "name": "Serif Flow",
+   "job": "Explain",
+   "line": "A dark card draws your process step by step in serif type.",
+   "preview": "previews/effects/serif-flow.mp4"
   }
  ]
 }

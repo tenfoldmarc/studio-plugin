@@ -1,0 +1,24 @@
+{
+ "key": "depth-scatter",
+ "pack": "depth-scatter",
+ "imported": "2026-10-19",
+ "cutout": "none",
+ "layer": "overlay",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the scattered words ARE the reel's words for the hook: fx_add.py hides the reel's captions only while the words are up (work/reel_captions.json)",
+ "reel_env": [],
+ "in_a_reel": [
+  "start the slot about 0.1 s before the first word of the hook and end it about 0.3 s after the phrase",
+  "the buyer's style wins: set the STYLE block at the top of build.py to the reel's caption style (font, weight, tracking, case, ink, accent) before the first build (effects/INDEX.md, Restyling an effect's own words)"
+ ],
+ "sounds": {},
+ "steps": [
+  "run build.py SAFE=1      # prints each word, size and place, the snapshot times and the caption window",
+  "hf lint",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # guide off",
+  "hf render",
+  "run check.py      # frame count, work/check/sheet.jpg, phone copy"
+ ]
+}

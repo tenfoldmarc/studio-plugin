@@ -71,14 +71,15 @@ import skillenv  # noqa: E402
 FPS = 30
 KINDS = ('hook', 'captions', 'effects', 'style')
 # caption styles to try, most different from each other first. Bold goes behind the head: only with a cutout.
-CAPTION_ORDER = ('karaoke', 'keyword', 'loud-lowercase', 'anchor', 'cool-dude', 'golden-hour', 'outline', 'signature',
+CAPTION_ORDER = ('karaoke', 'keyword', 'loud-lowercase', 'anchor', 'cool-dude', 'viral-guy', 'golden-hour', 'outline', 'signature',
                  'terminal', 'spec-sheet', 'weight-shift', 'arcade', 'low-key', 'vanity', 'moodboard', 'cool-girl',
                  'field-notes', 'bubblegum', 'bold')
 CAPTION_NAMES = {'arcade': 'Arcade', 'low-key': 'Low Key', 'field-notes': 'Field Notes', 'anchor': 'Anchor',
                  'loud-lowercase': 'Loud Lowercase', 'vanity': 'Vanity', 'bubblegum': 'Bubblegum',
                  'moodboard': 'Moodboard', 'golden-hour': 'Golden Hour', 'spec-sheet': 'Spec Sheet', 'bold': 'Bold',
                  'cool-girl': 'Cool Girl', 'cool-dude': 'Cool Dude', 'karaoke': 'Karaoke', 'signature': 'Signature',
-                 'keyword': 'Keyword', 'weight-shift': 'Weight Shift', 'terminal': 'Terminal', 'outline': 'Outline'}
+                 'keyword': 'Keyword', 'weight-shift': 'Weight Shift', 'terminal': 'Terminal', 'outline': 'Outline',
+                 'viral-guy': 'Viral Guy'}
 FILLERS = {'so', 'now', 'okay', 'ok', 'um', 'uh', 'alright', 'well', 'and', 'but', 'look', 'hey', 'yeah', 'like',
            'right', 'listen', 'basically', 'actually', 'honestly'}
 # what a working copy never gets: renders, checks, the trials themselves, and the effects' own working folders

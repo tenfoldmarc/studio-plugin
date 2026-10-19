@@ -19,6 +19,7 @@
     {"n": 16, "key": "keyword", "name": "Keyword", "look": "One clean tight lowercase line, the word that matters in yellow.", "motion": "Words pop in as you say them. A key word alone goes bigger.", "bestFor": "Everyday talking reels, the safe default", "preview": "previews/keyword.mp4"},
     {"n": 17, "key": "weight-shift", "name": "Weight Shift", "look": "One clean typeface. Thin for the lead-in, heavy black for the word that matters.", "motion": "The thin line builds, the heavy word lands.", "bestFor": "Clean, modern, product and tech", "preview": "previews/weight-shift.mp4"},
     {"n": 18, "key": "terminal", "name": "Terminal", "look": "Code-style type for the lead-in, one big serif italic word.", "motion": "The code line builds, the italic word lands.", "bestFor": "AI, coding and builder content", "preview": "previews/terminal.mp4"},
-    {"n": 19, "key": "outline", "name": "Outline", "look": "Tall condensed caps. The word that matters is drawn hollow.", "motion": "The caps build, the hollow word lands.", "bestFor": "Fitness, sport, bold statements", "preview": "previews/outline.mp4"}
+    {"n": 19, "key": "outline", "name": "Outline", "look": "Tall condensed caps. The word that matters is drawn hollow.", "motion": "The caps build, the hollow word lands.", "bestFor": "Fitness, sport, bold statements", "preview": "previews/outline.mp4"},
+    {"n": 20, "key": "viral-guy", "name": "Viral Guy", "look": "One quiet cream word at a time. The words that matter go huge.", "motion": "Hard cuts, no pop. A number brings a tiny caps line of what it counts.", "bestFor": "Talking-head teaching, step by step breakdowns, premium and calm", "preview": "previews/viral-guy.mp4"}
   ]
 }

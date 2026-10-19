@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Creator Studio: the eight overall styles. An overall style = a footage treatment (grade, layout, cuts,
+"""Claude Creator Studio: the nine overall styles. An overall style = a footage treatment (grade, layout, cuts,
 push-ins) plus a caption treatment, driven by the same word timings as the caption styles.
 
 This file is a library, like captions.py. scripts/build_reel.py calls page(<style key>, caption) after
@@ -20,7 +20,8 @@ import captions as cap
 from captions import Build, T, esc, bare, low, chunk, windows, STAR
 
 NAMES = {'soft-hours': 'Soft Hours', 'glam-cam': 'Glam Cam', 'color-block': 'Color Block', 'camera-shy': 'Camera Shy',
-         'chalk-talk': 'Chalk Talk', 'fireside': 'Fireside', 'raw-tape': 'Raw Tape', 'show-and-tell': 'Show and Tell'}
+         'chalk-talk': 'Chalk Talk', 'fireside': 'Fireside', 'raw-tape': 'Raw Tape', 'show-and-tell': 'Show and Tell',
+         'viral-guy': 'Viral Guy'}
 NEEDS_CUTOUT = ('chalk-talk', 'show-and-tell')      # these two lift the speaker off the room: they need assets/subject.webm
 NO_SWAP = {'show-and-tell': 'Show and Tell carries the words on its light canvas, and caption styles are built for video, '
                             'so they would not read there.'}
@@ -464,8 +465,72 @@ def show_and_tell(b, caption):
     return body                                           # no caption swap on this style: see NO_SWAP
 
 
+def viral_guy(b, caption):
+    """a calm, expensive talking head: slate-teal room, warm skin, a punch-in on every other shot, flat ink and paper
+    word cards slammed in on the beats, a small step label riding over the words, one quiet word at a time"""
+    p = plan('viral-guy')
+    INK, PAPER, PINE = '#101B1B', '#F4F6FA', '#12302B'
+    # the grade: the room pulled down and toward slate-teal, skin kept warm (soft-light tint + a dark edge)
+    b.css.append('''.gr{filter:brightness(.86) contrast(1.06) saturate(.8)}
+.vgtint{background:rgba(24,70,76,.55);mix-blend-mode:soft-light}
+.vgvig{background:radial-gradient(115% 70% at 50% 42%,rgba(0,0,0,0) 48%,rgba(6,16,18,.5) 100%)}
+.vgcard{position:absolute;inset:0}
+.vglbl{position:absolute;left:0;right:0;text-align:center;transform:translateY(-50%);font-family:'Inter';font-weight:500;
+  font-size:28px;color:var(--vg-ink,#E9DAC8);text-shadow:var(--vg-shadow,0 2px 18px rgba(0,0,0,.38))}''')
+    # shots: the reel's own cuts, plus one in the middle of any shot longer than 4.5 s (on a phrase start), each
+    # other one punched in, with a slow 3% push
+    starts = phrase_starts(.5)
+    extra, bounds = [], [t0 for t0, _ in cap.SEGS] + [cap.DUR]
+    for a, z in zip(bounds, bounds[1:]):
+        if z - a > 4.5:
+            mid = [t for t in starts if a + 1.5 < t < z - 1.5]
+            if mid:
+                extra.append(min(mid, key=lambda t: abs(t - (a + z) / 2)))
+    zooms = tuple(float(x) for x in p.get('zooms', (1.0, 1.12)))
+    body = footage_shots(b, 'viral-guy', push=.03, auto_cuts=extra, zooms=zooms)
+    body += ['<div class="full vgtint"></div>', '<div class="full vgvig"></div>']
+    own = caption is None or caption == 'viral-guy'
+    captions(b, caption, cap.viralguy)          # first: a swapped caption style sets b.cap_top, which the cards use
+    # word cards: [{"from", "to", "kind": "ink" | "paper"}]. Default: a card on every other new sentence, about a second
+    cards = p.get('cards')
+    if cards is None:
+        cards, last = [], -9.0
+        for n, t in enumerate(sentence_starts()[1:]):
+            if t - last < 4.0 or cap.DUR - t < 2.0:
+                continue
+            end = next((w['start'] for w in cap.W if w['start'] >= t + 1.0), None)
+            if end is None or end - t > 1.8:
+                continue
+            cards.append({'from': t, 'to': end, 'kind': 'paper' if own and len(cards) % 2 else 'ink'})
+            last = t
+    mid = cap.Y_CHEST + 40 if own else getattr(b, 'cap_top', cap.Y_CHEST) + 40
+    for n, c in enumerate(cards):
+        t0, t1 = float(c['from']), min(float(c['to']), cap.DUR)
+        kind = c.get('kind', 'ink')
+        if kind == 'paper' and not own:
+            NOTES.append('A paper card was turned ink: the swapped caption style is light text, which would not read on it.')
+            kind = 'ink'
+        cid = f'vgc{n}'
+        body.append(f'<div id="{cid}" class="vgcard" style="background:{PAPER if kind == "paper" else INK}"></div>')
+        b.cut(f'#{cid}', t0, t1)
+        # the words keep running, centred on the card
+        b.js.append(f"tl.set('#caps',{{y:{960 - mid}}},{T(t0):.3f});")
+        b.js.append(f"tl.set('#caps',{{y:0}},{T(t1):.3f});")
+        if kind == 'paper':
+            b.js.append(f"tl.set('#caps',{{'--vg-ink':'{PINE}','--vg-shadow':'none'}},{T(t0):.3f});")
+            b.js.append(f"tl.set('#caps',{{'--vg-ink':'#E9DAC8','--vg-shadow':'0 2px 18px rgba(0,0,0,.38)'}},{T(t1):.3f});")
+    # step labels: [{"from", "to", "label"}], a small line riding above the words (a chapter card = a card plus a
+    # step that starts with it)
+    for n, s in enumerate(p.get('steps') or []):
+        lid = b.nid('vgl')
+        b.html.append(f'<div id="{lid}" class="vglbl" style="top:{mid - 112}px">{esc(s["label"])}</div>')
+        b.cut(f'#{lid}', float(s['from']), min(float(s['to']), cap.DUR))
+    return body
+
+
 PRESETS = {'soft-hours': soft_hours, 'camera-shy': camera_shy, 'color-block': color_block, 'glam-cam': glam_cam,
-           'fireside': fireside, 'raw-tape': raw_tape, 'chalk-talk': chalk_talk, 'show-and-tell': show_and_tell}
+           'fireside': fireside, 'raw-tape': raw_tape, 'chalk-talk': chalk_talk, 'show-and-tell': show_and_tell,
+           'viral-guy': viral_guy}
 
 
 def page(key, caption=None, safe=False):

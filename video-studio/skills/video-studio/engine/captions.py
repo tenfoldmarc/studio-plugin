@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Creator Studio: the nineteen caption styles, one engine, all driven by the same word timings.
+"""Claude Creator Studio: the twenty caption styles, one engine, all driven by the same word timings.
 
 This file is a library. scripts/build_reel.py is what you run: it reads the buyer's picks, calls load(project) and
 then page(<caption style key>) (or engine/styles.py for an overall style) and writes <project>/index.html.
@@ -1144,6 +1144,64 @@ def custom(b):
             b.js += motion(s['motion'], sel, t0, t1 if t1 < DUR - .02 else None, 'Caption motion')
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# 20 VIRAL GUY: one quiet cream word at a time over the chest, hard cuts, no pop. The words that matter go huge, and a
+#               number brings a tiny caps line of what it counts ("14,000" over FOLLOWERS). The colour sits in css
+#               variables so an overall style can flip it for a light card (--vg-ink, --vg-shadow on #caps).
+# ----------------------------------------------------------------------------------------------------------------------
+VG_INK = '#E9DAC8'
+
+
+def viralguy(b):
+    mid = Y_CHEST + 40                      # centre of the line, over the chest
+    b.css.append(f'''
+#caps{{--vg-ink:{VG_INK};--vg-shadow:0 2px 18px rgba(0,0,0,.38)}}
+.vg{{position:absolute;left:60px;right:60px;top:{mid}px;transform:translateY(-50%);text-align:center;white-space:nowrap;
+  font-family:'Inter Tight';font-weight:700;font-size:66px;line-height:1;letter-spacing:-.035em;color:var(--vg-ink);
+  text-shadow:var(--vg-shadow)}}
+.vg.big{{font-weight:800;line-height:.86;letter-spacing:-.055em}}
+.vg .sub{{display:block;font-size:30px;line-height:1;letter-spacing:.01em;margin-top:16px;font-weight:800}}''')
+    i, items = 0, []
+    while i < len(W):
+        w = W[i]
+        if w.get('e') == 'num':                         # the number, huge, with what it counts under it
+            j = counted(i)
+            items.append(([w], [x for x in W[i + 1:j]]))
+            i = j
+            continue
+        nxt = W[i + 1] if i + 1 < len(W) else None
+        if (nxt and not w.get('e') and not nxt.get('e') and len(bare(w['text'])) <= 3
+                and nxt['start'] - w['start'] < .15 and w['text'][-1] not in ',.?!'):
+            items.append(([w, nxt], []))                # a short word said in the same breath rides with the next
+            i += 2
+            continue
+        items.append(([w], []))
+        i += 1
+    for n, (ws, sub) in enumerate(items):
+        t0 = ws[0]['start']
+        end = (sub or ws)[-1]['end']
+        if n + 1 < len(items):
+            nxt = items[n + 1][0][0]['start']
+            t1 = nxt if nxt - end <= .6 else end + .35
+        else:
+            t1 = end + .35
+        text = ' '.join(w['text'] for w in ws)
+        mark = ws[0].get('e') if len(ws) == 1 else None
+        i_d = b.nid()
+        if mark in ('num', 'emph', 'cta'):
+            txt = bare(text) if mark != 'cta' else bare(text).upper()
+            size = min(156, int(900 / (max(len(txt), 2) * .56)))
+            inner = esc(txt)
+            if sub:
+                s_id = b.nid('s')
+                inner += f'<span id="{s_id}" class="sub">{esc(" ".join(bare(x["text"]) for x in sub).upper())}</span>'
+                b.cut(f'#{s_id}', sub[0]['start'])
+            b.html.append(f'<div id="{i_d}" class="vg big" style="font-size:{size}px">{inner}</div>')
+        else:
+            b.html.append(f'<div id="{i_d}" class="vg">{esc(text)}</div>')
+        b.cut(f'#{i_d}', t0, t1)
+
+
 STYLES = {
     'arcade': ('01', 'Arcade', arcade),
     'low-key': ('02', 'Low Key', lowkey),
@@ -1164,6 +1222,7 @@ STYLES = {
     'weight-shift': ('17', 'Weight Shift', weightshift),
     'terminal': ('18', 'Terminal', terminal),
     'outline': ('19', 'Outline', outline),
+    'viral-guy': ('20', 'Viral Guy', viralguy),
 }
 
 SAFE_GUIDE = ('<div style="position:absolute;inset:0;z-index:99;pointer-events:none">'
@@ -1190,7 +1249,8 @@ def lifted(inner):
 # Bubblegum above the head, so those two are worked out in cap_top().
 CAP_OFFSET = {'arcade': 82, 'low-key': 120, 'field-notes': 96, 'anchor': 40, 'loud-lowercase': -6, 'vanity': 30,
               'moodboard': 56, 'spec-sheet': -30, 'bold': 50, 'cool-girl': -40, 'cool-dude': -70, 'karaoke': 96,
-              'signature': 70, 'keyword': -40, 'weight-shift': -50, 'terminal': -40, 'outline': -70}
+              'signature': 70, 'keyword': -40, 'weight-shift': -50, 'terminal': -40, 'outline': -70,
+              'viral-guy': 7}
 
 
 def cap_top(key):
@@ -1231,6 +1291,8 @@ def slots(b):
                  every caption style). fx_add.py --caption-y writes it
       gain       brightness lift for the slot picture (a slot render passes through the renderer twice and comes
                  back a touch darker than the footage around it)
+      overlay    true = the render is transparent graphics (.webm) laid over the reel's own footage, which keeps
+                 its grade, cuts and push-ins underneath (the overlay effects: slot.json "layer": "overlay")
       sfx        [{"src", "at", "media", "dur", "vol"}] the effect's own sounds, replayed over the reel's voice track
       off        true = leave this slot out of the build
     Returns (picture layers, audio elements). The voice always comes from the reel's own a-roll, so there is no
@@ -1245,9 +1307,11 @@ def slots(b):
         if t1 - t0 < .03:
             continue
         g = float(s.get('gain') or 1)
-        lift = f' style="filter:brightness({g:.4f})"' if abs(g - 1) > .003 else ''
-        # class gr: an overall style grades its footage with .gr, so the slot gets the same grade as its neighbours
-        out.append(f'<div id="fx{n}w"{lift}><video id="fx{n}" class="full gr" src="{s["src"]}" muted playsinline '
+        lift = f' style="filter:brightness({g:.4f})"' if abs(g - 1) > .003 and not s.get('overlay') else ''
+        # class gr: an overall style grades its footage with .gr, so the slot gets the same grade as its neighbours.
+        # An overlay slot (transparent graphics over the reel's own footage) is not footage: no grade, no lift
+        grade = '' if s.get('overlay') else ' gr'
+        out.append(f'<div id="fx{n}w"{lift}><video id="fx{n}" class="full{grade}" src="{s["src"]}" muted playsinline '
                    f'data-start="{T(t0):.3f}" data-media-start="{float(s.get("media", 0)):.3f}" '
                    f'data-duration="{t1 - T(t0):.3f}" data-track-index="{5 + n % 2}"></video></div>')
         b.cut(f'#fx{n}w', t0, t1)

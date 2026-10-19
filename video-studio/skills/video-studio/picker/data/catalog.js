@@ -155,6 +155,14 @@ window.STUDIO_CATALOG = {
    "poster": "previews/posters/captions/outline.jpg"
   },
   {
+   "key": "viral-guy",
+   "name": "Viral Guy",
+   "label": "Best for",
+   "line": "Talking-head teaching, step by step breakdowns, premium and calm",
+   "preview": "../captions/previews/viral-guy.mp4",
+   "poster": "previews/posters/captions/viral-guy.jpg"
+  },
+  {
    "key": "none",
    "name": "No captions",
    "label": "",
@@ -484,6 +492,54 @@ window.STUDIO_CATALOG = {
    "line": "One word in thick clear glass on your wall.",
    "preview": "previews/effects/glass-type.mp4",
    "poster": "previews/posters/effects/glass-type.jpg"
+  },
+  {
+   "n": 41,
+   "key": "depth-scatter",
+   "name": "Depth Scatter",
+   "line": "Your opening words land at different sizes and fall out of focus.",
+   "preview": "previews/effects/depth-scatter.mp4",
+   "poster": "previews/posters/effects/depth-scatter.jpg"
+  },
+  {
+   "n": 42,
+   "key": "stat-stack",
+   "name": "Stat Stack",
+   "line": "The number you say lands huge, with a tiny line under it.",
+   "preview": "previews/effects/stat-stack.mp4",
+   "poster": "previews/posters/effects/stat-stack.jpg"
+  },
+  {
+   "n": 43,
+   "key": "dot-counter",
+   "name": "Dot Counter",
+   "line": "A dot pops in for each thing you are about to cover.",
+   "preview": "previews/effects/dot-counter.mp4",
+   "poster": "previews/posters/effects/dot-counter.jpg"
+  },
+  {
+   "n": 44,
+   "key": "chip-row",
+   "name": "Chip Row",
+   "line": "A pill pops in under your captions for each thing you list.",
+   "preview": "previews/effects/chip-row.mp4",
+   "poster": "previews/posters/effects/chip-row.jpg"
+  },
+  {
+   "n": 45,
+   "key": "prompt-box",
+   "name": "Prompt Box",
+   "line": "What you tell the AI types itself into a glass box.",
+   "preview": "previews/effects/prompt-box.mp4",
+   "poster": "previews/posters/effects/prompt-box.jpg"
+  },
+  {
+   "n": 46,
+   "key": "serif-flow",
+   "name": "Serif Flow",
+   "line": "A dark card draws your process step by step in serif type.",
+   "preview": "previews/effects/serif-flow.mp4",
+   "poster": "previews/posters/effects/serif-flow.jpg"
   }
  ],
  "styles": [
@@ -615,6 +671,23 @@ window.STUDIO_CATALOG = {
    "ready": true,
    "preview": "previews/styles/show-and-tell.mp4",
    "poster": "previews/posters/styles/show-and-tell.jpg"
+  },
+  {
+   "n": 9,
+   "key": "viral-guy",
+   "name": "Viral Guy",
+   "group": "him",
+   "label": "For him",
+   "line": "Moody slate-teal room, a punch-in every other shot, flat word cards on the beats, one quiet word at a time.",
+   "captionStyle": "viral-guy",
+   "effects": [
+    "stat-stack",
+    "dot-counter",
+    "serif-flow"
+   ],
+   "ready": true,
+   "preview": "previews/styles/viral-guy.mp4",
+   "poster": "previews/posters/styles/viral-guy.jpg"
   }
  ],
  "parts": [

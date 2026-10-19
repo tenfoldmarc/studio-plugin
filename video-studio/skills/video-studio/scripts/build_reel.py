@@ -203,7 +203,7 @@ def main():
                 notes.append(f'{label} was left out of this build: {why}.')
                 continue
         live.append(s)
-    if live and style:
+    if style and any(not s.get('overlay') for s in live):     # overlay slots keep the style's own footage under them
         notes.append('An effect slot is laid over an overall style: the slot gets the style\'s colour grade, but not its '
                      'push-ins or reframing. Look at both edges of every slot in the final render.')
 

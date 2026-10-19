@@ -76,7 +76,16 @@ clip at its own size (Digital Zoom stays sharp that way). Two slots can never sh
 
 An effect that lives ON a cut (Zoom-Through Cut): give `fx_new.py` a span ACROSS one cut of the reel, about 0.5s on
 each side (the footage check prints where the cuts are). The slot then holds both shots and knows the cut frame.
-Every other effect needs one continuous shot: `fx_new.py` refuses a span that crosses a cut.
+Every other effect needs one continuous shot: `fx_new.py` refuses a span that crosses a cut, except an overlay effect.
+
+**Overlay effects** (Depth Scatter, Stat Stack, Dot Counter, Chip Row, Prompt Box, Serif Flow; `"layer": "overlay"` in
+their `slot.json`) are graphics only. Their final build is transparent and `hf render` makes `renders/<slot>.webm`; the
+reel lays it over its OWN footage, so the reel's grade, cuts and punch-ins (an overall style's too) stay under it, and
+the span may cross cuts. `build.py SAFE=1` (or `PREVIEW=1`) puts the slot's footage under the graphics for the
+snapshots only; the build after it, without SAFE, is the transparent one. Their `build.py` writes
+`work/reel_captions.json`, so `fx_add.py` hides the reel's captions just while the effect's own words are up (Chip
+Row keeps them on). They need no cutout and read where the face is from the reel's `layout.json`: on a close-up with
+no room under the chin they move above the head, and with no room either side they stop with a one-line reason.
 
 ## A recipe
 
@@ -148,6 +157,7 @@ its words are, and add what you find to the slot.
 | Pull-Back Reveal | the effect (window title, checklist, counter, label). It also draws the spoken words on the small card, because the reel's captions are hidden while the slot plays | `CAPTIONS=0` = no spoken words on the card | the `STYLE` block at the top of `build.py`: `ui_font`, `ui_weight`, `ui_case`, `label_font`, `label_case`, the colours (`page`, `window`, `panel`, `ink`, `accent`, `done`, `highlight`), and for the spoken words `cap_font`, `cap_weight`, `cap_case`, `cap_size`, `cap_color`, `cap_mark`: set those to the buyer's caption style. Limit: the words on the card take typeface, case, size and colour, not a plate behind them and not a word that lights up as it is said. Tell the buyer when their style has one of those |
 | Timeline Burn | the effect (track labels, timecodes). The reel's captions keep running | none needed. The timeline sits in the chest band: add the slot with the `--caption-y` value `build.py` prints, or `--captions hide` when it says there is no room | the `STYLE` block at the top of `build.py`: `FONT`, `WEIGHT`, `CASE`, `TEXT`, `LABEL_PX`, `NAME_PX`, `ACCENT`, `PANEL`, `PANEL_EDGE`, `PALETTE`. Set `DIM = 0` when the buyer's style is already dark or they do not want the room dimmed |
 | Type Wall | the effect (the wall of words) | none | `PHRASES`, `FS`, `INK`, `ACCENT`, `GROUND`, `ACCENT_Y`. Typeface: its own `@font-face` (`'Inter Tight Wall'`) and the `.wd` rule. The wall is drawn in capitals |
+| Depth Scatter, Stat Stack, Dot Counter, Chip Row, Prompt Box, Serif Flow | the effect (the words are what the effect shows; the reel's captions are hidden only while they are up, Chip Row keeps them on) | none needed | the `STYLE` block at the top of `build.py`, the same in all six: `font`, `weight`, `tracking`, `big_weight`, `big_tracking`, `case`, `small_font`, `small_weight`, `serif_font`, `serif_italic`, `ink`, `accent`, `card`, `shadow`. Colours as 6-digit hex. Their default is the Viral Guy look |
 
 Comment Bubble is the one with a ready style block. In the other effects made of words the typeface sits in css
 rules inside `build.py`: change the family and weight there, keep the size variables, and look at the slot
@@ -178,6 +188,7 @@ The type facts of the caption styles, for matching:
 | Weight Shift | Inter 300 | Inter Tight 900 | as spoken | white | none |
 | Terminal | JetBrains Mono 500 | Instrument Serif italic | as spoken | white | none |
 | Outline | Bebas Neue | the same, drawn hollow | capitals | white | none |
+| Viral Guy | Inter Tight 700, tracking -0.035em | Inter Tight 800, huge, tracking -0.055em; small caps lines Inter Tight 800 | as spoken | cream #E9DAC8 (deep green #12302B on a paper card) | none, a soft shadow |
 
 When a detail matters and this table is not enough, read the style's own function in `SK/engine/captions.py`
 (read only). A buyer's own style goes over this table. When the reel is in one of their saved styles with a custom
@@ -188,7 +199,7 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 ## The list
 
 <!-- LIST:START (generated from index.json, do not edit by hand) -->
-40 ready, 0 recipe.
+46 ready, 0 recipe.
 
 | # | Effect | Key | Kind | What it does | The buyer says | Framing | Camera | Wall | Cutout | Tracking | Extra packages |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -232,6 +243,12 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 | 38 | Rack Focus | `rack-focus` | ready | A title starts as soft lens bokeh, focus pulls to it while you and the room go into real lens blur, then racks back. | "rack focus to a title when I say X" | any | still or drifting | no need | clean | the title is glued to the lens | opencv-python-headless |
 | 39 | God Rays | `god-rays` | ready | The room drops a stop and beams of light fan out from behind your head, with two small lines of type. For one reveal line. | "backlight me with light rays when I say X" | any | still or drifting | clear wall above the head | clean | the light is locked to the head every frame | opencv-python-headless |
 | 40 | Glass Type | `glass-type` | ready | One word as thick clear glass letters on your wall, bending the light behind them. | "put the word X in glass on my wall" | any | still or drifting | clear wall above the head | clean | camera track pins the glass to the wall | opencv-python-headless |
+| 41 | Depth Scatter | `depth-scatter` | ready | Your opening words land one by one at different sizes and heights, and each earlier word goes soft as the next one lands. | "scatter my opening words" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
+| 42 | Stat Stack | `stat-stack` | ready | The number you say lands huge over your chest, and a tiny caps line under it swaps on the words that follow. | "make the number huge on this line" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
+| 43 | Dot Counter | `dot-counter` | ready | A row of dots pops in when you say how many things are coming; filled dots show how far along you are. | "pop a dot for each of the 3 things" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
+| 44 | Chip Row | `chip-row` | ready | As you list things, an outlined pill pops in for each one in a row under your captions. | "pop a pill for each thing I list" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
+| 45 | Prompt Box | `prompt-box` | ready | A glass input box appears over your chest and what you say you type into it types itself in, caret and all. | "type my prompt on screen" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
+| 46 | Serif Flow | `serif-flow` | ready | The picture cuts to a dark card and your process builds down it: serif italic steps, bold steps, thin lines drawing between them. | "draw the process on a card" | any | any | no need | none | none (screen-fixed, placed from layout.json) | none |
 
 ## Per effect: what the buyer has to give you, and what to watch
 
@@ -275,4 +292,10 @@ reel's captions are their own spec, not one of these: restyle an effect's words 
 - **Rack Focus** (READY, `effects/rack-focus/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rack.py, requirements.txt, slot.json). Needs nothing from the buyer. The title goes to the darkest calm spot off the face. Declines when the face fills every spot or the title would be sharp for under 0.55 s.
 - **God Rays** (READY, `effects/god-rays/`: bake.py, build.py, effect.md, example, fxio.py, onsets.py, post.py, rays.py, requirements.txt, slot.json). Needs nothing from the buyer. Once per reel, on a reveal or turning-point line. Declines with nobody in shot or the speaker filling the frame.
 - **Glass Type** (READY, `effects/glass-type/`: build.py, effect.md, example, glass.py, onsets.py, post.py, requirements.txt, slot.json). Needs nothing from the buyer. Needs some open wall above or beside the head. Best with something behind to bend (window, lamp, panels); a plain wall still reads. Declines on a zoom inside the slot or a camera that travels.
+- **Depth Scatter** (READY, `effects/depth-scatter/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a spoken opening phrase of 2 to 6 words). Any framing. Close-up selfie with a low chin: the cluster moves above the head; no room above or below the face: it declines.
+- **Stat Stack** (READY, `effects/stat-stack/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a number the speaker says). Any framing. A number that is only passing (a year, 'one of the') is not a stat: leave it out.
+- **Dot Counter** (READY, `effects/dot-counter/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a spoken count from 2 to 8). Any framing. Needs a real count ('3 things', 'five steps').
+- **Chip Row** (READY, `effects/chip-row/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a spoken list of 2 to 4 short things). Any framing. Long items shrink the row to the safe width.
+- **Prompt Box** (READY, `effects/prompt-box/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a spoken instruction of up to about 60 characters). Any framing. A plain glass field, never a real app's screen.
+- **Serif Flow** (READY, `effects/serif-flow/`: build.py, check.py, effect.md, slot.json, vgfx.py). Needs from the buyer: none (a line that describes 2 to 4 steps). Any framing: the card is full frame, so the face is never covered.
 <!-- LIST:END -->

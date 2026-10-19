@@ -1,11 +1,11 @@
-# Captions: the 19 styles, the word marks, where they sit
+# Captions: the 20 styles, the word marks, where they sit
 
-One engine (`SK/engine/captions.py`), 19 styles, all driven by the same `words.json`. `build_reel.py` picks the style
+One engine (`SK/engine/captions.py`), 20 styles, all driven by the same `words.json`. `build_reel.py` picks the style
 from the saved picks. You never edit the engine for a reel: you clean the words, mark them, and write the title.
 A buyer with a style of their own (an example they showed, a look they described) gets a custom caption style
 instead, a spec the same engine renders: `references/replicate.md`. The marks and the bands below work the same.
 
-## The 19
+## The 20
 
 | Key | Name | The look | Uses the marks | Sits | Needs |
 |---|---|---|---|---|---|
@@ -28,6 +28,7 @@ instead, a spec the same engine renders: `references/replicate.md`. The marks an
 | `weight-shift` | Weight Shift | Thin lead-in, heavy black punch word | num / emph / cta are the punch | chest (a tall block) | |
 | `terminal` | Terminal | Code-font lead-in, one big serif italic word | num / emph / cta are the punch | chest (a tall block) | |
 | `outline` | Outline | Tall condensed caps, the punch word drawn hollow | num / emph / cta are the punch | chest (a tall block) | |
+| `viral-guy` | Viral Guy | One quiet cream word at a time, hard cuts, no pop | num / emph / cta go huge; a num brings a tiny caps line of what it counts ("14,000" over FOLLOWERS) | chest | |
 
 `none` = no captions at all (titles and effects only).
 

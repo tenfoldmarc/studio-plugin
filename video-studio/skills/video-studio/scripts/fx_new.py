@@ -145,6 +145,8 @@ def main():
         segs = fxlib.read(os.path.join(proj, 'segments.json'), []) or []
         cut_frames = [s['frame'] - frame0 for s in segs if frame0 < s['frame'] < frame0 + n]
         two_shot = int(entry.get('segments') or 1) >= 2
+        if meta.get('layer') == 'overlay':
+            cut_frames = []          # graphics over the reel's own footage: the cuts under them do not matter
         if cut_frames and not two_shot:
             sys.exit(f'{entry["name"]} needs one continuous shot and this span crosses a cut at reel frame '
                      f'{cut_frames[0] + frame0} ({(cut_frames[0] + frame0) / 30:.2f}s). Move --from / --to to one side of it.')

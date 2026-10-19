@@ -1,0 +1,24 @@
+{
+ "key": "dot-counter",
+ "pack": "dot-counter",
+ "imported": "2026-10-19",
+ "cutout": "none",
+ "layer": "overlay",
+ "hi": "no",
+ "reel_captions": "hide",
+ "captions_note": "the dots stand in for the counted words: fx_add.py hides the reel's captions only while they are up (work/reel_captions.json)",
+ "reel_env": [],
+ "in_a_reel": [
+  "a later slot of the same effect (fx_new.py --name) can show progress: COUNT = all, FILLED = steps done",
+  "the buyer's style wins: set the STYLE block at the top of build.py to the reel's caption style (font, weight, tracking, case, ink, accent) before the first build (effects/INDEX.md, Restyling an effect's own words)"
+ ],
+ "sounds": {},
+ "steps": [
+  "run build.py SAFE=1      # prints count, timing, the snapshot times and the caption window",
+  "hf lint",
+  "hf snapshot --at <times build.py printed>",
+  "run build.py      # guide off",
+  "hf render",
+  "run check.py      # frame count, work/check/sheet.jpg, phone copy"
+ ]
+}

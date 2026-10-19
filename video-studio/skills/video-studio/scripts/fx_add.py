@@ -110,7 +110,8 @@ def main():
     if os.path.abspath(clip.get('src', '')) != os.path.join(proj, 'assets', 'aroll.mp4'):
         sys.exit('this slot was not cut from this reel\'s a-roll, so its frames do not line up with the reel. '
                  'Make it with: fx_new.py <effect> --project <project> --from S --to S')
-    render = os.path.join(slot, 'renders', name + '.mp4')
+    overlay = meta.get('layer') == 'overlay'      # transparent graphics over the reel's own footage
+    render = os.path.join(slot, 'renders', name + ('.webm' if overlay else '.mp4'))
     index = os.path.join(slot, 'index.html')
     if not os.path.isfile(render):
         sys.exit(f'no render yet: {render}. Finish the slot\'s commands (see {os.path.join(slot, "RUN.txt")}).')
@@ -137,12 +138,12 @@ def main():
                  f'({clash[0]["from"]} to {clash[0]["to"]}s). Two effects cannot share frames: remove one (--remove).')
 
     os.makedirs(os.path.join(proj, 'assets', 'fx'), exist_ok=True)
-    dst = f'assets/fx/{name}.mp4'
+    dst = f'assets/fx/{name}.webm' if overlay else f'assets/fx/{name}.mp4'
     dst_file = os.path.join(proj, *dst.split('/'))
     aroll = os.path.join(proj, 'assets', 'aroll.mp4')
     # a slot goes through the renderer twice, the footage around it once: take one pass back out of the slot
     gain, match = 1.0, 'not matched'
-    fit = None if '--no-match' in sys.argv else fxlib.pass_fit(aroll, f0, render)
+    fit = None if ('--no-match' in sys.argv or overlay) else fxlib.pass_fit(aroll, f0, render)
     if fit and fit['rms'] < 4 and fit['share'] > .5:
         wrote = fxlib.undo_pass(render, dst_file, fit, frames)
         if wrote == frames and fxlib.probe_frames(dst_file) == frames:
@@ -151,7 +152,10 @@ def main():
             fit = None
     else:
         fit = None
-    if fit is None:
+    if overlay:
+        shutil.copyfile(render, dst_file)
+        match = 'overlay: transparent graphics over the reel\'s own footage (its grade, cuts and push-ins stay)'
+    elif fit is None:
         shutil.copyfile(render, dst_file)
         a, s = fxlib.luma(aroll, f0), fxlib.luma(render, 0)
         gain = round(a / s, 4) if a and s else 1.0
@@ -164,6 +168,8 @@ def main():
         sys.exit('--captions takes keep or hide')
     item = {'key': key, 'slot': name, 'src': dst, 'frame': f0, 'frames': frames, 'from': round(t0, 4), 'to': round(t1, 4),
             'captions': captions, 'gain': gain}
+    if overlay:
+        item['overlay'] = True
     if opt('--hide-captions'):
         try:
             item['hide_captions'] = [[float(x) for x in w.split('-', 1)] for w in opt('--hide-captions').split(',') if w]
