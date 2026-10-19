@@ -40,6 +40,22 @@ On Windows this route needs [Git for Windows](https://git-scm.com/downloads) ins
 
 Then open Claude Code and type `/video-studio setup`.
 
+## Carousels
+
+The Studio makes carousels too, in your own look. In any chat, say:
+
+```
+make a carousel about [your topic]
+```
+
+or
+
+```
+turn my last reel into a carousel
+```
+
+The first time, it asks for your handle and your look: send screenshots of carousels you love and it rebuilds that style, or pick one of the 3 looks it comes with. Then it writes the copy for every slide, waits for your OK, designs the slides and opens a preview you can swipe through like the real post. The slides land in a Carousels folder in your home folder, ready to post.
+
 ## Getting updates
 
 Fixes and new effects arrive as updates to this plugin. Your picks and your own style are kept.

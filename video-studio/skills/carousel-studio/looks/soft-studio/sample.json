@@ -1,0 +1,18 @@
+[
+ {"layout": "hook", "class": "script",
+  "headline": "5 things I wish\nI knew before\nI [[started]]",
+  "sub": "Save this for the days you doubt it.",
+  "image": {"src": "{photo1}", "fit": "bleed", "face": "{face1}"},
+  "stickers": [{"type": "search", "text": "things I wish I knew sooner", "button": true, "x": 50, "y": 46, "anchor": "top", "w": 640, "size": 30}]},
+ {"label": "Tip 01",
+  "headline": "Start before\nyou feel [[ready]]",
+  "items": ["Pick the smallest version you can finish **this week.**", "Show it to **three real people.**", "Fix what they actually tripped on."],
+  "image": {"src": "{photo2}", "fit": "half", "side": "top", "share": 0.4, "face": "{face2}"}},
+ {"layout": "cta",
+  "class": "script",
+  "headline": "Want the [[full list?]]",
+  "keyword": "LIST",
+  "keywordPost": "and I'll send you all 5.",
+  "follow": "Follow {handle} for more",
+  "image": {"src": "{photo3}", "fit": "bleed", "face": "{face3}"}}
+]

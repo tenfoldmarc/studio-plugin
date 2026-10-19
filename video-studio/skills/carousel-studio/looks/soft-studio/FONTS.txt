@@ -1,0 +1,11 @@
+Fonts used by the Soft Studio look. All come from Google Fonts and are licensed under the
+SIL Open Font License 1.1 (full text in ../../fonts/OFL.txt). Copyright belongs to each family's authors; see
+https://github.com/google/fonts/tree/main/ofl/<family> for each notice.
+
+In this folder:
+Pinyon Script (PinyonScript-regular.woff2) - SIL Open Font License 1.1
+Sacramento (Sacramento-regular.woff2) - SIL Open Font License 1.1
+
+Shared from ../../fonts/:
+Instrument Serif (InstrumentSerif-regular.woff2, InstrumentSerif-italic.woff2) - SIL Open Font License 1.1
+Inter (Inter-var.woff2) - SIL Open Font License 1.1

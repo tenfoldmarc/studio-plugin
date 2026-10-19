@@ -1,0 +1,35 @@
+{
+ "name": "Bold Agency",
+ "about": "Huge heavy lowercase headlines packed tight, one word swapped to a serif italic or circled by hand, on moody warm photos or blocks of cream, rust and oxblood. Feels like a premium creative studio. Best for: agencies, marketers, consultants, founders, service businesses, positioning and brand advice.",
+ "size": "3:4",
+ "kind": "photo",
+ "for": ["everyone", "him", "her"],
+ "niches": ["agency", "marketing", "consulting", "branding", "founders", "freelance", "b2b", "social media management"],
+ "imageStyle": "moody warm editorial photos in low window light: people working at laptops, coffee on a desk, hands, notebooks, a studio corner; deep shadows, warm browns and burgundy tones, film grain, nothing bright or clinical",
+ "fonts": [
+  {"family": "Inter Tight", "file": "InterTight-var.woff2", "weight": "100 900"},
+  {"family": "Instrument Serif", "file": "InstrumentSerif-italic.woff2", "style": "italic"}
+ ],
+ "vars": {
+  "--bg": "#F1E9DE",
+  "--ink": "#4A0F16",
+  "--accent": "#A8361C",
+  "--accent-hi": "#E8653F",
+  "--cream": "#F4ECE1",
+  "--rust": "#93311A",
+  "--wine": "#4A0F16",
+  "--night": "#17110F",
+  "--font-head": "'Inter Tight', sans-serif",
+  "--font-body": "'Inter Tight', sans-serif",
+  "--font-serif": "'Instrument Serif', serif",
+  "--font-mono": "'Inter Tight', sans-serif",
+  "--pad-x": "64px",
+  "--pad-top": "172px",
+  "--pad-bottom": "150px",
+  "--chrome-top": "56px",
+  "--chrome-bottom": "58px",
+  "--zt-gap": "30px",
+  "--min-text": "26px",
+  "--zm-grow": "1.3"
+ }
+}

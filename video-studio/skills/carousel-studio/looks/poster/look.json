@@ -1,0 +1,31 @@
+{
+ "name": "Poster",
+ "about": "Magazine cover energy on light grid paper. Massive heavy headlines that alternate black and one bright colour, dark cards that look like screenshots dropped onto the page. Best for: hot takes, news, myth busting, quoting an expert, bold claims.",
+ "size": "3:4",
+ "kind": "type",
+ "for": ["everyone", "him", "her"],
+ "niches": ["news", "hot takes", "myth busting", "marketing", "tech", "expert quotes"],
+ "imageStyle": "bright, high-contrast editorial photos, clean backgrounds, punchy colour",
+ "fonts": [
+  {"family": "Bricolage Grotesque", "file": "BricolageGrotesque-var.woff2", "weight": "200 800"},
+  {"family": "Inter", "file": "Inter-var.woff2", "weight": "300 900"},
+  {"family": "JetBrains Mono", "file": "JetBrainsMono-var.woff2", "weight": "400 800"}
+ ],
+ "vars": {
+  "--bg": "#F4F0E6",
+  "--ink": "#0A0A0A",
+  "--ink-dim": "rgba(10,10,10,0.68)",
+  "--ink-mute": "rgba(10,10,10,0.45)",
+  "--accent": "#E15B40",
+  "--card": "#16181c",
+  "--on-card": "#E7E9EA",
+  "--font-head": "'Bricolage Grotesque', sans-serif",
+  "--font-body": "'Inter', sans-serif",
+  "--font-mono": "'JetBrains Mono', monospace",
+  "--pad-x": "72px",
+  "--pad-top": "140px",
+  "--pad-bottom": "140px",
+  "--min-text": "26px",
+  "--zm-grow": "1.35"
+ }
+}

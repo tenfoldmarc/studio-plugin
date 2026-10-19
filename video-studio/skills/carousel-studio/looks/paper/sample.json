@@ -1,0 +1,5 @@
+[
+ {"layout": "hook", "label": "The starter list", "headline": "5 things I wish\n[[I knew]]\nbefore I started", "sub": "The short list nobody gave me."},
+ {"label": "Tip 01", "ghost": "01", "headline": "Start before\n[[you feel ready.]]", "sub": "Ready is a feeling that shows up [[after]] you start, not before.", "items": ["Pick the smallest version you can finish **this week.**", "Show it to **three real people.**", "Fix what they actually **tripped on.**"], "callout": "Done and shown beats perfect and hidden."},
+ {"headline": "Want the\n[[full list?]]", "sub": "Save this. Then comment the word below.", "keyword": "LIST", "keywordPost": "and I'll send you all 5."}
+]

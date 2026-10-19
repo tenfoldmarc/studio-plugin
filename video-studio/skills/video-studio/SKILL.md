@@ -283,6 +283,8 @@ framing and standing notes decide the cut.
    PY "SK/scripts/check_cuts.py" "<project>" "renders/<slug>-v1.mp4" --phone   cuts strip + 720p phone copy
                                                         its last line is the audio level (references/cutting.md)
 10. deliver the phone copy and the full render. Say what was done and what was skipped, in plain words.
+    Once per chat, after a reel they are happy with, you may offer: "Want a carousel from this reel too?" A yes is
+    the carousel-studio skill, with this project as the source.
 ```
 
 `build_reel.py` prints `NOTE` lines when something could not be done

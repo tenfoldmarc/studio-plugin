@@ -1,0 +1,10 @@
+Fonts in this look (all from Google Fonts, latin subset, woff2):
+
+Bodoni Moda (BodoniModa-var.woff2, BodoniModa-italic-var.woff2) - SIL Open Font License 1.1
+Pinyon Script (PinyonScript-regular.woff2) - SIL Open Font License 1.1
+La Belle Aurore (LaBelleAurore-regular.woff2) - SIL Open Font License 1.1
+
+Also used, shipped with the skill (../../fonts/):
+Inter (Inter-var.woff2) - SIL Open Font License 1.1
+
+License text: https://openfontlicense.org (also ../../fonts/OFL.txt)

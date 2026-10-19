@@ -1,0 +1,31 @@
+{
+ "name": "Paper",
+ "about": "Warm cream paper, one earthy accent colour, clean bold headlines with a serif italic accent word, a thin frame with corner marks. Calm, smart, easy to read. Best for: lists, step by step, how-tos, frameworks, anything people save to come back to.",
+ "size": "3:4",
+ "kind": "type",
+ "for": ["everyone", "her", "him"],
+ "niches": ["education", "coaching", "how-to", "frameworks", "productivity", "business", "lists"],
+ "imageStyle": "warm daylight, cream and terracotta tones, calm desk or studio scenes, soft shadows",
+ "fonts": [
+  {"family": "Space Grotesk", "file": "SpaceGrotesk-var.woff2", "weight": "300 700"},
+  {"family": "Fraunces", "file": "Fraunces-italic-var.woff2", "weight": "400 900", "style": "italic"},
+  {"family": "JetBrains Mono", "file": "JetBrainsMono-var.woff2", "weight": "400 800"}
+ ],
+ "vars": {
+  "--bg": "#F4F3EE",
+  "--ink": "#2A1F14",
+  "--ink-dim": "rgba(42,31,20,0.72)",
+  "--ink-mute": "rgba(42,31,20,0.5)",
+  "--accent": "#C15F3C",
+  "--card": "#FBFAF4",
+  "--font-head": "'Space Grotesk', sans-serif",
+  "--font-body": "'Space Grotesk', sans-serif",
+  "--font-serif": "'Fraunces', serif",
+  "--font-mono": "'JetBrains Mono', monospace",
+  "--pad-x": "90px",
+  "--pad-top": "128px",
+  "--pad-bottom": "150px",
+  "--min-text": "26px",
+  "--zm-grow": "1.35"
+ }
+}

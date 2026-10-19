@@ -1,0 +1,22 @@
+[
+ {
+  "layout": "hook",
+  "headline": "5 things I\nwish I knew",
+  "image": {"src": "{photo1}", "fit": "bleed", "face": "{face1}"},
+  "class": "drop-xl",
+  "note": "The short list I'd hand a beginner."
+ },
+ {
+  "headline": "What I'd tell\nmy day-one self",
+  "image": {"src": "{photo2}", "fit": "half", "side": "top", "face": "{face2}", "focus": "50% 30%"},
+  "items": {"style": "check", "list": ["Post before you feel ready", "Done beats perfect, every time", "Talk to one person, not everyone"]}
+ },
+ {
+  "layout": "cta",
+  "headline": "Want the\nfull list?",
+  "image": {"src": "{photo3}", "fit": "half", "side": "bottom", "face": "{face3}", "focus": "50% 25%"},
+  "keyword": "LIST",
+  "keywordPost": "and I'll send you all 5.",
+  "follow": "Follow {handle} for more"
+ }
+]

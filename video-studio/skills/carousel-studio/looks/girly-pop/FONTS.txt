@@ -1,0 +1,11 @@
+Fonts used by the Girly Pop look. All come from Google Fonts (latin subset, woff2).
+
+In this folder:
+DM Sans                SIL Open Font License 1.1   (DMSans-var.woff2, variable: weight 100-1000, optical size 9-40)
+Nothing You Could Do   SIL Open Font License 1.1   (NothingYouCouldDo-400.woff2)
+
+Shared from the skill's fonts/ folder (../../fonts/, licence text in ../../fonts/OFL.txt):
+Inter                  SIL Open Font License 1.1   (Inter-var.woff2)
+Instrument Serif       SIL Open Font License 1.1   (InstrumentSerif-italic.woff2)
+
+Licence text: https://openfontlicense.org (the same SIL OFL 1.1 as ../../fonts/OFL.txt).

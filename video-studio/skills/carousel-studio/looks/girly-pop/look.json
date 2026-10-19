@@ -1,0 +1,43 @@
+{
+ "name": "Girly Pop",
+ "about": "Your candid phone photos full-bleed, with big bold pastel pink and butter-yellow headlines, a handwritten note beside them, and little iPhone bits (a highlighted line with the Copy bar, message bubbles, task chips, a New Message card). Fun, current and confident. Best for: social media managers, creators, day-in-my-life, lifestyle and small business girls.",
+ "size": "3:4",
+ "kind": "photo",
+ "for": ["her"],
+ "niches": ["social media manager", "ugc creator", "content creator", "lifestyle", "day in my life", "small business", "beauty", "fashion", "wellness", "coaching"],
+ "imageStyle": "candid portrait phone photos of a woman in her real day (mirror selfies, coffee in hand, at a cafe table with a laptop, walking the street, at her desk), warm natural light, soft muted neutrals with cream, beige and denim, a little grain, the face in the upper half with calm room below it for the headline",
+ "fonts": [
+  {"family": "DM Sans", "file": "DMSans-var.woff2", "weight": "100 1000"},
+  {"family": "Nothing You Could Do", "file": "NothingYouCouldDo-400.woff2"},
+  {"family": "Inter", "file": "Inter-var.woff2", "weight": "100 900"},
+  {"family": "Instrument Serif", "file": "InstrumentSerif-italic.woff2", "style": "italic"}
+ ],
+ "vars": {
+  "--bg": "#F6D3DE",
+  "--ink": "#2A1A21",
+  "--accent": "#F2609E",
+  "--pink": "#F9C3DC",
+  "--butter": "#FBF1A0",
+  "--rose": "#F2609E",
+  "--cocoa": "#2A1A21",
+  "--blush": "#F6D3DE",
+  "--grout": "rgba(255,255,255,0.42)",
+  "--select": "#FCEC8C",
+  "--handle-blue": "#3B82F6",
+  "--bubble-grey": "#E9E9EB",
+  "--font-head": "'DM Sans', sans-serif",
+  "--font-body": "'Inter', sans-serif",
+  "--font-hand": "'Nothing You Could Do', cursive",
+  "--font-serif": "'Instrument Serif', serif",
+  "--font-mono": "'Inter', sans-serif",
+  "--pad-x": "72px",
+  "--pad-top": "150px",
+  "--pad-bottom": "150px",
+  "--chrome-top": "56px",
+  "--chrome-bottom": "52px",
+  "--gap": "34px",
+  "--zt-gap": "22px",
+  "--min-text": "26px",
+  "--zm-grow": "1.45"
+ }
+}

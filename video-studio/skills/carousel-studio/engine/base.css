@@ -1,0 +1,134 @@
+/* Structure every look shares. A look's own CSS comes after this and can change any of it.
+   Nothing here sets a colour or a typeface: those are the look's (look.css + the vars in look.json). */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: var(--w); height: var(--h); overflow: hidden; background: var(--bg, #111); }
+body { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+img { display: block; }
+
+.slide { position: relative; width: var(--w); height: var(--h); overflow: hidden; background: var(--bg, #111);
+  color: var(--ink, #fff); font-family: var(--font-body, sans-serif); }
+.decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.bleed { position: absolute; inset: 0; z-index: 1; }
+.bleed img { width: 100%; height: 100%; object-fit: cover; opacity: var(--dim, var(--bleed-dim, 1)); }
+
+/* a photo on one part of the slide (fit "half"): it takes --share of the slide, the body moves to the rest */
+.bleed.half.side-top { bottom: auto; height: calc(var(--h) * var(--share)); }
+.bleed.half.side-bottom { top: auto; height: calc(var(--h) * var(--share)); }
+.bleed.half.side-left { right: auto; width: calc(var(--w) * var(--share)); }
+.bleed.half.side-right { left: auto; width: calc(var(--w) * var(--share)); }
+.bleed.half img { opacity: 1; }
+.bleed.half::after { display: none; }   /* a half photo is shown as it is; the text sits on the other half */
+.half-top .body { top: calc(var(--h) * var(--share, 0.5) + 48px); }
+.half-bottom .body { bottom: calc(var(--h) * var(--share, 0.5) + 48px); }
+.half-left .body { left: calc(var(--w) * var(--share, 0.5) + 40px); }
+.half-right .body { right: calc(var(--w) * var(--share, 0.5) + 40px); }
+.half-cap { position: absolute; }
+.half-top .chrome.top { color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.45); }   /* the top bar sits on the photo */
+
+/* several photos as one block (field "photos") */
+.collage { position: relative; flex: 1 1 0; min-height: var(--collage-min, 420px); width: 100%; }
+/* min-height 0: a photo never sets the size of its cell (a big photo would push the slide over), the cell sets it */
+.collage .ph { position: relative; overflow: hidden; transform: rotate(var(--rot, 0deg)); min-height: 0; min-width: 0; }
+.collage .ph img { width: 100%; height: 100%; object-fit: cover; }
+.collage .ph figcaption { position: absolute; }
+.collage.c-row { display: flex; justify-content: center; }
+.collage.c-row .ph { height: 100%; aspect-ratio: 4 / 5; }
+.collage.c-pair { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: var(--collage-gap, 18px); }
+.collage.c-trio { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: var(--collage-gap, 18px); }
+.collage.c-trio .ph1 { grid-row: 1 / 3; }
+.collage.c-grid { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(0, 1fr); gap: var(--collage-gap, 18px); }
+.collage.c-strip { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; grid-template-rows: minmax(0, 1fr); gap: var(--collage-gap, 14px); }
+.collage.c-pair .ph, .collage.c-trio .ph, .collage.c-grid .ph, .collage.c-strip .ph { height: 100%; }
+.collage.c-stack .ph, .collage.c-scatter .ph { position: absolute; width: 62%; height: 78%; }
+.collage.c-stack .ph1 { left: 4%; top: 2%; --rot: -5deg; }
+.collage.c-stack .ph2 { right: 4%; bottom: 2%; --rot: 4deg; }
+.collage.c-stack .ph3 { left: 22%; top: 12%; --rot: -1deg; }
+.collage.c-scatter .ph { width: 46%; height: 52%; }
+.collage.c-scatter .ph1 { left: 0; top: 0; --rot: -6deg; }
+.collage.c-scatter .ph2 { right: 0; top: 6%; --rot: 5deg; }
+.collage.c-scatter .ph3 { left: 8%; bottom: 0; --rot: 3deg; }
+.collage.c-scatter .ph4 { right: 6%; bottom: 4%; --rot: -4deg; }
+.collage-bleed .collage { position: absolute; inset: 0; --collage-gap: 0px; }
+/* photo frames: plain, polaroid (white border, thicker bottom), tape (a strip of tape on top), card (rounded, shadow) */
+.collage .f-polaroid { background: #fbfaf6; padding: 3.5% 3.5% 14%; box-shadow: 0 18px 40px rgba(0,0,0,0.28); overflow: visible; }
+.collage .f-polaroid figcaption { left: 0; right: 0; bottom: 2.5%; text-align: center; color: #2a2a2a;
+  font: 400 38px/1.1 var(--st-hand-font, var(--font-serif, serif)); }
+.collage figcaption { font-size: 30px; }
+.collage .f-card { border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.25); }
+.collage .f-tape { overflow: visible; box-shadow: 0 14px 30px rgba(0,0,0,0.22); }
+.collage .f-tape::before { content: ""; position: absolute; z-index: 2; top: -18px; left: 50%; width: 34%; height: 40px;
+  transform: translateX(-50%) rotate(-3deg); background: rgba(240,232,210,0.82); box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+
+/* stickers (engine/stickers.py + stickers.css): absolutely placed anywhere; front = over the text, back = under it */
+.stickers { position: absolute; inset: 0; pointer-events: none; }
+.stickers.back { z-index: 4; }
+.stickers.front { z-index: 7; }
+.sticker { position: absolute; }
+.stage-img { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; align-items: flex-end; pointer-events: none; }
+.stage-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; object-position: bottom; }
+.ghost { position: absolute; z-index: 2; pointer-events: none; display: none; }
+
+/* chrome: the small parts that repeat on every slide (tag, counter, handle, swipe cue, progress) */
+.chrome { position: absolute; left: var(--pad-x, 64px); right: var(--pad-x, 64px); z-index: 8;
+  display: flex; justify-content: space-between; align-items: center; }
+.chrome.top { top: var(--chrome-top, 52px); }
+.chrome.bottom { bottom: var(--chrome-bottom, 44px); }
+.chrome .who { display: flex; align-items: center; gap: 12px; }
+.chrome .av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.chrome .av.initial { display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.chrome .swipe { display: flex; align-items: center; gap: 10px; }
+.chrome .swipe svg { width: 30px; height: 30px; }
+.chrome .tag, .label { display: flex; align-items: center; gap: 12px; }
+.progress { position: absolute; z-index: 8; display: none; }
+.progress i { display: block; height: 100%; width: var(--progress); }
+
+/* the body sits between the chrome; three zones top to bottom */
+.body { position: absolute; z-index: 5; top: var(--pad-top, 150px); bottom: var(--pad-bottom, 140px);
+  left: var(--pad-x, 64px); right: var(--pad-x, 64px); display: flex; flex-direction: column;
+  gap: var(--gap, 40px); }
+.zt, .zm, .zb { position: relative; display: flex; flex-direction: column; min-width: 0; }
+.zt { gap: var(--zt-gap, 26px); flex: 0 0 auto; }
+.zm { gap: var(--zm-gap, 28px); flex: 1 1 auto; min-height: 0; justify-content: var(--zm-justify, center); }
+.zb { gap: var(--zb-gap, 18px); flex: 0 0 auto; margin-top: var(--zb-push, auto); }
+.measuring .zm { flex: 0 0 auto; }
+.measuring .zb { margin-top: 0; }
+
+.hl { display: flex; flex-direction: column; }
+.hl .ln { display: block; white-space: nowrap; }
+.hl.wrap .ln { white-space: normal; }
+.sub, .callout, .pl-text, .items, .quote p { overflow-wrap: break-word; }
+.ac { font-style: inherit; }
+.q { font-style: italic; }
+code { font-family: var(--font-mono, monospace); }
+
+/* items */
+.items { display: flex; flex-direction: column; gap: var(--items-gap, 24px); list-style: none; }
+.items li { display: flex; gap: 22px; align-items: flex-start; }
+.items .dot { flex-shrink: 0; }
+.items .t { display: block; }
+.items .d { display: block; }
+.items.chips { flex-direction: row; flex-wrap: wrap; justify-content: inherit; }
+.items.grid { display: grid; grid-template-columns: 1fr 1fr; }
+.items.compare { display: grid; grid-template-columns: 1fr 1fr; }
+.items.compare.one { grid-template-columns: 1fr; }
+.items .pair { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
+.items.versus { display: grid; grid-template-columns: 1fr 1fr; }
+.items.versus .col { display: flex; flex-direction: column; gap: 16px; }
+
+.big { display: flex; flex-direction: column; }
+.big .num { line-height: 0.9; white-space: nowrap; }
+
+.media { position: relative; min-height: 0; display: flex; justify-content: center; }
+.media img { height: 100%; width: auto; max-width: 100%; object-fit: contain; }   /* the box hugs the picture, so frames and shadows sit on it */
+.media.cover img { width: 100%; height: 100%; object-fit: cover; }
+.media.circle img { border-radius: 50%; aspect-ratio: 1; object-fit: cover; }
+.media figcaption { position: absolute; }
+.zm > .media, .zm > .collage { flex: 1 1 auto; }
+
+.payload, .callout, .cta-word { position: relative; }
+.kw { display: inline-block; white-space: nowrap; }
+
+/* layouts: only the defaults; a look can change any of them */
+.L-hook .body, .L-statement .body { justify-content: center; }
+.L-cta .body { justify-content: center; align-items: center; text-align: center; }
+.L-cta .hl, .L-cta .zt, .L-cta .zb { align-items: center; }
