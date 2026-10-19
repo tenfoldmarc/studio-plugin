@@ -236,10 +236,25 @@ def main():
             sizes[n] = (round(d, 2), hash(fh.read()))
         log(f'{n}  {d:.2f}s')
     listed = open(os.path.join(trials, 'what-changed.txt'), encoding='utf-8').read()
-    # every trial is its own video (2.2.0): its own speed, so three different lengths, and the list says so
+    # every trial is its own video (2.2.0): no two speeds alike and none 1.0, and each finished trial is its own cut
+    # played at its own speed. Not "three different lengths": a hook trial changes the cut too, so a shorter cut at one
+    # speed can land on the same length as the full cut at another (it did, on a CI voice).
+    own_speed = True
+    speeds = []
+    for n in made:
+        name = n[:-4]
+        entry = json.load(open(os.path.join(proj, 'work', 'variations', name, 'variation.json'), encoding='utf-8'))['entry']
+        sp = float((entry.get('unique') or {}).get('speed', 1))
+        speeds.append(sp)
+        pre = os.path.join(proj, 'work', 'variations', name, 'renders', name + '.mp4')      # the render before its own speed
+        d0 = float(subprocess.run([rec['ffprobe'], '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', pre],
+                                  capture_output=True, text=True).stdout.strip() or 0)
+        log(f'{n}  cut {d0:.2f}s at {sp:g}x -> {sizes[n][0]:.2f}s (expected {d0 / sp:.2f}s)')
+        own_speed = own_speed and abs(d0 / sp - sizes[n][0]) <= .1
     ok = (len(made) == 3 and [n[:9] for n in made] == ['trial-01-', 'trial-02-', 'trial-03-']
           and all(d > 3 for d, _ in sizes.values()) and len({h for _, h in sizes.values()}) == 3
-          and len({d for d, _ in sizes.values()}) == 3 and 'its own speed, framing and colour' in listed
+          and len(set(speeds)) == 3 and all(abs(s - 1) > 1e-6 for s in speeds) and own_speed
+          and 'its own speed, framing and colour' in listed
           and all(n in listed for n in made) and chr(0x2014) not in listed)
     RESULTS.append({'step': 'variations: 3 distinct reels and the list', 'ok': ok, 'code': 0, 'optional': False})
     log(f'----- {"PASS" if ok else "FAIL"}: 3 distinct trial reels in one folder\n{listed}')
