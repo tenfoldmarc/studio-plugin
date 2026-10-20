@@ -75,7 +75,7 @@ import skillenv  # noqa: E402
 
 API = 'https://zernio.com/api/v1'
 ENV_VARS = ('ZERNIO_API_KEY', 'LATE_API_KEY')
-BRAND = 'Claude Creator Studio'
+BRAND = 'Creator Studio'
 NAMES = {'instagram': 'Instagram', 'tiktok': 'TikTok', 'youtube': 'YouTube', 'facebook': 'Facebook',
          'threads': 'Threads', 'linkedin': 'LinkedIn', 'twitter': 'X', 'bluesky': 'Bluesky', 'pinterest': 'Pinterest',
          'reddit': 'Reddit', 'googlebusiness': 'Google Business'}
@@ -354,7 +354,7 @@ def cmd_key(args):
     path = key_file()
     fd = os.open(path + '.tmp', os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
-        f.write('# Claude Creator Studio: Zernio key for posting. Private, this computer only. Never share this file.\n')
+        f.write('# Creator Studio: Zernio key for posting. Private, this computer only. Never share this file.\n')
         f.write(f'ZERNIO_API_KEY={key}\n')
     os.replace(path + '.tmp', path)
     try:

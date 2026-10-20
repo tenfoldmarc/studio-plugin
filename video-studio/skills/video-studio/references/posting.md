@@ -28,7 +28,7 @@ password: they log in on the platform's own page, once.
    - In a terminal of their own, `PY "SK/scripts/post.py" key` asks for it with a hidden prompt.
    `STATUS key SAVED` means it was checked and works. It lives on this computer only.
 3. **Connect each platform** they want to post to, one at a time:
-   `PY "SK/scripts/post.py" connect instagram --wait` (IN THE BACKGROUND). It opens a page that says "Claude Creator
+   `PY "SK/scripts/post.py" connect instagram --wait` (IN THE BACKGROUND). It opens a page that says "Creator
    Studio wants to connect to your Instagram"; they click Continue and log in on Instagram's own page. The command
    ends with `STATUS connect DONE instagram @handle` when it shows up. No browser opened? It prints the link: give it
    to them. Before they start, tell them what each platform needs:

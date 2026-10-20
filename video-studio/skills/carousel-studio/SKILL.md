@@ -1,9 +1,9 @@
 ---
 name: carousel-studio
-description: "Claude Creator Studio carousels. Makes finished Instagram (and LinkedIn) carousels in the creator's own look: from a topic or idea, from scratch, or from a video (a reel the Studio edited, any video file, or a link). Writes the copy for every slide first and waits for approval, then renders the slides as PNGs and opens a swipe-through preview. Pictures from their own photos, a connected drive, their video, or an image generator. First carousel only: a short setup (handle, look built from carousels they love or picked from the Studio's looks shown with their own photos). Use when the user says 'make a carousel', 'carousel about X', 'turn this video / my last reel into a carousel', 'repurpose this into a carousel', 'carousel from this transcript', 'redo slide 3', 'make a new carousel look', 'copy this carousel style', 'change my carousel look', 'set up carousels', or runs /carousel-studio."
+description: "Creator Studio carousels. Makes finished Instagram (and LinkedIn) carousels in the creator's own look: from a topic or idea, from scratch, or from a video (a reel the Studio edited, any video file, or a link). Writes the copy for every slide first and waits for approval, then renders the slides as PNGs and opens a swipe-through preview. Pictures from their own photos, a connected drive, their video, or an image generator. First carousel only: a short setup (handle, look built from carousels they love or picked from the Studio's looks shown with their own photos). Use when the user says 'make a carousel', 'carousel about X', 'turn this video / my last reel into a carousel', 'repurpose this into a carousel', 'carousel from this transcript', 'redo slide 3', 'make a new carousel look', 'copy this carousel style', 'change my carousel look', 'set up carousels', or runs /carousel-studio."
 ---
 
-# Claude Creator Studio: carousels (carousel-studio)
+# Creator Studio: carousels (carousel-studio)
 
 A topic, an idea or a video in. A finished carousel out, in the buyer's own look: the copy for every slide first,
 then the slides, then a preview they can swipe through like the real post.

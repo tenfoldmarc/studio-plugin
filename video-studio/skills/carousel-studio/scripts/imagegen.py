@@ -570,7 +570,7 @@ def cmd_key():
     path = keys_file()
     fd = os.open(path + '.tmp', os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
-        f.write('# Claude Creator Studio: image keys. Private, this computer only. Never share this file.\n' if
+        f.write('# Creator Studio: image keys. Private, this computer only. Never share this file.\n' if
                 not lines or not lines[0].startswith('#') else '')
         f.write('\n'.join(lines) + '\n')
     os.replace(path + '.tmp', path)

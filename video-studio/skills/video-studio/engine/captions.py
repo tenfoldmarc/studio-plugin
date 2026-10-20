@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Creator Studio: the twenty caption styles, one engine, all driven by the same word timings.
+"""Creator Studio: the twenty caption styles, one engine, all driven by the same word timings.
 
 This file is a library. scripts/build_reel.py is what you run: it reads the buyer's picks, calls load(project) and
 then page(<caption style key>) (or engine/styles.py for an overall style) and writes <project>/index.html.

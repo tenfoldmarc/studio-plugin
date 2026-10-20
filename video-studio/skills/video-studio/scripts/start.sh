@@ -1,5 +1,5 @@
 #!/bin/sh
-# video-studio (Claude Creator Studio): the setup check for macOS and Linux, for a computer that may have no Python.
+# video-studio (Creator Studio): the setup check for macOS and Linux, for a computer that may have no Python.
 #
 # Usage:   sh start.sh [the same options as setup.py]
 #

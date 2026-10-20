@@ -1,4 +1,4 @@
-# video-studio (Claude Creator Studio): the setup check for Windows, for a computer that may have no Python.
+# video-studio (Creator Studio): the setup check for Windows, for a computer that may have no Python.
 #
 # Usage:   powershell -NoProfile -ExecutionPolicy Bypass -File start.ps1 [the same options as setup.py]
 #

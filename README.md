@@ -1,8 +1,8 @@
-# Claude Creator Studio
+# Creator Studio
 
 You film your clips. Claude edits the reel.
 
-This is the plugin for buyers of Claude Creator Studio. The walkthrough videos and support are in your portal: https://portal.tenfoldmarketing.com
+This is the plugin for buyers of Creator Studio. The walkthrough videos and support are in your portal: https://portal.tenfoldmarketing.com
 
 ## Install in the Claude desktop app
 
@@ -15,7 +15,7 @@ This is the plugin for buyers of Claude Creator Studio. The walkthrough videos a
 https://github.com/tenfoldmarc/studio-plugin
 ```
 
-5. Install **Claude Creator Studio** from the list.
+5. Install **Creator Studio** from the list.
 6. Start a new chat and type:
 
 ```
@@ -84,4 +84,4 @@ Email info@tenfoldmarketing.com. Say what you were doing and what happened. A sc
 
 ---
 
-© Ten Fold Marketing. For buyers of Claude Creator Studio, under the terms you agreed to at purchase. Not affiliated with or endorsed by Anthropic or Instagram.
+© Ten Fold Marketing. For buyers of Creator Studio, under the terms you agreed to at purchase. Not affiliated with or endorsed by Anthropic or Instagram.

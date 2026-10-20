@@ -1,6 +1,6 @@
 /* Snapshot of the catalog for when index.html is opened as a plain file. Rebuilt by tools/build_previews.py. */
 window.STUDIO_CATALOG = {
- "product": "Claude Creator Studio",
+ "product": "Creator Studio",
  "captions": [
   {
    "key": "arcade",

@@ -4,7 +4,7 @@
     "name": "Marc Cleroux",
     "url": "https://github.com/tenfoldmarc"
   },
-  "description": "Claude Creator Studio by Marc Cleroux (@tenfoldmarc).",
+  "description": "Creator Studio by Marc Cleroux (@tenfoldmarc).",
   "plugins": [
     {
       "name": "video-studio",

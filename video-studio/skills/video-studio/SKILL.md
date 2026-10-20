@@ -1,9 +1,9 @@
 ---
 name: video-studio
-description: "Claude Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'post it', 'post this to Instagram / TikTok / YouTube', 'post these as trial reels', 'schedule this for tomorrow', 'set up posting', 'connect my Instagram', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'post it', 'post this to Instagram / TikTok / YouTube', 'post these as trial reels', 'schedule this for tomorrow', 'set up posting', 'connect my Instagram', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
-# Claude Creator Studio (video-studio)
+# Creator Studio (video-studio)
 
 Raw clips in, finished reel out, in the buyer's own editing style. They show you reels whose editing they love (links
 or files, mixing captions from one and motion from another), or describe it, or pick from the Studio's built-in
@@ -146,7 +146,7 @@ or their default. Change only that. Never wipe their styles, picks or folders.
 
 `STATUS config MISSING`:
 0. Start `PY "SK/scripts/prefetch.py"` in the background now (see Step 0: the downloads), then go on.
-1. Say: "Welcome to Claude Creator Studio. Two quick questions, then we build your editing style. This only
+1. Say: "Welcome to Creator Studio. Two quick questions, then we build your editing style. This only
    happens once."
 2. Ask in one message: where their raw clips usually land (default `~/Downloads`; you check there for new clips
    every time they say "edit it") and where finished reel projects should live (default `~/reel-edits`).

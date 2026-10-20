@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Creator Studio: the nine overall styles. An overall style = a footage treatment (grade, layout, cuts,
+"""Creator Studio: the nine overall styles. An overall style = a footage treatment (grade, layout, cuts,
 push-ins) plus a caption treatment, driven by the same word timings as the caption styles.
 
 This file is a library, like captions.py. scripts/build_reel.py calls page(<style key>, caption) after

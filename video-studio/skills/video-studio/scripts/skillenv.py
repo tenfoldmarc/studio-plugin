@@ -207,7 +207,7 @@ def resolve_state(explicit=None, environ=None, skill_dir=SKILL_DIR, osn=None, ho
         return os.path.abspath(os.path.expanduser(env.strip())), 'CLAUDE_PLUGIN_DATA'
     if venv_state:
         return venv_state, 'this Python environment'
-    return user_data_dir(osn, environ, home), 'your Claude Creator Studio folder, kept outside the skill so updates do not erase it'
+    return user_data_dir(osn, environ, home), 'your Creator Studio folder, kept outside the skill so updates do not erase it'
 
 
 def state_dir():

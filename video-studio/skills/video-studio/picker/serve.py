@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Studio Picker for Claude Creator Studio.
+"""Studio Picker for Creator Studio.
 
 Opens a local page where you pick a caption style and the effects you like (or one overall style),
 then saves the picks to a JSON file the skill reads. Python 3 standard library only. Mac, Linux, Windows.
@@ -54,7 +54,7 @@ DEFAULT_CONFIG = os.path.join(HERE, 'studio-picks.json')
 DEFAULT_CAPTIONS = os.path.normpath(os.path.join(HERE, '..', 'captions', 'styles.json'))
 DEFAULT_STYLES = os.path.join(HERE, 'data', 'styles.json')
 DEFAULT_PORT = 4747
-PRODUCT = 'Claude Creator Studio'
+PRODUCT = 'Creator Studio'
 PARTS = (('hook', 'Hook'), ('middle', 'Middle'), ('end', 'End'))      # the parts of a reel an effect can be kept to
 PART_KEYS = tuple(k for k, _ in PARTS)
 # captionStyle "none": no caption style at all. Some overall styles carry their words inside the look itself.
@@ -598,7 +598,7 @@ def bind(port, config, captions_json, verbose, keep_alive, styles_json=None):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description='Studio Picker for Claude Creator Studio.')
+    ap = argparse.ArgumentParser(description='Studio Picker for Creator Studio.')
     ap.add_argument('--config', default=DEFAULT_CONFIG, help='the picks file (default: studio-picks.json beside serve.py)')
     ap.add_argument('--captions', default=DEFAULT_CAPTIONS, help='the caption styles list (default: ../captions/styles.json)')
     ap.add_argument('--styles', default=DEFAULT_STYLES, help='the overall styles list (default: data/styles.json)')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""End-to-end test of Claude Creator Studio on one machine, the way a new buyer meets it: the setup starter on a
+"""End-to-end test of Creator Studio on one machine, the way a new buyer meets it: the setup starter on a
 computer with nothing installed for the Studio, then a named style, one full edit with custom motion, the self
 checks, the study of an example, saving the style, and a second reel that picks the style up by itself.
 

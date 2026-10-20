@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""video-studio (Claude Creator Studio) setup check, for macOS, Linux (and WSL) and Windows. Safe to re-run: it only
+"""video-studio (Creator Studio) setup check, for macOS, Linux (and WSL) and Windows. Safe to re-run: it only
 reports and fills in what is missing. Standard library only, because it runs before the skill's own Python
 environment exists.
 
