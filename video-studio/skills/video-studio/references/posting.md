@@ -16,9 +16,9 @@ password: they log in on the platform's own page, once.
 - `STATUS posting READY instagram,tiktok`: post.
 - `ACCOUNT ... NEEDS RECONNECT`: step 3 for that platform (it refreshes the same account, history kept).
 
-1. **A Zernio account.** Send them to https://zernio.com to sign up. Say what it costs before they go: the first 2
-   connected accounts are free with no card (Instagram and TikTok, for example), each one after that is $6 a month
-   (YouTube as the third). Profiles are free.
+1. **A Zernio account.** Send them to https://zernio.link/marc-andre-cleroux to sign up. Say what it costs before
+   they go: the first 2 connected accounts are free with no card (Instagram and TikTok, for example), each one after
+   that is $6 a month (YouTube as the third). Profiles are free.
 2. **Their key.** At https://zernio.com/dashboard/api-keys they click **Create API key** and copy it. Zernio shows it
    once only. Then save it without it ever appearing in the chat:
    - They copied it: `PY "SK/scripts/post.py" key --clipboard`.
@@ -106,8 +106,8 @@ every other platform in the same post gets it as a normal post (TikTok and YouTu
 ## What the buyer hears
 
 - First time, no key: "I can post this for you. It goes through Zernio, the service that connects to your Instagram
-  and TikTok. It's free for your first 2 accounts (a third, like YouTube, is $6 a month). Sign up at zernio.com, then
-  go to API keys, click Create API key, and copy it. Tell me when it's copied."
+  and TikTok. It's free for your first 2 accounts (a third, like YouTube, is $6 a month). Sign up at
+  zernio.link/marc-andre-cleroux, then go to API keys, click Create API key, and copy it. Tell me when it's copied."
 - Key saved: "Got it, your key is saved on this computer only. Now let's connect Instagram. A page opens, click
   Continue and log in on Instagram's own page. Your Instagram needs to be a Professional account for trial reels."
 - Connected: "Instagram is connected (@handle). Want TikTok and YouTube too?"
