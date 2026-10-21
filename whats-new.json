@@ -15,5 +15,6 @@
   "2.5.0": "Carousels. Say: make a carousel about [your topic], or: turn my last reel into a carousel. I write the copy for every slide first, you approve it, then I design it in your look and open a preview you can swipe like the real post. Use your own photos, stills from your videos, or pictures I generate. The first time, send me carousels you love and I'll rebuild that look, or pick from 8 looks I show you made with your own photos.",
   "2.6.0": "I can post for you now. Say: post it, or: post my trial reels. Instagram (as normal reels or trial reels), TikTok, YouTube Shorts and Facebook, right away, at a time you pick, or a few minutes apart. It goes through Zernio, free for your first 2 accounts. The first time, I walk you through connecting your accounts. I always show you what goes where and when, and nothing goes out until you say yes.",
   "2.6.1": "New name: Creator Studio. Same Studio, same styles. ChatGPT support is on the way.",
-  "2.6.2": "Posting setup now sends you to Zernio through my referral link. Posting works exactly the same."
+  "2.6.2": "Posting setup now sends you to Zernio through my referral link. Posting works exactly the same.",
+  "2.6.3": "Two fixes for iPhone clips. Punch-in zooms no longer crash on clips your phone saved sideways. And your voice stays locked to your mouth from the first cut to the last, where before it could slip a little further off at every cut."
 }
