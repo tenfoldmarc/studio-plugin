@@ -23,9 +23,18 @@ FF, FP = skillenv.tool('ffmpeg'), skillenv.tool('ffprobe')
 
 
 def size(f):
-    w, h = subprocess.run([FP, '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', f],
-                          **skillenv.TEXT).stdout.strip().split(',')[:2]
-    return int(w), int(h)
+    """Width and height as ffmpeg's filters see the frame. Phones often store a vertical clip sideways with a rotation
+    tag; ffmpeg turns it upright before -vf runs, so a 90/270 tag swaps the stored width and height."""
+    d = json.loads(subprocess.run([FP, '-v', 'error', '-select_streams', 'v:0', '-show_entries',
+                                   'stream=width,height:stream_tags=rotate:stream_side_data=rotation', '-of', 'json', f],
+                                  **skillenv.TEXT).stdout or '{}')
+    s = (d.get('streams') or [{}])[0]
+    w, h = int(s['width']), int(s['height'])
+    rot = str((s.get('tags') or {}).get('rotate') or next((x.get('rotation') for x in s.get('side_data_list') or []
+                                                           if 'rotation' in x), 0) or 0)
+    if rot.lstrip('-').split('.')[0] in ('90', '270'):
+        w, h = h, w
+    return w, h
 
 
 def crop(z, cx, cy, sw, sh):
@@ -61,12 +70,22 @@ def main():
         out = os.path.join(work, f'seg_{k}.mp4')
         # vertical fill: scale to cover 1080x1920 then centre-crop (handles 4K 9:16 and odd phone sizes)
         vf = (f"{crop(s.get('zoom', 1), s.get('cx', .5), s.get('cy', .5), sw, sh)}"
-              'scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,fps=30')
-        subprocess.run([FF, '-loglevel', 'error', '-y', '-ss', f"{s['in']:.3f}", '-t', f'{d:.3f}', '-i', f,
-                        '-map', '0:v:0', '-map', '0:a:0', '-vf', vf,
-                        '-af', f'afade=t=in:d=0.02,afade=t=out:st={d - 0.03:.3f}:d=0.03',   # no clicks at the joins
-                        '-c:v', 'libx264', '-crf', '14', '-preset', 'medium', '-pix_fmt', 'yuv420p',
-                        '-c:a', 'pcm_s16le', '-ar', '48000', out], check=True)
+              'scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,fps=30:start_time=0')
+        # Lip sync: every segment's video starts at 0 like its audio (fps start_time=0; without it a cut that lands between
+        # source frames starts its video one frame late) and its audio is exactly as long as its video (n frames =
+        # n * 1600 samples at 48 kHz). Left alone, both drift up to 33 ms per cut and the joins add that up over the reel.
+        n = max(1, round(d * 30))
+        for _ in range(2):
+            subprocess.run([FF, '-loglevel', 'error', '-y', '-ss', f"{s['in']:.3f}", '-t', f'{n / 30 + 0.1:.3f}', '-i', f,
+                            '-map', '0:v:0', '-map', '0:a:0', '-vf', vf, '-frames:v', str(n),
+                            '-af', f'aresample=48000,apad,atrim=end_sample={n * 1600},'
+                                   f'afade=t=in:d=0.02,afade=t=out:st={n / 30 - 0.03:.3f}:d=0.03',   # no clicks at the joins
+                            '-c:v', 'libx264', '-crf', '14', '-preset', 'medium', '-pix_fmt', 'yuv420p',
+                            '-c:a', 'pcm_s16le', '-ar', '48000', out], check=True)
+            got = frames(out)
+            if got == n:
+                break
+            n = got   # the clip ran out early: match the audio to the frames it really has
         parts.append(out)
         meta.append({**s, 'src_in': s['in'], 'src_out': s['out'], 'src_w': sw, 'src_h': sh})   # source size: 4K or not
     # the list holds bare file names (resolved next to concat.txt), so no drive letters or backslashes end up in it
@@ -74,7 +93,7 @@ def main():
     with open(concat, 'w', encoding='utf-8', newline='\n') as fh:
         fh.write(''.join(skillenv.concat_entry(os.path.basename(p)) for p in parts))
     subprocess.run([FF, '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', concat,
-                    '-vf', 'setpts=N/30/TB', '-r', '30', '-fps_mode', 'cfr', '-af', 'asetpts=PTS-STARTPTS',
+                    '-vf', 'setpts=N/30/TB', '-r', '30', '-fps_mode', 'cfr', '-af', 'asetpts=N/SR/TB',   # audio laid end to end, like the video
                     '-c:v', 'libx264', '-crf', '14', '-preset', 'medium', '-g', '30', '-keyint_min', '30', '-pix_fmt', 'yuv420p',
                     '-c:a', 'aac', '-b:a', '192k', aroll], check=True)
     fr = 0
