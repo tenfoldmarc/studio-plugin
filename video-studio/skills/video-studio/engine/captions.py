@@ -47,6 +47,7 @@ LANG = 'en'               # the language spoken (skillenv.language): captions ar
 RTL = False               # Arabic, Persian, Urdu, Hebrew: lines read right to left, letters join, no letter spacing
 STOPS = ',.?!،؟؛'          # punctuation a caption line may break after (Arabic comma, question mark, semicolon too)
 ENDS = '.?!؟'              # the end of a sentence
+CUES = {'comment', 'اكتب', 'أكتب', 'اكتبلي', 'اكتبي', 'علق', 'علّق', 'علقي'}   # the word that asks for a comment (marks.py)
 LIFT, FILL = 0, '#0d0d10'  # close-up fallback: the picture is lifted LIFT px so captions get the collar band
 HEAD = dict(top=452, chin=760, cx=540, width=250)
 
@@ -397,7 +398,7 @@ def vanity(b):
             icon = ICON_BURST
         elif em == 'cta':
             txt = f'&ldquo;{esc(bare(w["text"]))}&rdquo;'
-        elif bare(w['text']).lower() == 'comment':
+        elif bare(w['text']).lower() in CUES:
             icon = ICON_BUBBLE
         i_d = b.nid()
         b.html.append(f'<div id="{i_d}" class="cap vn{" em" if em else ""}">{icon}{txt}</div>')

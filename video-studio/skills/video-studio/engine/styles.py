@@ -297,8 +297,18 @@ def cta_times():
     if ci is None:
         return None
     t_cta = cap.W[ci]['start']
-    t_say = next((w['start'] for w in reversed(cap.W[:ci]) if bare(w['text']).lower() == 'comment'), t_cta)
+    t_say = next((w['start'] for w in reversed(cap.W[:ci]) if bare(w['text']).lower() in cap.CUES), t_cta)
     return t_say, t_cta, bare(cap.W[ci]['text']).strip('"“”\'')
+
+
+def cta_lead(english):
+    """the words drawn above the comment keyword: the English word for an English reel (unchanged), otherwise what
+    the speaker said before the keyword, from the cue word ("اكتب كلمة"), so no English lands in another language"""
+    if cap.LANG == 'en':
+        return english
+    ci = first('cta')
+    start = next((k for k in range(ci - 1, max(-1, ci - 4), -1) if bare(cap.W[k]['text']).lower() in cap.CUES), ci - 1)
+    return ' '.join(bare(w['text']) for w in cap.W[max(0, start):ci])
 
 
 def chalk_talk(b, caption):
@@ -376,7 +386,7 @@ def chalk_talk(b, caption):
     if cta:                                               # back on the speaker for the call to action
         t_say, t_cta, kw = cta
         size = min(214, int(900 / (max(len(kw), 2) * .46)))
-        b.html.append('<div id="kc1" class="mk" style="left:70px;top:250px;font-size:96px;line-height:92px">COMMENT</div>'
+        b.html.append(f'<div id="kc1" class="mk" style="left:70px;top:250px;font-size:96px;line-height:92px">{esc(cta_lead("COMMENT"))}</div>'
                       f'<div id="kc2" class="mk" style="left:70px;top:336px;font-size:{size}px;line-height:190px">{esc(kw.upper())}</div>')
         b.cut('#kc1', t_say)
         b.cut('#kc2', t_cta)
@@ -458,7 +468,7 @@ def show_and_tell(b, caption):
             b.out(f'#sb{n}n', t1)
     if cta:                                               # the call to action, big on the canvas
         t_say, t_cta, kw = cta
-        b.html.append(f'<div id="big"><div id="bg1" style="font-size:118px;line-height:120px">Comment</div>'
+        b.html.append(f'<div id="big"><div id="bg1" style="font-size:118px;line-height:120px">{esc(cta_lead("Comment"))}</div>'
                       f'<div id="bg2" style="font-size:{min(210, int(900 / (max(len(kw), 2) * .62)))}px;line-height:200px">&ldquo;{esc(kw.upper())}&rdquo;</div></div>')
         b.cut('#bg1', t_say)
         b.tween_in('#bg2', t_cta, {'scale': .8}, {'scale': 1}, .22, 'back.out(2)')
