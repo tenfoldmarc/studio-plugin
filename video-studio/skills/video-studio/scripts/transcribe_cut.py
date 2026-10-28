@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Word timings for the assembled cut -> <project>/words.json (medium.en; these drive every caption).
+Any other language (skillenv.language: plan.json, the clips, config.json) uses large-v3-turbo in that language.
 
 Usage:  PY transcribe_cut.py <project_dir> ["prompt with names: Claude, Claude Code, skill"]
 Whisper mishears proper nouns ("Claude" -> "cloud"/"claws", "skill" -> "scale", "design" -> "this line"):
 pass them in the prompt and still fix captions by hand from what the speaker actually said.
+For Arabic and other non-Latin speech, write the prompt in that script ("كلود، كلود كود"): a Latin prompt is dropped.
 """
 import json
 import os
@@ -20,11 +22,15 @@ skillenv.utf8_stdio()
 proj = skillenv.path_arg(sys.argv[1])
 wav = os.path.join(proj, 'work', 'aroll.wav')
 os.makedirs(os.path.join(proj, 'work'), exist_ok=True)
-prompt = sys.argv[2] if len(sys.argv) > 2 else 'Claude, Claude Code, skill.'
+lang = skillenv.language(proj)
+prompt = sys.argv[2] if len(sys.argv) > 2 else ('Claude, Claude Code, skill.' if lang == 'en' else None)
 subprocess.run([skillenv.tool('ffmpeg'), '-loglevel', 'error', '-y', '-i', os.path.join(proj, 'assets', 'aroll.mp4'), '-vn', '-ac', '1',
                 '-ar', '16000', wav], check=True)
-m = WhisperModel('medium.en', device='cpu', compute_type='int8')   # cpu, not 'auto': see ingest.py
-s, _ = m.transcribe(wav, word_timestamps=True, vad_filter=False, initial_prompt=prompt)
+model = skillenv.asr_model('best', lang)
+if lang != 'en':
+    print(f'{skillenv.lang_name(lang)} speech: reading it with {model} (about 1.6 GB, downloaded once the first time)')
+m = WhisperModel(model, device='cpu', compute_type='int8')   # cpu, not 'auto': see ingest.py
+s, _ = m.transcribe(wav, word_timestamps=True, vad_filter=False, **skillenv.asr_options(lang, prompt))
 ws = []
 for x in s:
     for w in x.words:
@@ -35,8 +41,8 @@ for x in s:
             continue
         ws.append({'text': t, 'start': round(w.start, 3), 'end': round(w.end, 3)})
 with open(os.path.join(proj, 'words.json'), 'w', encoding='utf-8') as fh:
-    json.dump(ws, fh, indent=1)
+    json.dump(ws, fh, indent=1, ensure_ascii=False)     # Arabic stays readable for the hand fixes
 # keep Whisper's untouched output too: words.json is then cleaned and marked by hand (see references/captions.md)
 with open(os.path.join(proj, 'work', 'words_raw.json'), 'w', encoding='utf-8') as fh:
-    json.dump(ws, fh, indent=1)
+    json.dump(ws, fh, indent=1, ensure_ascii=False)     # Arabic stays readable for the hand fixes
 print(' '.join(f"{w['text']}@{w['start']:.2f}" for w in ws))

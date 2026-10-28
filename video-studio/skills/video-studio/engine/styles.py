@@ -68,7 +68,7 @@ def sentence_starts():
     for w in cap.W:
         if new:
             out.append(w['start'])
-        new = w['text'][-1:] in '.?!'
+        new = w['text'][-1:] in cap.ENDS
     return out
 
 
@@ -277,12 +277,12 @@ def auto_beats():
     beats, W = [], cap.W
     ni = first('num')
     t_num = W[ni]['start'] if ni is not None else None
-    hook_end = t_num if t_num is not None else next((w['end'] for w in W if w['text'][-1:] in ',.?!'), W[-1]['end']) + .2
+    hook_end = t_num if t_num is not None else next((w['end'] for w in W if w['text'][-1:] in cap.STOPS), W[-1]['end']) + .2
     if hook_end - W[0]['start'] > .5:
         beats.append({'from': W[0]['start'], 'to': hook_end, 'title': ' '.join(t for t in cap.TITLE if t)})
     if ni is not None:
         j = cap.counted(ni)
-        t_end = next((w['end'] for w in W[ni:] if w['text'][-1:] in ',.?!'), W[-1]['end']) + .1
+        t_end = next((w['end'] for w in W[ni:] if w['text'][-1:] in cap.STOPS), W[-1]['end']) + .1
         ci = first('cta')
         if ci is not None and ci > ni:
             t_end = min(t_end, W[max(ci - 1, ni)]['start'])

@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: "Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'post it', 'post this to Instagram / TikTok / YouTube', 'post these as trial reels', 'schedule this for tomorrow', 'set up posting', 'connect my Instagram', 'open the picker', 'update the Studio', or runs /video-studio."
+description: "Creator Studio. Setup runs once, at the first use or when the buyer asks for it ('set up the Studio', /video-studio setup). Turns raw 9:16 talking-head or voice-over clips (English, Arabic, or any other language) into a finished Instagram reel in the creator's own named editing style: rebuilt from links or files of reels they love (captions, animation, overlays, pace, mixed from several examples), or one of 20 caption styles or 9 overall styles from the Studio Picker, plus the effects they like. Picks the cleanest take of every line, cuts dead air, transcribes with word timings, places captions from where the speaker actually is in the frame, and checks every result inside the Reels safe zone. Use when the user says 'edit it', 'edit these clips', 'I dropped clips in my downloads', 'cut this into a reel', 'switch my captions', 'change my effects', 'change my style', 'edit these in <style name>', 'replicate the editing style of this reel', 'copy this editing style', 'save this style', 'what styles do I have', 'make 8 variations for my trial reels', 'make N variations', 'trial reel versions', 'post it', 'post this to Instagram / TikTok / YouTube', 'post these as trial reels', 'schedule this for tomorrow', 'set up posting', 'connect my Instagram', 'open the picker', 'update the Studio', or runs /video-studio."
 ---
 
 # Creator Studio (video-studio)
@@ -233,8 +233,8 @@ could not be matched. Never fake it.
 1. Reels safe zone (1080x1920): top 220, bottom 450 (nothing below y 1470), sides 35, right 100 from y 1155 down.
    One exception: the Show and Tell speaker card sits flush with the bottom of the video on purpose. Or unless told to disregard safe zones.
 2. Captions and effects never cover the face (eyes to chin).
-3. Captions say what was actually said. Fix Whisper's mishearings ("Claude" comes out as "cloud"). No em dashes
-   in on-screen text.
+3. Captions say what was actually said, in the language it was said in (Arabic and more: "Reels in Arabic and other
+   languages" below). Fix Whisper's mishearings ("Claude" comes out as "cloud"). No em dashes in on-screen text.
 4. Everything on screen is real or a clearly generic placeholder. Never a real person who is not the buyer, never
    invented numbers, comments or results.
 5. Effects only where the footage qualifies (footage check) and only in the parts the buyer allowed. A skipped
@@ -250,6 +250,15 @@ Style = the saved style they name ("edit these in Hype": `my_styles.py list` sho
 enough), else their default. No saved style and no picks: "First run only" above. Several styles, none named, and
 the clips could suit more than one: ask which, in one line. Read the style's `style.md` before step 2: its pace,
 framing and standing notes decide the cut.
+
+The language question, ONCE ever (new buyers and buyers who set up before it existed). Before step 1, run
+`PY "SK/scripts/language.py"`. Only when it prints `STATUS language NOT ASKED`, ask in one line, then wait:
+
+> "Quick one before I edit, I only ask this once: do you speak English in your videos, or another language?"
+
+Then `PY "SK/scripts/language.py" set <answer>`: `en` for English, the language for one other language (`ar`,
+`Arabic`, `es`, ...), `auto` when it changes from video to video or they speak more than one. Not English: say in
+one line that the first edit downloads its speech model once (about 2 GB). Never ask again, unless they bring it up.
 
 ```
 1. PY "SK/scripts/ingest.py" "<project>" <clips or folder> [--newest 5]
@@ -304,6 +313,28 @@ caption unless the effect's own words carry it.
 Notes round: change `edl.json` / `words.json` / `plan.json`, rebuild from the step that changed, render `-v2`. Keep
 every version in `renders/`. A note meant for every reel ("always", "from now on") goes into the style too: after
 they approve, `my_styles.py save "<style>" --from-project "<project>"`, plus a line in its style.md.
+
+## Reels in Arabic and other languages
+
+The Studio edits reels in the language the buyer speaks, from their answer to the language question (the workflow
+above). Said `auto`, or never answered: `ingest.py` notices clips that are not English on its own (a
+`LANGUAGE ar (Arabic)` line) and that reel is read and captioned in that language. Said English and a reel turns out
+to be in another language (a NOTE says the model was unsure): `language.py "<project>" ar`, then run ingest.py and
+transcribe_cut.py again. They change their answer: `language.py set <new answer>`.
+
+- Captions are in what was said, in its own script. Never translate them unless the buyer asks for translated captions.
+- The first non-English edit downloads the multilingual speech models once (about 2 GB). Tell the buyer in one line.
+- Names prompt for transcribe_cut.py: write it in the reel's own script ("كلود، كلود كود"); a Latin prompt is dropped.
+- Fix words.json by hand the same way: Whisper misspells hamza (أ / إ / ا), drops "ال", and mishears names. Spell
+  it the way the speaker would write it. Keep Arabic punctuation (، ؟): caption lines break on it.
+- Arabic, Persian, Urdu and Hebrew read right to left. The build does that by itself: lines run right to left, each
+  caption style gets a matching Arabic face (bold, serif or handwritten), and letter-by-letter animations move word by
+  word instead (Arabic letters join, a lone letter reads wrong). Check every snapshot: words in the right order, letters
+  joined, nothing clipped at the edges.
+- `marks.py` finds the comment keyword after "اكتب" / "علق" ("اكتب كلمة فيديو" marks فيديو). Arabic has no capital
+  letters, so names are never guessed: mark `key` on names and brands by hand.
+- Effects with their own on-screen words (code, comments, checklists) are built for English text: before using one in
+  an Arabic reel, snapshot its slot and skip it if the words do not read right.
 
 ## Trial reel variations ("make 8 variations for my trial reels")
 

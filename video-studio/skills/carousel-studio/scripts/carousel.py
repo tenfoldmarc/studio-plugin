@@ -489,8 +489,9 @@ def cmd_transcript():
         wav = os.path.join(work, 'work', 'source.wav')
         subprocess.run([skillenv.tool('ffmpeg'), '-loglevel', 'error', '-y', '-i', video, '-vn', '-ac', '1', '-ar', '16000', wav], check=True)
         say('STATUS transcript LISTENING (about a quarter of the video length, one time)')
-        m = WhisperModel('small.en', device='cpu', compute_type='int8')
-        segs, _ = m.transcribe(wav, word_timestamps=True, vad_filter=False)
+        lang = skillenv.language()
+        m = WhisperModel(skillenv.asr_model('fast', lang), device='cpu', compute_type='int8')
+        segs, _ = m.transcribe(wav, word_timestamps=True, vad_filter=False, **skillenv.asr_options(lang))
         words = [{'text': w.word.strip(), 'start': round(w.start, 2), 'end': round(w.end, 2)} for s in segs for w in s.words]
     lines = sentences(words)
     if opt('--out'):

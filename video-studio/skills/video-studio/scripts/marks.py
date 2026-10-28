@@ -27,12 +27,15 @@ NUMBER_WORDS = {'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
                 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'thirty', 'forty',
                 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred', 'thousand', 'million', 'billion', 'zero',
                 'double', 'triple', 'half'}                       # "one" is left out: it is usually not a number
-SKIP_AFTER_COMMENT = {'the', 'word', 'a', 'below', 'down', 'this', 'just', 'me', 'with'}
+SKIP_AFTER_COMMENT = {'the', 'word', 'a', 'below', 'down', 'this', 'just', 'me', 'with',
+                      'كلمة', 'بكلمة', 'الكلمة', 'لي', 'هنا', 'تحت'}      # Arabic: "اكتب كلمة فيديو" -> فيديو
+COMMENT = {'comment', 'اكتب', 'أكتب', 'اكتبلي', 'اكتبي', 'علق', 'علّق', 'علقي'}
 NOT_NAMES = {'i', "i'm", "i'll", "i've", "i'd", 'ok', 'okay'}
+ENDS = '.?!؟'                                     # ؟ is the Arabic question mark
 
 
 def bare(text):
-    return text.strip('.,;:!?"“”\'()')
+    return text.strip('.,;:!?"“”\'()،؛؟«»')
 
 
 def guess(words):
@@ -44,13 +47,14 @@ def guess(words):
         starts = new_sentence
         if new_sentence:
             punch_in_sentence = False
-        new_sentence = w['text'][-1:] in '.?!'
+        new_sentence = w['text'][-1:] in ENDS
         if w.get('e'):
             punch_in_sentence = punch_in_sentence or w['e'] in ('num', 'emph', 'cta')
             continue
         prev = [bare(x['text']).lower() for x in words[max(0, i - 3):i]]
-        after_comment = 'comment' in prev and all(p in SKIP_AFTER_COMMENT or p == 'comment' for p in prev[prev.index('comment'):])
-        if after_comment and low not in SKIP_AFTER_COMMENT and low != 'comment' and t:
+        cue = next((k for k in range(len(prev) - 1, -1, -1) if prev[k] in COMMENT), None)
+        after_comment = cue is not None and all(p in SKIP_AFTER_COMMENT for p in prev[cue + 1:])
+        if after_comment and low not in SKIP_AFTER_COMMENT and low not in COMMENT and t:
             out.append((i, 'cta', 'the word after "comment"'))
             punch_in_sentence = True
         elif re.search(r'\d', t) or low in NUMBER_WORDS:
@@ -77,7 +81,7 @@ def main():
     for i, mark, why in found:
         print(f'{mark:5} {words[i]["text"]:18} @{words[i]["start"]:.2f}   ({why})')
     openers = [bare(w['text']) for i, w in enumerate(words)
-               if (i == 0 or words[i - 1]['text'][-1:] in '.?!') and bare(w['text'])[:1].isupper()
+               if (i == 0 or words[i - 1]['text'][-1:] in ENDS) and bare(w['text'])[:1].isupper()
                and bare(w['text']).lower() not in NOT_NAMES]
     if openers:
         print('check by hand (a name that starts a sentence cannot be told from a normal word): ' + ', '.join(dict.fromkeys(openers)))
@@ -90,7 +94,7 @@ def main():
     for i, mark, _ in found:
         words[i]['e'] = mark
     with open(path, 'w', encoding='utf-8') as fh:
-        json.dump(words, fh, indent=1)
+        json.dump(words, fh, indent=1, ensure_ascii=False)
     print(f'{len(found)} marks written to {path}')
 
 

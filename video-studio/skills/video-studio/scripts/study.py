@@ -247,7 +247,9 @@ def main():
             from faster_whisper import WhisperModel
             wav = os.path.join(out, 'audio.wav')
             subprocess.run(quiet + ['-i', src, '-vn', '-ac', '1', '-ar', '16000', wav])
-            segs, _ = WhisperModel('small.en', device='cpu', compute_type='int8').transcribe(wav, word_timestamps=True, vad_filter=True)
+            lang = skillenv.language()       # an example in another language than the buyer's: --no-words still works
+            segs, _ = WhisperModel(skillenv.asr_model('fast', lang), device='cpu', compute_type='int8').transcribe(
+                wav, word_timestamps=True, vad_filter=True, **skillenv.asr_options(lang))
             words = [{'text': x.word.strip(), 'start': round(x.start, 2), 'end': round(x.end, 2)} for s in segs for x in (s.words or [])]
         except Exception as e:      # no speech model yet, no speech, or music only: the study still stands
             print(f'note: no transcript ({type(e).__name__}). Run again after the first edit, or pass --no-words.')

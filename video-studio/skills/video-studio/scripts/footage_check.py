@@ -46,7 +46,7 @@ def parts(words, dur, plan):
     sentences, cur = [], []
     for w in words:
         cur.append(w)
-        if w['text'][-1:] in '.?!':
+        if w['text'][-1:] in '.?!؟':
             sentences.append(cur)
             cur = []
     if cur:

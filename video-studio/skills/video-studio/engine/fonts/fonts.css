@@ -274,3 +274,47 @@
   font-display: block;
   src: url('CoveredByYourGrace-400-normal.woff2') format('woff2');
 }
+/* Arabic letters for every caption font: captions.py adds the matching one after each font-family when the reel is
+   in Arabic, Persian or Urdu (Sans for bold and plain faces, Serif for the serif ones, Hand for the handwritten) */
+@font-face {
+  font-family: 'Studio Arabic Sans';
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: block;
+  src: url('Cairo-arabic-variable.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Studio Arabic Serif';
+  font-style: normal;
+  font-weight: 100 500;
+  font-display: block;
+  src: url('Amiri-400-arabic.woff2') format('woff2');
+  size-adjust: 115%;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Studio Arabic Serif';
+  font-style: normal;
+  font-weight: 501 1000;
+  font-display: block;
+  src: url('Amiri-700-arabic.woff2') format('woff2');
+  size-adjust: 115%;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Studio Arabic Hand';
+  font-style: normal;
+  font-weight: 100 500;
+  font-display: block;
+  src: url('ArefRuqaa-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Studio Arabic Hand';
+  font-style: normal;
+  font-weight: 501 1000;
+  font-display: block;
+  src: url('ArefRuqaa-700-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFF;
+}

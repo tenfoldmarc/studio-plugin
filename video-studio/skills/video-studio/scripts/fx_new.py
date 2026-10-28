@@ -315,8 +315,9 @@ def main():
             from faster_whisper import WhisperModel
             wav = os.path.join(slot, 'work', 'aroll.wav')
             run([FF, '-v', 'error', '-y', '-i', aroll, '-vn', '-ac', '1', '-ar', '16000', wav])
-            model = WhisperModel('medium.en', device='cpu', compute_type='int8')   # cpu, not 'auto': see ingest.py
-            segments, _ = model.transcribe(wav, word_timestamps=True, vad_filter=False, initial_prompt=a.prompt)
+            lang = skillenv.language(proj)
+            model = WhisperModel(skillenv.asr_model('best', lang), device='cpu', compute_type='int8')   # cpu, not 'auto': see ingest.py
+            segments, _ = model.transcribe(wav, word_timestamps=True, vad_filter=False, **skillenv.asr_options(lang, a.prompt))
             ws = [{'text': w.word.strip(), 'start': round(w.start, 3), 'end': round(w.end, 3)} for s in segments for w in s.words]
             fxlib.write(words_path, ws)
             print('words: ' + ' '.join(f"{w['text']}@{w['start']:.2f}" for w in ws))

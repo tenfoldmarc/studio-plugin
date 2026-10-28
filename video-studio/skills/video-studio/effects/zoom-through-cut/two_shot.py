@@ -105,10 +105,14 @@ if not a.no_transcribe:
     try:
         from faster_whisper import WhisperModel
         subprocess.run([FF, '-v', 'error', '-y', '-i', AROLL, '-vn', '-ac', '1', '-ar', '16000', 'work/aroll.wav'], check=True)
-        model = WhisperModel('medium.en', device='cpu', compute_type='int8')   # cpu, not 'auto': see scripts/ingest.py
-        segs, _ = model.transcribe('work/aroll.wav', word_timestamps=True, vad_filter=False, initial_prompt=a.prompt)
+        sys.dont_write_bytecode = True
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
+        import skillenv
+        lang = skillenv.language(os.path.abspath(os.path.join('..', '..')))   # the slot sits in <project>/fx/<name>
+        model = WhisperModel(skillenv.asr_model('best', lang), device='cpu', compute_type='int8')   # cpu, not 'auto': see scripts/ingest.py
+        segs, _ = model.transcribe('work/aroll.wav', word_timestamps=True, vad_filter=False, **skillenv.asr_options(lang, a.prompt))
         ws = [{'text': w.word.strip(), 'start': round(w.start, 3), 'end': round(w.end, 3)} for s in segs for w in s.words]
-        json.dump(ws, open('words.json', 'w'), indent=1)
+        json.dump(ws, open('words.json', 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
         print('words: ' + ' '.join('%s@%.2f' % (w['text'], w['start']) for w in ws))
         print('  (the cut is at %.2fs; Whisper word starts can be 0.1 to 0.3s early: confirm onsets on the audio)' % (cut / 30.0))
     except ImportError:

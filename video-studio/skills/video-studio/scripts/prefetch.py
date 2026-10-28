@@ -89,9 +89,12 @@ def logged(cmd, cwd=None, env=None, timeout=3600):
 
 
 def speech():
+    lang = skillenv.language()
+    models = repr(tuple(dict.fromkeys(('small.en', 'medium.en', skillenv.asr_model('fast', lang),
+                                       skillenv.asr_model('best', lang)))))
     code = logged([sys.executable, '-c',
                    "from faster_whisper import WhisperModel\n"
-                   "for m in ('small.en', 'medium.en'):\n"
+                   f"for m in {models}:\n"
                    "    WhisperModel(m, device='cpu', compute_type='int8')\n"
                    "    print('ready', m, flush=True)\n"])
     return code == 0, '' if code == 0 else 'the speech models did not download'

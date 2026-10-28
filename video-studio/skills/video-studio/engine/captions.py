@@ -14,6 +14,7 @@ per-reel text come from <project>/plan.json, written by the editing Claude from 
 import html
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -42,6 +43,10 @@ W, DUR = [], 0.0
 PROJECT = None
 LAYOUT, PLAN, SEGS = {}, {}, []
 FACELESS = False          # nobody on camera (voice over b-roll)
+LANG = 'en'               # the language spoken (skillenv.language): captions are written in it
+RTL = False               # Arabic, Persian, Urdu, Hebrew: lines read right to left, letters join, no letter spacing
+STOPS = ',.?!،؟؛'          # punctuation a caption line may break after (Arabic comma, question mark, semicolon too)
+ENDS = '.?!؟'              # the end of a sentence
 LIFT, FILL = 0, '#0d0d10'  # close-up fallback: the picture is lifted LIFT px so captions get the collar band
 HEAD = dict(top=452, chin=760, cx=540, width=250)
 
@@ -60,9 +65,9 @@ def guess_title(words):
     line = []
     for w in words:
         line.append(w['text'])
-        if w['text'][-1:] in ',.?!' and len(line) >= 3 or len(line) >= 9:
+        if w['text'][-1:] in STOPS and len(line) >= 3 or len(line) >= 9:
             break
-    line = [t.strip(',.?!;:') for t in line]
+    line = [t.strip(STOPS + ';:') for t in line]
     best = min(range(1, len(line)), key=lambda k: abs(len(' '.join(line[:k])) - len(' '.join(line[k:])))) if len(line) > 1 else 1
     return ' '.join(line[:best]), ' '.join(line[best:])
 
@@ -70,8 +75,10 @@ def guess_title(words):
 def load(project):
     """Point the engine at one reel project. Sets the module values every style reads."""
     global HEAD_TOP, Y_ABOVE_HEAD, Y_CHEST, Y_LOWER, WALL_LEFT, WALL_RIGHT, TITLE, SWASH, VIDEO, CUTOUT, W, DUR
-    global PROJECT, LAYOUT, PLAN, SEGS, FACELESS, LIFT, FILL, HEAD
+    global PROJECT, LAYOUT, PLAN, SEGS, FACELESS, LIFT, FILL, HEAD, LANG, RTL
     PROJECT = os.path.abspath(project)
+    LANG = skillenv.language(PROJECT)
+    RTL = skillenv.is_rtl(LANG)
     W = _json(os.path.join(PROJECT, 'words.json'), None)
     if not W:
         sys.exit('words.json is missing or empty: run transcribe_cut.py first.')
@@ -113,7 +120,7 @@ def counted(i):
     """end index of what a number counts: up to two more words ("21 video effects"), never past punctuation, a marked
     word, a weak word or a pronoun ("3 things" stops before "I")"""
     j = i + 1
-    while (j < len(W) and j - i < 3 and W[j - 1]['text'][-1] not in ',.?!' and not W[j].get('e')
+    while (j < len(W) and j - i < 3 and W[j - 1]['text'][-1] not in STOPS and not W[j].get('e')
            and W[j]['text'].rstrip(',.;:').lower() not in WEAK | PRONOUNS):
         j += 1
     return j
@@ -129,7 +136,13 @@ def esc(s):
 
 
 def bare(s):
-    return s.rstrip(',.;:')
+    return s.rstrip(',.;:،؛')
+
+
+def letters(txt):
+    """the pieces a letter-by-letter animation steps through: the letters, or whole words in a joined script (an
+    Arabic letter changes shape with its neighbours, so a letter on its own reads wrong)"""
+    return re.findall(r'\S+|\s', txt) if RTL else list(txt)
 
 
 def low(w):
@@ -147,7 +160,7 @@ def chunk(words, max_words, max_chars, solo=()):
         if not cur:
             return
         tail = []
-        if carry and len(cur) > 1 and bare(cur[-1]['text']).lower() in WEAK and cur[-1]['text'][-1] not in ',.?!':
+        if carry and len(cur) > 1 and bare(cur[-1]['text']).lower() in WEAK and cur[-1]['text'][-1] not in STOPS:
             tail = [cur.pop()]
         groups.append(cur)
         cur = tail
@@ -159,7 +172,7 @@ def chunk(words, max_words, max_chars, solo=()):
             continue
         if cur:
             text = ' '.join(x['text'] for x in cur + [w])
-            punct = cur[-1]['text'][-1] in ',.?!' and len(cur) >= 2
+            punct = cur[-1]['text'][-1] in STOPS and len(cur) >= 2
             pause = w['start'] - cur[-1]['end'] > .3
             if len(cur) >= max_words or len(text) > max_chars or punct or pause:
                 flush(carry=not (punct or pause))
@@ -335,7 +348,7 @@ def loud(b):
     title, t_end = set(), 0
     if ni is not None:
         title = set(range(ni, counted(ni)))
-        t_end = next((w['end'] for w in W[ni:] if w['text'][-1] in ',.?!'), W[-1]['end']) + .1
+        t_end = next((w['end'] for w in W[ni:] if w['text'][-1] in STOPS), W[-1]['end']) + .1
         rows = []
         for j in sorted(title - {ni}):
             i_d = b.nid('t')
@@ -434,7 +447,7 @@ def moodboard(b):
     sents, cur = [], []
     for w in W:
         cur.append(w)
-        if w['text'][-1] in '.?!':
+        if w['text'][-1] in ENDS:
             sents.append(cur)
             cur = []
     if cur:
@@ -453,7 +466,7 @@ def moodboard(b):
         t1 = nxt if nxt is not None and nxt - last <= .6 else last + .4
         chars = []
         for w in sub:
-            txt = (' ' if chars else '') + low(w)
+            txt = letters((' ' if chars else '') + low(w))
             step = (w['end'] - w['start']) / max(len(txt), 1)
             for k, ch in enumerate(txt):
                 chars.append((ch, w['start'] + k * step))
@@ -509,7 +522,7 @@ def specsheet(b):
 
     ni = next((i for i, w in enumerate(W) if w.get('e') == 'num'), None)
     if ni is not None:
-        t_end = next((w['end'] for w in W[ni:] if w['text'][-1] in ',.?!'), W[-1]['end']) + .1
+        t_end = next((w['end'] for w in W[ni:] if w['text'][-1] in STOPS), W[-1]['end']) + .1
         tag(' '.join(bare(w['text']) for w in W[ni + 1:counted(ni)]), W[ni]['text'], W[ni]['start'], t_end)
     ci = next((i for i, w in enumerate(W) if w.get('e') == 'cta'), None)
     if ci is not None:
@@ -551,7 +564,7 @@ def cards(extend_num):
             while end > p + 1 and len(' '.join(w['text'] for w in W[p:end])) > 16:
                 end -= 1
         nxt = idx[k + 1] if k + 1 < len(idx) else len(W)
-        stop = next((j + 1 for j in range(end - 1, len(W)) if W[j]['text'][-1] in ',.?!'), len(W))
+        stop = next((j + 1 for j in range(end - 1, len(W)) if W[j]['text'][-1] in STOPS), len(W))
         after_end = len(W) if k + 1 == len(idx) else (stop if stop <= nxt else end)
         out.append(dict(before=W[start:p], punch=W[p:end], after=W[end:after_end]))
         start = after_end
@@ -663,7 +676,7 @@ def cooldude(b):
             txt = ' '.join(low(w) for w in c['punch'])
             size = min(230, int(860 / (len(txt) * .47)))
             ital = ';font-style:italic' if n == len(cs) - 1 else ''
-            chars = ''.join('&nbsp;' if ch == ' ' else f'<span class="mk"><span class="ch">{esc(ch)}</span></span>' for ch in txt)
+            chars = ''.join('&nbsp;' if ch == ' ' else f'<span class="mk"><span class="ch">{esc(ch)}</span></span>' for ch in letters(txt))
             parts.append(f'<div class="p" style="font-size:{size}px{ital}">{chars}</div>')
             b.js.append(f"gsap.set('#{card} .ch',{{yPercent:115}});")
             b.js.append(f"tl.to('#{card} .ch',{{yPercent:0,duration:.5,ease:'expo.out',stagger:.028}},{T(c['punch'][0]['start']):.3f});")
@@ -1085,7 +1098,7 @@ def custom(b):
         if lines_n == 2 and len(g) > 1 and (len(g) > per_line_words or len(' '.join(x['text'] for x in g)) > per_line_chars):
             cut = min(range(1, len(g)), key=lambda k: abs(len(' '.join(x['text'] for x in g[:k])) - len(' '.join(x['text'] for x in g[k:]))))
             rows = [g[:cut], g[cut:]]
-        n_chars = sum(len(shown(w)) for w in g)
+        n_chars = sum(len(letters(shown(w))) for w in g)
         said, ci, parts = max(.12, g[-1]['end'] - g[0]['start']), 0, []
         for row in rows:
             ws = []
@@ -1095,7 +1108,7 @@ def custom(b):
                 cls = 'w m' if w.get('e') else 'w'
                 if entrance == 'type-on':
                     inner = ''
-                    for ch in txt:
+                    for ch in letters(txt):
                         cid = b.nid('h')
                         inner += f'<span id="{cid}" class="ch">{esc(ch)}</span>'
                         b.js.append(f"gsap.set('#{cid}',{{opacity:0}});")
@@ -1171,7 +1184,7 @@ def viralguy(b):
             continue
         nxt = W[i + 1] if i + 1 < len(W) else None
         if (nxt and not w.get('e') and not nxt.get('e') and len(bare(w['text'])) <= 3
-                and nxt['start'] - w['start'] < .15 and w['text'][-1] not in ',.?!'):
+                and nxt['start'] - w['start'] < .15 and w['text'][-1] not in STOPS):
             items.append(([w, nxt], []))                # a short word said in the same breath rides with the next
             i += 2
             continue
@@ -1512,6 +1525,44 @@ def reframe_css(r):
             + (f";filter:{v['grade']}" if v['grade'] else '') + '}')
 
 
+ARABIC_SERIF = {'newsreader', 'playfair display', 'instrument serif', 'dm serif display'}
+ARABIC_HAND = {'caveat', 'marck script', 'covered by your grace', 'permanent marker', 'elsie swash caps'}
+RTL_CSS = '''
+#root{direction:rtl}
+#caps *,#layers *{letter-spacing:0!important;font-style:normal!important;font-synthesis:none}'''
+
+
+def arabic_face(families):
+    """the shipped Arabic face that suits a font-family list: serif, handwritten, or sans (anything else)"""
+    first = families.split(',')[0].strip().strip('\'"').lower()
+    if first in ARABIC_HAND or 'script' in first or 'hand' in first:
+        return 'Studio Arabic Hand'
+    if first in ARABIC_SERIF or ('serif' in first and 'sans' not in first):
+        return 'Studio Arabic Serif'
+    return 'Studio Arabic Sans'
+
+
+def localise(doc):
+    """The page in the reel's language. Right-to-left scripts (Arabic, Persian, Urdu, Hebrew) get direction:rtl on
+    the 1080px frame (#root) so the words of a line run right to left. Never dir="rtl" on <html> (HyperFrames then
+    renders a black video), and not on #caps alone (it is narrower than the frame: captions with no left set slide
+    off centre). No letter spacing or slant (they pull joined letters apart), and an Arabic face after
+    every font-family, so each caption style keeps its feel in Arabic letters (engine/fonts/fonts.css)."""
+    doc = doc.replace('<html lang="en"', f'<html lang="{LANG}"', 1)
+    if not RTL:
+        return doc
+
+    def add(m):
+        fams = m.group(2).rstrip()
+        rule = m.string[m.string.rfind('}', 0, m.start()) + 1:m.start()]
+        if ('@font-face' in rule or 'Studio Arabic' in fams or 'var(' in fams
+                or fams.split(',')[0].strip() in ('inherit', 'initial', 'unset')):
+            return m.group(0)
+        return f"{m.group(1)}{fams},'{arabic_face(fams)}'"
+    doc = re.sub(r'(font-family:\s*)([^;}"<>]+)', add, doc)
+    return doc.replace('</style>', RTL_CSS + '\n</style>', 1)
+
+
 def document(b, footage, safe=False, audio_track=9):
     """The whole composition: footage layers, effect slots, captions, timeline. Used by page() and by styles.py."""
     nl = '\n'
@@ -1525,7 +1576,7 @@ def document(b, footage, safe=False, audio_track=9):
         b.css.append('\n' + str(EXTRA['css']))
         css_motion_note(EXTRA['css'], 'The style css')
     b.js += reel_motion(EXTRA.get('motion'))   # reel-wide motion: punch-ins on key words, a flash on every cut, ...
-    return f'''<!doctype html>
+    return localise(f'''<!doctype html>
 <html lang="en" data-resolution="portrait">
 <head>
 <meta charset="UTF-8" />
@@ -1563,7 +1614,7 @@ window.__timelines["main"] = tl;
 </script>
 </body>
 </html>
-'''
+''')
 
 
 if __name__ == '__main__':

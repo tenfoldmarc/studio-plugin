@@ -32,7 +32,7 @@ def read(path, fallback=None):
 
 def write(path, data):
     with open(path, 'w', encoding='utf-8', newline='\n') as fh:
-        json.dump(data, fh, indent=1)
+        json.dump(data, fh, indent=1, ensure_ascii=False)
         fh.write('\n')
 
 

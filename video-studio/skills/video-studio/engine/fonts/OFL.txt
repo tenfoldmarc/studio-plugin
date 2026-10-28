@@ -1,7 +1,8 @@
 The font files in this folder come from Google Fonts. All of them except Permanent Marker are licensed under the
 SIL Open Font License, Version 1.1, reproduced in full below: Archivo, Arimo, Barlow Condensed, Bebas Neue, Caveat,
 Covered By Your Grace, DM Serif Display, Elsie Swash Caps, Figtree, Instrument Serif, Inter, Inter Tight,
-JetBrains Mono, Marck Script, Montserrat, Newsreader, Pixelify Sans, Playfair Display, Poppins.
+JetBrains Mono, Marck Script, Montserrat, Newsreader, Pixelify Sans, Playfair Display, Poppins, and the Arabic
+faces Cairo, Amiri and Aref Ruqaa (their Arabic letters only).
 Copyright belongs to each family's authors: the copyright notice of every family is on its page at
 https://fonts.google.com and in its folder at https://github.com/google/fonts/tree/main/ofl
 

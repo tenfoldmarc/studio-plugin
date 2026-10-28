@@ -356,6 +356,78 @@ def effective_picks(project=None, picks_path=None, state=None):
     return _read_json(path, {}) or {}, path
 
 
+# ------------------------------------------------------------------ the language the buyer speaks in their reels
+# English keeps the English-only Whisper models (best for English). Any other language uses the multilingual ones:
+# 'small' to read the takes, 'large-v3-turbo' for the caption words (far better than 'medium' at Arabic spelling and
+# punctuation, which the caption lines break on). Checked 2026-10-27 on an Arabic clip.
+LANG_NAMES = {'auto': 'it changes from video to video', 'en': 'English', 'ar': 'Arabic', 'fa': 'Persian', 'ur': 'Urdu', 'he': 'Hebrew', 'fr': 'French',
+              'es': 'Spanish', 'pt': 'Portuguese', 'de': 'German', 'it': 'Italian', 'nl': 'Dutch', 'tr': 'Turkish',
+              'hi': 'Hindi', 'id': 'Indonesian', 'ms': 'Malay', 'ru': 'Russian', 'pl': 'Polish', 'ja': 'Japanese',
+              'ko': 'Korean', 'zh': 'Chinese', 'vi': 'Vietnamese', 'th': 'Thai', 'tl': 'Tagalog', 'sw': 'Swahili'}
+LANG_ALIASES = {'both': 'auto', 'mixed': 'auto', 'it depends': 'auto', 'arabic': 'ar', 'عربي': 'ar', 'العربية': 'ar', 'english': 'en', 'farsi': 'fa', 'persian': 'fa',
+                'urdu': 'ur', 'hebrew': 'he', 'french': 'fr', 'spanish': 'es', 'portuguese': 'pt', 'german': 'de',
+                'italian': 'it', 'dutch': 'nl', 'turkish': 'tr', 'hindi': 'hi', 'indonesian': 'id', 'malay': 'ms',
+                'russian': 'ru', 'polish': 'pl', 'japanese': 'ja', 'korean': 'ko', 'chinese': 'zh',
+                'vietnamese': 'vi', 'thai': 'th', 'tagalog': 'tl', 'filipino': 'tl', 'swahili': 'sw'}
+RTL = {'ar', 'fa', 'ur', 'he', 'yi', 'ps', 'sd', 'ug'}     # written right to left
+NON_LATIN = RTL | {'hi', 'ja', 'ko', 'zh', 'th', 'ru', 'uk', 'el', 'bn', 'ta'}
+
+
+def lang_code(s):
+    """'Arabic' / 'ar' / 'ar-SA' / 'العربية' -> 'ar'; '' or None -> None"""
+    s = str(s or '').strip()
+    if not s:
+        return None
+    low_s = s.lower()
+    return LANG_ALIASES.get(low_s) or LANG_ALIASES.get(s) or re.split(r'[-_]', low_s)[0]
+
+
+def language(project=None, state=None):
+    """The language spoken in this reel: <project>/plan.json "language", else what ingest.py found
+    (<project>/language.json), else config.json "language" (the buyer's own language), else 'en'."""
+    if project:
+        plan = _read_json(os.path.join(project, 'plan.json'), {}) or {}
+        found = _read_json(os.path.join(project, 'language.json'), {}) or {}
+        for v in (plan.get('language'), found.get('language')):
+            if lang_code(v):
+                return lang_code(v)
+    v = language_setting(state)
+    return 'en' if v in (None, 'auto') else v
+
+
+def language_setting(state=None):
+    """What the buyer answered to "do you speak English in your videos?" (config.json "language"): a language code,
+    'auto' (it changes from video to video), or None (not asked yet)"""
+    return lang_code((_read_json(config_file(state), {}) or {}).get('language'))
+
+
+def is_rtl(lang):
+    return lang_code(lang) in RTL
+
+
+def lang_name(lang):
+    c = lang_code(lang) or 'en'
+    return LANG_NAMES.get(c, c)
+
+
+def asr_model(role, lang='en'):
+    """the Whisper model for a job: role 'fast' (reading takes, examples) or 'best' (the caption words)"""
+    if (lang_code(lang) or 'en') == 'en':
+        return 'small.en' if role == 'fast' else 'medium.en'
+    return 'small' if role == 'fast' else 'large-v3-turbo'
+
+
+def asr_options(lang='en', prompt=None):
+    """keyword arguments for WhisperModel.transcribe: the language, and the names prompt only when it is in that
+    language (an English prompt on Arabic speech makes Whisper translate or write Latin letters)"""
+    c = lang_code(lang) or 'en'
+    out = {'language': c}
+    latin = not re.search(r'[^\x00-ɏ]', prompt or '')
+    if prompt and not (latin and c in NON_LATIN):
+        out['initial_prompt'] = prompt
+    return out
+
+
 def my_fonts_dir(state=None):
     """Font files fetched for the buyer's own style (get_font.py). build_reel.py copies them into every project."""
     return os.path.join(state or state_dir(), 'fonts')

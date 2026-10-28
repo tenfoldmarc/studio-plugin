@@ -36,9 +36,9 @@ def guess_title(words):
     line = []
     for w in words:
         line.append(w['text'])
-        if w['text'][-1:] in ',.?!' and len(line) >= 3 or len(line) >= 9:
+        if w['text'][-1:] in ',.?!،؟؛' and len(line) >= 3 or len(line) >= 9:     # Arabic comma and question mark too
             break
-    line = [t.strip(',.?!;:') for t in line]
+    line = [t.strip(',.?!;:،؟؛') for t in line]
     if len(line) < 2:
         return [' '.join(line), '']
     k = min(range(1, len(line)), key=lambda k: abs(len(' '.join(line[:k])) - len(' '.join(line[k:]))))
